@@ -8,7 +8,7 @@ from sqlalchemy import Integer, String, Float, ForeignKey, DateTime, Enum
 # from sqlalchemy.dialects.postgresql import JSON
 
 import enum
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime, timezone
 
 
@@ -20,12 +20,26 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(String(64))
     email: Mapped[str] = mapped_column(String(64), index=True, unique=True)
     image_path: Mapped[Optional[str]] = mapped_column(String(256))
-    status: Mapped[int] = mapped_column(Integer, default=0)
+    
+    # Role relationship (users can have multiple roles)
+    role_id: Mapped[Optional[int]] = mapped_column(ForeignKey('roles.id'))
+    role: Mapped["Roles"] = relationship("Roles", backref="users")
+
+    class Status(enum.Enum):
+        PENDING = "pending"
+        ACTIVE = "active"
+        INACTIVE = "inactive"
+        BANNED = "banned"
+
+    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING.value)
     company: Mapped[str] = mapped_column(String(64))
     password_hash: Mapped[Optional[str]] = mapped_column(String(256))
+    location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
+    location: WriteOnlyMapped["Location"] = relationship("Location", back_populates="users")
 
     def __repr__(self):
         return f"<User {self.name}>"
+
 
 class Roles(db.Model):
     """
@@ -41,7 +55,15 @@ class Equipment(db.Model):
     """
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(64))
-    # images: Mapped[list[str]] = mapped_column(JSON, default=list)
+    price_per_day: Mapped[float] = mapped_column(Float, nullable=False, default=100_000.0)
+
+    class Status(enum.Enum):
+        AVAILABLE = "available"
+        MAINTENANCE = "maintenance"
+        RENTED = "rented"
+    
+    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.AVAILABLE.value)
+
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
     location: WriteOnlyMapped["Location"] = relationship("Location", back_populates="equipment")
 
@@ -64,7 +86,8 @@ class Location(db.Model):
     object_id: Mapped[Optional[int]] = mapped_column(nullable=True)
     object_type: Mapped[Optional[str]] = mapped_column(String(64))
 
-    equipment: WriteOnlyMapped[list["Equipment"]] = relationship("Equipment", back_populates="location")
+    users: WriteOnlyMapped[List["User"]] = relationship("User", back_populates="location")
+    equipment: WriteOnlyMapped[List["Equipment"]] = relationship("Equipment", back_populates="location")
 
     def __repr__(self):
         return f"<Location {self.name or self.city}>"
@@ -79,7 +102,7 @@ class Booking(db.Model):
     equipment_id: Mapped[int] = mapped_column(ForeignKey('equipment.id'))
     start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-
+    
     class Status(enum.Enum):
         PENDING = "pending"
         CONFIRMED = "confirmed"
@@ -99,3 +122,5 @@ class Booking(db.Model):
         equipment_name = self.equipment.name if self.equipment else "N/A"
         user_name = self.user.name if self.user else "N/A"
         return f"<Booking {self.id} - {equipment_name} by {user_name}>"
+    
+    
