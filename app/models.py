@@ -65,7 +65,7 @@ class Equipment(db.Model):
         MAINTENANCE = "maintenance"
         RENTED = "rented"
     
-    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.AVAILABLE.value)
+    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.AVAILABLE)
 
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
     location: Mapped[Optional["Location"]] = relationship("Location", back_populates="equipment")
@@ -120,7 +120,6 @@ class Booking(db.Model):
         default=datetime.now(timezone.utc),
         onupdate=datetime.now(timezone.utc))
 
-    # Fixed: Changed WriteOnlyMapped to regular Mapped for many-to-one relationships
     user: Mapped["User"] = relationship("User", back_populates="bookings")
     equipment: Mapped["Equipment"] = relationship("Equipment", back_populates="bookings")
 
