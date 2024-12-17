@@ -6,6 +6,7 @@ from app import db
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from sqlalchemy import Integer, String, Float, ForeignKey, DateTime, Enum, Numeric
 # from sqlalchemy.dialects.postgresql import JSON
+from werkzeug.security import generate_password_hash, check_password_hash
 
 import enum
 from typing import Optional, List
@@ -39,6 +40,12 @@ class User(db.Model):
 
     payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="user")
     bookings: Mapped[List["Booking"]] = relationship("Booking", back_populates="user")
+
+    def set_password(self, password: str) -> None:
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password: str) -> bool:
+        return check_password_hash(self.password_hash, password)
 
     def __repr__(self) -> str:
         return f"<User {self.name}>"
