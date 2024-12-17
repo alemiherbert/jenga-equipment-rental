@@ -31,7 +31,7 @@ class User(db.Model):
         INACTIVE = "inactive"
         BANNED = "banned"
 
-    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING.value)
+    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING)
     company: Mapped[str] = mapped_column(String(64))
     password_hash: Mapped[Optional[str]] = mapped_column(String(256))
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
@@ -128,7 +128,7 @@ class Booking(db.Model):
         CANCELLED = "cancelled"
         COMPLETED = "completed"
     
-    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING.value)
+    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING)
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.now(timezone.utc),
@@ -168,7 +168,7 @@ class Payment(db.Model):
         FAILED = "failed"
         REFUNDED = "refunded"
     
-    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING.value)
+    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING)
     
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(
@@ -184,5 +184,5 @@ class Payment(db.Model):
     user: Mapped["User"] = relationship("User", back_populates="payments")
     
     def __repr__(self) -> str:
-        return f"<Payment {self.id} - {self.total_amount} {self.currency} - {self.status.value}>"
+        return f"<Payment {self.id} - {self.total_amount} {self.currency} - {self.status}>"
 
