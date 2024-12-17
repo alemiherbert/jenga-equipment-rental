@@ -21,5 +21,7 @@ def create_app(test_config=None) -> Flask:
     migrate.init_app(app, db)
 
     from app.auth import auth
+    from app.main import main
     app.register_blueprint(auth)
+    app.register_blueprint(main)
     return app
