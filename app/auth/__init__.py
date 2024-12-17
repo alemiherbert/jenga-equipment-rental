@@ -4,5 +4,5 @@ The authentification blueprint
 
 from flask import Blueprint
 
-auth = Blueprint(__name__, "auth", url_prefix="auth/")
-import routes
+auth = Blueprint("auth", __name__, url_prefix="/auth")
+from app.auth import routes

@@ -3,17 +3,19 @@ Authentification routes
 """
 
 from app.auth import auth
+from app.models import User, Role, Equipment, Booking, Location
 
-@auth.route
+
+@auth.route("/login")
 def login():
     """
     Login functionality
     """
-    pass
+    return "Login"
 
-@auth.route
+@auth.route("/register")
 def register():
     """
     Registration functionality
     """
-    pass
+    return "Register"
