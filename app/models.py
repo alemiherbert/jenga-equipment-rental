@@ -55,6 +55,7 @@ class Equipment(db.Model):
     """
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(64))
+    # images: Mapped[list[str]] = mapped_column(JSON, default=list)
     price_per_day: Mapped[float] = mapped_column(Float, nullable=False, default=100_000.0)
 
     class Status(enum.Enum):
