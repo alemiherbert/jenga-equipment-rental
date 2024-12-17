@@ -3,7 +3,7 @@ Application Models
 """
 
 from app import db
-from sqlalchemy.orm import mapped_column, relationship, Mapped, WriteOnlyMapped
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 from sqlalchemy import Integer, String, Float, ForeignKey, DateTime, Enum
 # from sqlalchemy.dialects.postgresql import JSON
 
@@ -35,7 +35,9 @@ class User(db.Model):
     company: Mapped[str] = mapped_column(String(64))
     password_hash: Mapped[Optional[str]] = mapped_column(String(256))
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
-    location: WriteOnlyMapped["Location"] = relationship("Location", back_populates="users")
+    location: Mapped[Optional["Location"]] = relationship("Location", back_populates="users")
+
+    bookings: Mapped[List["Booking"]] = relationship("Booking", back_populates="user")
 
     def __repr__(self) -> str:
         return f"<User {self.name}>"
@@ -66,7 +68,9 @@ class Equipment(db.Model):
     status: Mapped[Status] = mapped_column(Enum(Status), default=Status.AVAILABLE.value)
 
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
-    location: WriteOnlyMapped["Location"] = relationship("Location", back_populates="equipment")
+    location: Mapped[Optional["Location"]] = relationship("Location", back_populates="equipment")
+    
+    bookings: Mapped[List["Booking"]] = relationship("Booking", back_populates="equipment")
 
     def __repr__(self) -> str:
         return f"<Equipment {self.name} at Location {self.location.name if self.location else 'N/A'}>"
@@ -87,8 +91,8 @@ class Location(db.Model):
     object_id: Mapped[Optional[int]] = mapped_column(nullable=True)
     object_type: Mapped[Optional[str]] = mapped_column(String(64))
 
-    users: WriteOnlyMapped[List["User"]] = relationship("User", back_populates="location")
-    equipment: WriteOnlyMapped[List["Equipment"]] = relationship("Equipment", back_populates="location")
+    users: Mapped[List["User"]] = relationship("User", back_populates="location")
+    equipment: Mapped[List["Equipment"]] = relationship("Equipment", back_populates="location")
 
     def __repr__(self) -> str:
         return f"<Location {self.name or self.city}>"
@@ -116,12 +120,13 @@ class Booking(db.Model):
         default=datetime.now(timezone.utc),
         onupdate=datetime.now(timezone.utc))
 
-    user: WriteOnlyMapped["User"] = relationship("User", back_populates="bookings")
-    equipment: WriteOnlyMapped["Equipment"] = relationship("Equipment", back_populates="bookings")
+    # Fixed: Changed WriteOnlyMapped to regular Mapped for many-to-one relationships
+    user: Mapped["User"] = relationship("User", back_populates="bookings")
+    equipment: Mapped["Equipment"] = relationship("Equipment", back_populates="bookings")
 
     def __repr__(self) -> str:
         equipment_name = self.equipment.name if self.equipment else "N/A"
         user_name = self.user.name if self.user else "N/A"
         return f"<Booking {self.id} - {equipment_name} by {user_name}>"
-    
-    
+
+
