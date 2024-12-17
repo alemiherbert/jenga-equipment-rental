@@ -37,6 +37,7 @@ class User(db.Model):
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
     location: Mapped[Optional["Location"]] = relationship("Location", back_populates="users")
 
+    payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="user")
     bookings: Mapped[List["Booking"]] = relationship("Booking", back_populates="user")
 
     def __repr__(self) -> str:
