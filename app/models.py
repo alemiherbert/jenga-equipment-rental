@@ -22,8 +22,8 @@ class User(db.Model):
     image_path: Mapped[Optional[str]] = mapped_column(String(256))
     
     # Role relationship (users can have multiple roles)
-    role_id: Mapped[Optional[int]] = mapped_column(ForeignKey('roles.id'))
-    role: Mapped["Roles"] = relationship("Roles", backref="users")
+    role_id: Mapped[Optional[int]] = mapped_column(ForeignKey('role.id'))
+    role: Mapped["Role"] = relationship("Role", backref="users")
 
     class Status(enum.Enum):
         PENDING = "pending"
@@ -37,11 +37,11 @@ class User(db.Model):
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
     location: WriteOnlyMapped["Location"] = relationship("Location", back_populates="users")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<User {self.name}>"
 
 
-class Roles(db.Model):
+class Role(db.Model):
     """
     Role model
     """
@@ -55,7 +55,7 @@ class Equipment(db.Model):
     """
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(64))
-    # images: Mapped[list[str]] = mapped_column(JSON, default=list)
+    # images: Mapped[List[str]] = mapped_column(JSON, default=List)
     price_per_day: Mapped[float] = mapped_column(Float, nullable=False, default=100_000.0)
 
     class Status(enum.Enum):
@@ -68,7 +68,7 @@ class Equipment(db.Model):
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
     location: WriteOnlyMapped["Location"] = relationship("Location", back_populates="equipment")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Equipment {self.name} at Location {self.location.name if self.location else 'N/A'}>"
 
 
@@ -90,7 +90,7 @@ class Location(db.Model):
     users: WriteOnlyMapped[List["User"]] = relationship("User", back_populates="location")
     equipment: WriteOnlyMapped[List["Equipment"]] = relationship("Equipment", back_populates="location")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Location {self.name or self.city}>"
 
 
@@ -119,7 +119,7 @@ class Booking(db.Model):
     user: WriteOnlyMapped["User"] = relationship("User", back_populates="bookings")
     equipment: WriteOnlyMapped["Equipment"] = relationship("Equipment", back_populates="bookings")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         equipment_name = self.equipment.name if self.equipment else "N/A"
         user_name = self.user.name if self.user else "N/A"
         return f"<Booking {self.id} - {equipment_name} by {user_name}>"
