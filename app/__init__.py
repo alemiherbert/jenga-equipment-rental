@@ -8,7 +8,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import select
 from flask_migrate import Migrate
-from flask_jwt_extended import JWTManager # type: ignore for now
+from flask_jwt_extended import JWTManager
 from config import Config
 
 db = SQLAlchemy()
@@ -53,8 +53,8 @@ def create_app(test_config=None) -> Flask:
         identity = jwt_data["sub"]
         return User.query.filter_by(id=identity).one_or_none()
 
-    from app.auth import auth
+    from app.api import api
     from app.main import main
-    app.register_blueprint(auth)
+    app.register_blueprint(api)
     app.register_blueprint(main)
     return app

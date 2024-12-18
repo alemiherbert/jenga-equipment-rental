@@ -1,14 +1,13 @@
 """
 Application Models
 """
-
 from app import db
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from sqlalchemy import select, String, Float, ForeignKey, DateTime, Enum, Numeric
 # from sqlalchemy.dialects.postgresql import JSON
 from flask import url_for
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token
 
 import enum
 from typing import Optional, List
@@ -101,7 +100,7 @@ class User(PaginatedAPIMixin, db.Model):
             'image_path': self.image_path,
             'last_login': self.last_login.isoformat() if self.last_login else None,
             '_links': {
-                'self': url_for('main.get_user', user_id=self.id)
+                'self': url_for('api.get_user', user_id=self.id)
             }
         }
         if include_email:
@@ -202,7 +201,7 @@ class Equipment(PaginatedAPIMixin, db.Model):
             'location': self.location.name if self.location else None,
             'stripe_product_id': self.stripe_product_id,
             '_links': {
-                'self': url_for('main.get_equipment', equipment_id=self.id)
+                'self': url_for('api.get_equipment', equipment_id=self.id)
             }
         }
 
@@ -242,7 +241,7 @@ class Location(PaginatedAPIMixin, db.Model):
             'object_id': self.object_id,
             'object_type': self.object_type,
             '_links': {
-                'self': url_for('main.get_location', location_id=self.id)
+                'self': url_for('api.get_location', location_id=self.id)
             }
         }
 
@@ -304,9 +303,9 @@ class Booking(PaginatedAPIMixin, db.Model):
             'equipment_name': self.equipment.name if self.equipment else None,
             'user_name': self.user.name if self.user else None,
             '_links': {
-                'self': url_for('main.get_booking', booking_id=self.id),
-                'user': url_for('main.get_user', user_id=self.user_id),
-                'equipment': url_for('main.get_equipment', equipment_id=self.equipment_id)
+                'self': url_for('api.get_booking', booking_id=self.id),
+                'user': url_for('api.get_user', user_id=self.user_id),
+                'equipment': url_for('api.get_equipment', equipment_id=self.equipment_id)
             }
         }
 
@@ -371,9 +370,9 @@ class Payment(db.Model):
             'updated_at': self.updated_at.isoformat(),
             'booking_equipment_name': self.booking.equipment.name if self.booking and self.booking.equipment else None,
             '_links': {
-                'self': url_for('main.get_payment', payment_id=self.id),
-                'booking': url_for('main.get_booking', booking_id=self.booking_id) if self.booking_id else None,
-                'user': url_for('main.get_user', user_id=self.user_id)
+                'self': url_for('api.get_payment', payment_id=self.id),
+                'booking': url_for('api.get_booking', booking_id=self.booking_id) if self.booking_id else None,
+                'user': url_for('api.get_user', user_id=self.user_id)
             }
         }
    

@@ -55,7 +55,7 @@ class TestAuthRoutes:
     def test_register_success(self, client, test_user_data):
         """Test successful user registration."""
         response = client.post(
-            '/auth/register',
+            '/api/register',
             data=json.dumps(test_user_data),
             content_type='application/json'
         )
@@ -77,7 +77,7 @@ class TestAuthRoutes:
         }
         
         response = client.post(
-            '/auth/register',
+            '/api/register',
             data=json.dumps(incomplete_data),
             content_type='application/json'
         )
@@ -92,7 +92,7 @@ class TestAuthRoutes:
         test_user_data["email"] = "invalid-email"
         
         response = client.post(
-            '/auth/register',
+            '/api/register',
             data=json.dumps(test_user_data),
             content_type='application/json'
         )
@@ -106,7 +106,7 @@ class TestAuthRoutes:
         test_user_data["email"] = "invalid-email"
         
         response = client.post(
-            '/auth/register',
+            '/api/register',
             data=json.dumps(test_user_data),
             content_type='application/json'
         )
@@ -118,7 +118,7 @@ class TestAuthRoutes:
     def test_register_duplicate_email(self, client, test_user_data, registered_user):
         """Test registration with already registered email."""
         response = client.post(
-            '/auth/register',
+            '/api/register',
             data=json.dumps(test_user_data),
             content_type='application/json'
         )
@@ -137,7 +137,7 @@ class TestAuthRoutes:
         }
         
         response = client.post(
-            '/auth/login',
+            '/api/login',
             data=json.dumps(login_data),
             content_type='application/json'
         )
@@ -155,7 +155,7 @@ class TestAuthRoutes:
         }
         
         response = client.post(
-            '/auth/login',
+            '/api/login',
             data=json.dumps(login_data),
             content_type='application/json'
         )
@@ -170,7 +170,7 @@ class TestAuthRoutes:
         login_data = {"email": "test@example.com"}
         
         response = client.post(
-            '/auth/login',
+            '/api/login',
             data=json.dumps(login_data),
             content_type='application/json'
         )
@@ -188,7 +188,7 @@ class TestAuthRoutes:
             "password": test_user_data["password"]
         }
         login_response = client.post(
-            '/auth/login',
+            '/api/login',
             data=json.dumps(login_data),
             content_type='application/json'
         )
@@ -196,7 +196,7 @@ class TestAuthRoutes:
         
         # Then logout using the token
         response = client.delete(
-            '/auth/logout',
+            '/api/logout',
             headers={"Authorization": f"Bearer {access_token}"}
         )
         
@@ -206,7 +206,7 @@ class TestAuthRoutes:
 
     def test_logout_without_token(self, client):
         """Test logout without authentication token."""
-        response = client.delete('/auth/logout')
+        response = client.delete('/api/logout')
         
         assert response.status_code == 401
         data = json.loads(response.data)
@@ -215,7 +215,7 @@ class TestAuthRoutes:
     def test_logout_with_invalid_token(self, client):
         """Test logout with invalid token."""
         response = client.delete(
-            '/auth/logout',
+            '/api/logout',
             headers={"Authorization": "Bearer invalid_token"}
         )
         

@@ -3,15 +3,15 @@ Authentication Routes
 """
 
 from app import db
-from app.auth import auth
-from app.auth.utils import error_response, validate_fields
+from app.api import api
+from app.api.utils import error_response, validate_fields
 from app.models import User, TokenBlocklist
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt
 import validators
 from datetime import datetime, timezone
 
-@auth.route("/login", methods=["POST"])
+@api.route("/login", methods=["POST"])
 def login():
     """
     User login route.
@@ -36,7 +36,7 @@ def login():
     return jsonify(tokens), 200
 
 
-@auth.route("/register", methods=["POST"])
+@api.route("/register", methods=["POST"])
 def register():
     """
     User registration route.
@@ -98,7 +98,7 @@ def register():
         db.session.rollback()
         return jsonify({"msg": "Error creating user", "error": str(e)}), 500
 
-@auth.route("/logout", methods=["DELETE"])
+@api.route("/logout", methods=["DELETE"])
 @jwt_required()
 def logout():
     """
