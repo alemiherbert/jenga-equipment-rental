@@ -51,6 +51,7 @@ def register():
     email = request.json.get("email")
     password = request.json.get("password")
     name = request.json.get("name")
+    company = request.json.get("company")
 
     # Validate required fields
     # Todo: Validate emails
@@ -64,9 +65,11 @@ def register():
     try:
         new_user = User(
             email=email,
-            password_hash=generate_password_hash(password),
-            name=name
+            name=name,
+            company=company
         )
+        # Todo: Obtain and store user location
+        new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
         
