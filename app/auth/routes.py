@@ -81,6 +81,7 @@ def register():
         new_user = User(
             name=required_fields["name"],
             email=required_fields["email"],
+            phone=required_fields["phone"],            
             company=required_fields["company"],
         )
         new_user.set_password(required_fields["password"])
