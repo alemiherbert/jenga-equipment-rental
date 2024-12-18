@@ -4,13 +4,14 @@ Application Models
 
 from app import db
 from sqlalchemy.orm import mapped_column, relationship, Mapped
-from sqlalchemy import Integer, String, Float, ForeignKey, DateTime, Enum, Numeric
+from sqlalchemy import select, String, Float, ForeignKey, DateTime, Enum, Numeric
 # from sqlalchemy.dialects.postgresql import JSON
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
 
 import enum
 from typing import Optional, List
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 
 class User(db.Model):
@@ -20,10 +21,11 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(64))
     email: Mapped[str] = mapped_column(String(64), index=True, unique=True)
+    phone: Mapped[str] = mapped_column(String(64), index=True, unique=True)
     image_path: Mapped[Optional[str]] = mapped_column(String(256))
     
     # Role relationship (users can have multiple roles)
-    role_id: Mapped[Optional[int]] = mapped_column(ForeignKey('role.id'))
+    role_id: Mapped[Optional[int]] = mapped_column(ForeignKey("role.id"))
     role: Mapped["Role"] = relationship("Role", backref="users")
 
     class Status(enum.Enum):
@@ -46,6 +48,30 @@ class User(db.Model):
     
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
+
+    def get_tokens(self) -> dict:
+        """Generate access and refresh tokensr"""
+        access_token = create_access_token(
+            identity=self.email,
+            fresh=True,
+            expires_delta=timedelta(minutes=15)
+        )
+        
+        refresh_token = create_refresh_token(
+            identity=self.email,
+            expires_delta=timedelta(days=7)
+        )
+        
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }
+    
+    @staticmethod
+    def verify_by_email(email: str):
+        """Verify if user exists using their email"""
+        return db.session.scalar(select(User).where(User.email == email))
+
 
     def __repr__(self) -> str:
         return f"<User {self.name}>"
@@ -114,8 +140,8 @@ class Booking(db.Model):
     Booking model
     """
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
-    equipment_id: Mapped[int] = mapped_column(ForeignKey('equipment.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    equipment_id: Mapped[int] = mapped_column(ForeignKey("equipment.id"))
     start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     

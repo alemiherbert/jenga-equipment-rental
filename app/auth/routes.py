@@ -6,8 +6,6 @@ from app import db
 from app.auth import auth
 from app.models import User, Role, Equipment, Booking, Location
 from flask import jsonify, request
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
-from sqlalchemy import select
 import validators
 
 @auth.route("/login", methods=["POST"])
@@ -27,13 +25,12 @@ def login():
     if not email or not password:
         return jsonify({"msg": "Missing email or password"}), 400
 
-    user = db.session.scalar(select(User).where(User.email == email))
-    
+    user = User.verify_by_email(email)    
     if user is None or not user.check_password(password):
         return jsonify({"msg": "Bad username or password"}), 401
 
-    access_token = create_access_token(identity=email)
-    return jsonify(access_token=access_token)
+    tokens = user.get_tokens()
+    return jsonify(tokens)
 
 
 @auth.route("/register", methods=["POST"])
@@ -81,7 +78,7 @@ def register():
             elif func != validators.length and not func(value):
                 return jsonify({"msg": f"Invalid {field} format"}), 400
 
-    existing_user = db.session.scalar(select(User).where(User.email == email))
+    existing_user = User.verify_by_email(email)
     if existing_user:
         return jsonify({"msg": "Email already registered!"}), 409
 
@@ -97,10 +94,10 @@ def register():
         db.session.commit()
         
         # Generate access token
-        access_token = create_access_token(identity=email)
+        tokens = new_user.get_tokens()
         return jsonify({
             "msg": "User registered successfully",
-            "access_token": access_token
+            "tokens": tokens
         }), 201
 
     except Exception as e:

@@ -51,6 +51,7 @@ def test_user(app, test_role, test_location):
     user = User(
         name="Alemi Herbert",
         email="alemiherbert@example.com",
+        phone="0772345678",
         company="Alemi Consulting",
         role=test_role,
         location=test_location,
@@ -134,6 +135,7 @@ class TestUserModel:
         assert test_user.id is not None
         assert test_user.name == "Alemi Herbert"
         assert test_user.email == "alemiherbert@example.com"
+        assert test_user.phone == "0772345678"
         assert test_user.status == User.Status.ACTIVE
 
     def test_user_role_relationship(self, test_user, test_role):
