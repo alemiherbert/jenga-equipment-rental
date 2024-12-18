@@ -85,7 +85,7 @@ class User(PaginatedAPIMixin, db.Model):
     token_version: Mapped[int] = mapped_column(default=0)
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
-    payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="user")
+    payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="user") # type: ignore
     bookings: Mapped[List["Booking"]] = relationship("Booking", back_populates="user")
 
     def to_dict(self, include_email=True):
@@ -101,7 +101,7 @@ class User(PaginatedAPIMixin, db.Model):
             'image_path': self.image_path,
             'last_login': self.last_login.isoformat() if self.last_login else None,
             '_links': {
-                'self': url_for('api.get_user', user_id=self.id)
+                'self': url_for('main.get_user', user_id=self.id)
             }
         }
         if include_email:
@@ -202,7 +202,7 @@ class Equipment(PaginatedAPIMixin, db.Model):
             'location': self.location.name if self.location else None,
             'stripe_product_id': self.stripe_product_id,
             '_links': {
-                'self': url_for('api.get_equipment', equipment_id=self.id)
+                'self': url_for('main.get_equipment', equipment_id=self.id)
             }
         }
 
@@ -210,7 +210,7 @@ class Equipment(PaginatedAPIMixin, db.Model):
         return f"<Equipment {self.name} at Location {self.location.name if self.location else 'N/A'}>"
 
 
-class Location(db.Model):
+class Location(PaginatedAPIMixin, db.Model):
     """
     Generic Location model
     """
@@ -228,11 +228,29 @@ class Location(db.Model):
     users: Mapped[List["User"]] = relationship("User", back_populates="location")
     equipment: Mapped[List["Equipment"]] = relationship("Equipment", back_populates="location")
 
+    def to_dict(self):
+        """Serialize location object to dictionary"""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'address': self.address,
+            'city': self.city,
+            'region': self.region,
+            'country': self.country,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'object_id': self.object_id,
+            'object_type': self.object_type,
+            '_links': {
+                'self': url_for('main.get_location', location_id=self.id)
+            }
+        }
+
     def __repr__(self) -> str:
         return f"<Location {self.name or self.city}>"
 
 
-class Booking(db.Model):
+class Booking(PaginatedAPIMixin, db.Model):
     """
     Booking model
     """
@@ -266,53 +284,33 @@ class Booking(db.Model):
 
     user: Mapped["User"] = relationship("User", back_populates="bookings")
     equipment: Mapped["Equipment"] = relationship("Equipment", back_populates="bookings")
-    payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="booking")
+    payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="booking") # type: ignore
+
+    def to_dict(self):
+        """Serialize booking object to dictionary"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'equipment_id': self.equipment_id,
+            'start_date': self.start_date.isoformat(),
+            'end_date': self.end_date.isoformat(),
+            'distance_km': self.distance_km,
+            'rental_amount': float(self.rental_amount),
+            'transport_amount': float(self.transport_amount),
+            'total_amount': float(self.total_amount),
+            'currency': self.currency,
+            'status': self.status.value,
+            'created_at': self.created_at.isoformat(),
+            'equipment_name': self.equipment.name if self.equipment else None,
+            'user_name': self.user.name if self.user else None,
+            '_links': {
+                'self': url_for('main.get_booking', booking_id=self.id),
+                'user': url_for('main.get_user', user_id=self.user_id),
+                'equipment': url_for('main.get_equipment', equipment_id=self.equipment_id)
+            }
+        }
 
     def __repr__(self) -> str:
         equipment_name = self.equipment.name if self.equipment else "N/A"
         user_name = self.user.name if self.user else "N/A"
         return f"<Booking {self.id} - {equipment_name} by {user_name}>"
-
-
-class Payment(db.Model):
-    """
-    Payment model for tracking payments
-    """
-    id: Mapped[int] = mapped_column(primary_key=True)
-    booking_id: Mapped[int] = mapped_column(ForeignKey("booking.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    
-    rental_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
-    transport_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
-    total_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
-    currency: Mapped[str] = mapped_column(String(3), default="UGX")
-    
-    # Stripe stuff
-    stripe_payment_intent_id: Mapped[Optional[str]] = mapped_column(String(128))
-    stripe_payment_method_id: Mapped[Optional[str]] = mapped_column(String(128))
-    
-    class Status(enum.Enum):
-        PENDING = "pending"
-        PROCESSING = "processing"
-        SUCCEEDED = "succeeded"
-        FAILED = "failed"
-        REFUNDED = "refunded"
-    
-    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING)
-    
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc)
-    )
-    
-    # Payment metadata to store additional Stripe webhook data. Not needed right now.
-    # metadata: Mapped[Optional[dict]] = mapped_column(JSON)
-    
-    booking: Mapped["Booking"] = relationship("Booking", back_populates="payments")
-    user: Mapped["User"] = relationship("User", back_populates="payments")
-    
-    def __repr__(self) -> str:
-        return f"<Payment {self.id} - {self.total_amount} {self.currency} - {self.status}>"
-
