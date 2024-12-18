@@ -5,9 +5,11 @@ Authentication Routes
 from app import db
 from app.auth import auth
 from app.auth.utils import error_response, validate_fields
-from app.models import User, Role, Equipment, Booking, Location
+from app.models import User, TokenBlocklist
 from flask import jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt
 import validators
+from datetime import datetime, timezone
 
 @auth.route("/login", methods=["POST"])
 def login():
@@ -95,3 +97,25 @@ def register():
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error creating user", "error": str(e)}), 500
+
+@auth.route("/logout", methods=["DELETE"])
+@jwt_required()
+def logout():
+    """
+    Logout user and revoke access token
+    
+    Returns:
+        JSON response indicating logout status
+    """
+    try:
+        jti = get_jwt()["jti"]
+        now = datetime.now(timezone.utc)
+        
+        # Store the revoked token
+        db.session.add(TokenBlocklist(jti=jti, created_at=now))
+        db.session.commit()
+        
+        return jsonify({"msg": "Successfully logged out"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error during logout", "error": str(e)}), 500
