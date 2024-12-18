@@ -8,7 +8,6 @@ from app.models import User, Role, Equipment, Booking, Location
 from flask import jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required  # type: ignore
 from sqlalchemy import select
-from werkzeug.security import generate_password_hash
 
 
 @auth.route("/login", methods=["POST"])
