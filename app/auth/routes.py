@@ -1,9 +1,10 @@
 """
-Authentification routes
+Authentication Routes
 """
 
 from app import db
 from app.auth import auth
+from app.auth.utils import error_response, validate_fields
 from app.models import User, Role, Equipment, Booking, Location
 from flask import jsonify, request
 import validators
@@ -11,94 +12,84 @@ import validators
 @auth.route("/login", methods=["POST"])
 def login():
     """
-    Login functionality
-    
+    User login route.
+
     Returns:
-        JSON response with access token or error message
+        JSON response with access token or error message.
     """
     if not request.is_json:
-        return jsonify({"msg": "Missing JSON in request"}), 400
+        return error_response("Missing JSON in request", 400)
 
     email = request.json.get("email")
     password = request.json.get("password")
 
     if not email or not password:
-        return jsonify({"msg": "Missing email or password"}), 400
+        return error_response("Missing email or password", 400)
 
-    user = User.verify_by_email(email)    
+    user = User.verify_by_email(email)
     if user is None or not user.check_password(password):
-        return jsonify({"msg": "Bad username or password"}), 401
+        return error_response("Invalid email or password", 401)
 
     tokens = user.get_tokens()
-    return jsonify(tokens)
+    return jsonify(tokens), 200
 
 
 @auth.route("/register", methods=["POST"])
 def register():
     """
-    Registration functionality
-    
+    User registration route.
+
     Returns:
-        JSON response with success message or error details
+        JSON response with success message or error details.
     """
     if not request.is_json:
-        return jsonify({"msg": "Missing JSON in request"}), 400
+        return error_response("Missing JSON in request", 400)
 
-    name = request.json.get("name")
-    email = request.json.get("email")
-    phone = request.json.get("phone")
-    company = request.json.get("company")
-    password = request.json.get("password")
-
-
-    # Validate required fields
+    # Extract required fields
     required_fields = {
-        "name": name,
-        "email": email,
-        "phone": phone,
-        "company": company,
-        "password": password,
+        "name": request.json.get("name"),
+        "email": request.json.get("email"),
+        "phone": request.json.get("phone"),
+        "company": request.json.get("company"),
+        "password": request.json.get("password"),
     }
-    
-    if missing_fields := [field for field, value in required_fields.items() if not value]:
-        return jsonify({"msg": f"Missing required fields: [{', '.join(missing_fields)}]"}), 400
-    
+
+    # Check for missing fields
+    missing_fields = [field for field, value in required_fields.items() if not value]
+    if missing_fields:
+        return error_response(f"Missing required fields: {', '.join(missing_fields)}", 400)
+
+    # Validation rules
     validations = {
         "name": [validators.length],
         "email": [validators.length, validators.email],
         "phone": [validators.length],
-        "company": [validators.length]
+        "company": [validators.length],
     }
-    
-    for field, funcs in validations.items():
-        value = required_fields[field]
-        for func in funcs:
-            if func == validators.length and not func(value, max_val=64):
-                return jsonify({"msg": f"{field.title()} must not exceed 64 characters"}), 400
-            elif func != validators.length and not func(value):
-                return jsonify({"msg": f"Invalid {field} format"}), 400
 
-    existing_user = User.verify_by_email(email)
-    if existing_user:
-        return jsonify({"msg": "Email already registered!"}), 409
+    # Validate fields
+    is_valid, error_message = validate_fields(required_fields, validations)
+    if not is_valid:
+        return error_response(error_message, 400)
 
+    # Check if the email is already registered
+    if User.verify_by_email(required_fields["email"]):
+        return error_response("Email already registered", 409)
+
+    # Create new user
     try:
         new_user = User(
-            email=email,
-            name=name,
-            company=company
+            name=required_fields["name"],
+            email=required_fields["email"],
+            company=required_fields["company"],
         )
-        # Todo: Obtain and store user location
-        new_user.set_password(password)
+        new_user.set_password(required_fields["password"])
         db.session.add(new_user)
         db.session.commit()
-        
-        # Generate access token
+
+        # Generate tokens
         tokens = new_user.get_tokens()
-        return jsonify({
-            "msg": "User registered successfully",
-            "tokens": tokens
-        }), 201
+        return jsonify({"msg": "User registered successfully", "tokens": tokens}), 201
 
     except Exception as e:
         db.session.rollback()
