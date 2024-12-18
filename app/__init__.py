@@ -24,7 +24,7 @@ def create_app(test_config=None) -> Flask:
     migrate.init_app(app, db)
     jwt.init_app(app)
     
-    from app.models import TokenBlocklist
+    from app.models import User, TokenBlocklist
 
     def setup_jwt_callbacks(app):
         """Set up JWT callbacks for token verification"""
@@ -37,6 +37,21 @@ def create_app(test_config=None) -> Flask:
                 select(TokenBlocklist).where(TokenBlocklist.jti == jti)
             )
             return token is not None
+
+    @jwt.user_identity_loader
+    def user_identity_lookup(user):
+        """
+        Convert user entered as identity into serialisable object
+        """
+        return user.id
+
+    @jwt.user_lookup_loader
+    def user_lookup_callback(_jwt_header, jwt_data):
+        """
+        Loads a user from your database whenever a protected route is accessed.
+        """
+        identity = jwt_data["sub"]
+        return User.query.filter_by(id=identity).one_or_none()
 
     from app.auth import auth
     from app.main import main

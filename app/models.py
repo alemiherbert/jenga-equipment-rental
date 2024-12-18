@@ -72,7 +72,7 @@ class User(db.Model):
         db.session.commit()
         
         access_token = create_access_token(
-            identity=self.email,
+            identity=self,
             fresh=True,
             expires_delta=timedelta(minutes=15),
             additional_claims={
@@ -83,7 +83,7 @@ class User(db.Model):
         )
         
         refresh_token = create_refresh_token(
-            identity=self.email,
+            identity=self,
             expires_delta=timedelta(days=7),
             additional_claims={
                 "token_version": self.token_version
