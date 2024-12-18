@@ -314,3 +314,68 @@ class Booking(PaginatedAPIMixin, db.Model):
         equipment_name = self.equipment.name if self.equipment else "N/A"
         user_name = self.user.name if self.user else "N/A"
         return f"<Booking {self.id} - {equipment_name} by {user_name}>"
+
+
+class Payment(db.Model):
+    """
+    Payment model for tracking payments
+    """
+    id: Mapped[int] = mapped_column(primary_key=True)
+    booking_id: Mapped[int] = mapped_column(ForeignKey("booking.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    
+    rental_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    transport_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    total_amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    currency: Mapped[str] = mapped_column(String(3), default="UGX")
+    
+    # Stripe stuff
+    stripe_payment_intent_id: Mapped[Optional[str]] = mapped_column(String(128))
+    stripe_payment_method_id: Mapped[Optional[str]] = mapped_column(String(128))
+    
+    class Status(enum.Enum):
+        PENDING = "pending"
+        PROCESSING = "processing"
+        SUCCEEDED = "succeeded"
+        FAILED = "failed"
+        REFUNDED = "refunded"
+    
+    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING)
+    
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc)
+    )
+    
+    # Payment metadata to store additional Stripe webhook data. Not needed right now.
+    # metadata: Mapped[Optional[dict]] = mapped_column(JSON)
+    
+    booking: Mapped["Booking"] = relationship("Booking", back_populates="payments")
+    user: Mapped["User"] = relationship("User", back_populates="payments")
+    
+    def to_dict(self):
+        """Serialize payment object to dictionary"""
+        return {
+            'id': self.id,
+            'booking_id': self.booking_id,
+            'user_id': self.user_id,
+            'rental_amount': float(self.rental_amount),
+            'transport_amount': float(self.transport_amount),
+            'total_amount': float(self.total_amount),
+            'currency': self.currency,
+            'status': self.status.value,
+            'stripe_payment_intent_id': self.stripe_payment_intent_id,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+            'booking_equipment_name': self.booking.equipment.name if self.booking and self.booking.equipment else None,
+            '_links': {
+                'self': url_for('main.get_payment', payment_id=self.id),
+                'booking': url_for('main.get_booking', booking_id=self.booking_id) if self.booking_id else None,
+                'user': url_for('main.get_user', user_id=self.user_id)
+            }
+        }
+   
+    def __repr__(self) -> str:
+        return f"<Payment {self.id} - {self.total_amount} {self.currency} - {self.status}>"
