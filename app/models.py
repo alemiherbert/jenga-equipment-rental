@@ -14,6 +14,18 @@ from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 
 
+class TokenBlocklist(db.Model):
+    """
+    Token blocklist for tracking revoked JWT tokens
+    """
+    id: Mapped[int] = mapped_column(primary_key=True)
+    jti: Mapped[str] = mapped_column(String(36), nullable=False, unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    
+    def __repr__(self) -> str:
+        return f"<TokenBlocklist {self.jti}>"
+
+
 class User(db.Model):
     """
     The User model
@@ -39,6 +51,10 @@ class User(db.Model):
     password_hash: Mapped[Optional[str]] = mapped_column(String(256))
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
     location: Mapped[Optional["Location"]] = relationship("Location", back_populates="users")
+    
+    # Token management
+    token_version: Mapped[int] = mapped_column(default=0)
+    last_login: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
     payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="user")
     bookings: Mapped[List["Booking"]] = relationship("Booking", back_populates="user")
@@ -50,28 +66,46 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def get_tokens(self) -> dict:
-        """Generate access and refresh tokensr"""
+        """Generate access and refresh tokens"""
+        # Update last login timestamp
+        self.last_login = datetime.now(timezone.utc)
+        db.session.commit()
+        
         access_token = create_access_token(
             identity=self.email,
             fresh=True,
-            expires_delta=timedelta(minutes=15)
+            expires_delta=timedelta(minutes=15),
+            additional_claims={
+                "token_version": self.token_version,
+                "role": self.role.name if self.role else None,
+                "status": self.status.value
+            }
         )
         
         refresh_token = create_refresh_token(
             identity=self.email,
-            expires_delta=timedelta(days=7)
+            expires_delta=timedelta(days=7),
+            additional_claims={
+                "token_version": self.token_version
+            }
         )
         
         return {
             "access_token": access_token,
-            "refresh_token": refresh_token
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "expires_in": 900
         }
     
+    def revoke_tokens(self) -> None:
+        """Revoke all tokens for this user"""
+        self.token_version += 1
+        db.session.commit()
+    
     @staticmethod
-    def verify_by_email(email: str):
+    def verify_by_email(email: str) -> Optional["User"]:
         """Verify if user exists using their email"""
         return db.session.scalar(select(User).where(User.email == email))
-
 
     def __repr__(self) -> str:
         return f"<User {self.name}>"
