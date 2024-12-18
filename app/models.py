@@ -6,6 +6,7 @@ from app import db
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from sqlalchemy import select, String, Float, ForeignKey, DateTime, Enum, Numeric
 # from sqlalchemy.dialects.postgresql import JSON
+from flask import url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
 
@@ -26,7 +27,35 @@ class TokenBlocklist(db.Model):
         return f"<TokenBlocklist {self.jti}>"
 
 
-class User(db.Model):
+class PaginatedAPIMixin(object):
+    """
+    Add pagination for HATEOAS compliance
+    """
+    @staticmethod
+    def to_collection_dict(query, page, per_page, endpoint, **kwargs):
+        resources = db.paginate(query, page=page, per_page=per_page,
+                              error_out=False)
+        data = {
+            'items': [item.to_dict() for item in resources.items],
+            '_meta': {
+                'page': page,
+                'per_page': per_page,
+                'total_pages': resources.pages,
+                'total_items': resources.total
+            },
+            '_links': {
+                'self': url_for(endpoint, page=page, per_page=per_page,
+                              **kwargs),
+                'next': url_for(endpoint, page=page + 1, per_page=per_page,
+                              **kwargs) if resources.has_next else None,
+                'prev': url_for(endpoint, page=page - 1, per_page=per_page,
+                              **kwargs) if resources.has_prev else None
+            }
+        }
+        return data
+
+
+class User(PaginatedAPIMixin, db.Model):
     """
     The User model
     """
@@ -58,6 +87,26 @@ class User(db.Model):
 
     payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="user")
     bookings: Mapped[List["Booking"]] = relationship("Booking", back_populates="user")
+
+    def to_dict(self, include_email=True):
+        """Serialize user object to dictionary"""
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'phone': self.phone,
+            'company': self.company,
+            'status': self.status.value,
+            'role': self.role.name if self.role else None,
+            'location': self.location.name if self.location else None,
+            'image_path': self.image_path,
+            'last_login': self.last_login.isoformat() if self.last_login else None,
+            '_links': {
+                'self': url_for('api.get_user', user_id=self.id)
+            }
+        }
+        if include_email:
+            data['email'] = self.email
+        return data
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
@@ -119,7 +168,7 @@ class Role(db.Model):
     name: Mapped[str] = mapped_column(String(64))
 
 
-class Equipment(db.Model):
+class Equipment(PaginatedAPIMixin, db.Model):
     """
     Equipment model
     """
@@ -140,8 +189,22 @@ class Equipment(db.Model):
 
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
     location: Mapped[Optional["Location"]] = relationship("Location", back_populates="equipment")
-    
     bookings: Mapped[List["Booking"]] = relationship("Booking", back_populates="equipment")
+    
+    def to_dict(self):
+        """Serialize equipment object to dictionary"""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'price_per_day': self.price_per_day,
+            'transport_cost_per_km': self.transport_cost_per_km,
+            'status': self.status.value,
+            'location': self.location.name if self.location else None,
+            'stripe_product_id': self.stripe_product_id,
+            '_links': {
+                'self': url_for('api.get_equipment', equipment_id=self.id)
+            }
+        }
 
     def __repr__(self) -> str:
         return f"<Equipment {self.name} at Location {self.location.name if self.location else 'N/A'}>"
