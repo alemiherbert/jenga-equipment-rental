@@ -4,8 +4,8 @@
   "description": "Styles, Scripts and Images for Jenga Equipment Rental",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --mode development --watch",
-    "build": "webpack --mode production"
+    "sass-dev": "sass --watch --update --load-path=node_modules --style=expanded scss:dist/css",
+    "sass-prod": "sass --no-source-map --load-path=node_modules --style=compressed scss:dist/css"
   },
   "author": "Alemi Herbert <alemiherbert@gmail.com>",
   "license": "MIT",
@@ -14,12 +14,6 @@
     "sprucecss": "^2.3.3"
   },
   "devDependencies": {
-    "css-loader": "^7.1.2",
-    "mini-css-extract-plugin": "^2.9.2",
-    "sass": "^1.77.0",
-    "sass-loader": "^16.0.4",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.97.1",
-    "webpack-cli": "^5.1.4"
+    "sass": "^1.76.0"
   }
 }
