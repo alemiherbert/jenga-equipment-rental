@@ -12,4 +12,4 @@ def index():
     """
     Homepage
     """
-    return "<h1>Welcome to Jenga </h1>"
+    return render_template("index.html")
