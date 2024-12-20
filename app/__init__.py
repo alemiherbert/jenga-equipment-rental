@@ -9,11 +9,13 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import select
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from flask_feather import Feather
 from config import Config
 
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
+feather = Feather()
 
 
 def create_app(test_config=None) -> Flask:
@@ -23,6 +25,7 @@ def create_app(test_config=None) -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    feather.init_app(app)
     
     from app.models import User, TokenBlocklist
 
