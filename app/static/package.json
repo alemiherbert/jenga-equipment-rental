@@ -1,19 +1,25 @@
 {
-  "name": "static",
-  "version": "1.0.0",
-  "description": "Styles, Scripts and Images for Jenga Equipment Rental",
-  "main": "index.js",
-  "scripts": {
-    "sass-dev": "sass --watch --update --load-path=node_modules --style=expanded scss:dist/css",
-    "sass-prod": "sass --no-source-map --load-path=node_modules --style=compressed scss:dist/css"
-  },
-  "author": "Alemi Herbert <alemiherbert@gmail.com>",
-  "license": "MIT",
-  "dependencies": {
-    "alpinejs": "^3.14.7",
-    "sprucecss": "^2.3.3"
-  },
-  "devDependencies": {
-    "sass": "^1.76.0"
-  }
+	"name": "static",
+	"version": "1.0.0",
+	"description": "Styles, Scripts and Images for Jenga Equipment Rental",
+	"main": "index.js",
+	"scripts": {
+		"start": "webpack serve",
+		"dev": "webpack --mode development --watch",
+		"build": "webpack --mode production",
+		"sass-dev": "sass --watch --update --load-path=node_modules --style=expanded scss:dist/css",
+		"sass-prod": "sass --no-source-map --load-path=node_modules --style=compressed scss:dist/css"
+	},
+	"author": "Alemi Herbert <alemiherbert@gmail.com>",
+	"license": "MIT",
+	"dependencies": {
+		"@alpinejs/focus": "^3.14.7",
+		"alpinejs": "^3.14.7",
+		"sprucecss": "^2.3.3"
+	},
+	"devDependencies": {
+		"sass": "^1.76.0",
+		"webpack": "^5.97.1",
+		"webpack-cli": "^5.1.4"
+	}
 }

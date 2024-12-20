@@ -8,7 +8,7 @@ $color-danger: hsl(0deg 71% 51%);
 
 @use 'sprucecss/scss/spruce' with (
   $btn: (
-    'font-family': #{'Manrope', sans-serif},
+    'font-family': #{'Lexend', sans-serif},
     'font-weight': 600,
   ),
   $btn-lg: (
@@ -117,15 +117,15 @@ $color-danger: hsl(0deg 71% 51%);
     'row-container-inline-size': 40rem,
   ),
   $form-label: (
-    'font-family': #{'Manrope', sans-serif},
+    'font-family': #{'Lexend', sans-serif},
     'font-weight': 600,
   ),
   $form-select: (
     'padding-right': 2.5rem,
   ),
   $typography: (
-    'font-family-base': #{'Open Sans', sans-serif},
-    'font-family-heading': #{'Manrope', sans-serif},
+    'font-family-base': #{'Lexend', sans-serif},
+    'font-family-heading': #{'Lexend', sans-serif},
     'font-size-base': 0.938rem,
     'font-weight-heading': 600,
   ),
