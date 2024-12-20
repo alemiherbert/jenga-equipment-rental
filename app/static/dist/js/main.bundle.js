@@ -1,5 +1,4 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./node_modules/@alpinejs/focus/dist/module.esm.js":
@@ -8,6 +7,7 @@
   \*********************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ module_default),
@@ -1045,6 +1045,7 @@ focus-trap/dist/focus-trap.esm.js:
   \**************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Alpine: () => (/* binding */ src_default),
@@ -4456,6 +4457,122 @@ var module_default = src_default;
 
 
 
+/***/ }),
+
+/***/ "./src/js/components/search.js":
+/*!*************************************!*\
+  !*** ./src/js/components/search.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const searchComponent = (() => ({
+    notificationOpen: false,
+    sidebarOpen: false,
+    search: {
+        blank: false,
+        count: window.search.length,
+        items: window.search,
+        open: false,
+        term: '',
+        show() {
+            this.open = true;
+            setTimeout(() => $focus.focus($refs.searchInput), 250);
+        },
+        close() {
+            this.open = false;
+            $refs.searchOpen.focus();
+        },
+        filteredItems() {
+            if (this.term === '') {
+                return this.items;
+            }
+            const result = this.items.filter((item) => {
+                return item.caption
+                    .replace(/ /g, '')
+                    .toLowerCase()
+                    .includes(this.term.replace(/ /g, '').toLowerCase());
+            });
+            this.blank = result.length === 0;
+            this.count = result.length;
+            return result;
+        }
+    }
+}))();
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (searchComponent);
+
+
+/***/ }),
+
+/***/ "./src/js/theme-detection.js":
+/*!***********************************!*\
+  !*** ./src/js/theme-detection.js ***!
+  \***********************************/
+/***/ (() => {
+
+(() => {
+    const systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const preferredTheme = localStorage.getItem('preferred-theme');
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme-mode', theme === 'system' ? systemMode : theme);
+    }
+
+    window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', (e) => {
+            if (localStorage.getItem('preferred-theme') === 'system' || localStorage.getItem('preferred-theme') === null) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+    setTheme(preferredTheme || systemMode);
+})();
+
+
+/***/ }),
+
+/***/ "./src/js/theme-switcher.js":
+/*!**********************************!*\
+  !*** ./src/js/theme-switcher.js ***!
+  \**********************************/
+/***/ (() => {
+
+document.addEventListener('DOMContentLoaded', () => {
+    (() => {
+        const themeSwitcher = document.querySelector('#theme-switcher');
+        const preferredTheme = localStorage.getItem('preferred-theme') ?? 'system';
+
+        if (!themeSwitcher) {
+            return;
+        }
+
+        themeSwitcher.addEventListener('click', (e) => {
+            if (!e.target.matches('[data-action]')) {
+                return;
+            }
+
+            const theme = e.target.getAttribute('data-action');
+            const systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.classList.add('no-transition');
+
+            localStorage.setItem('preferred-theme', theme);
+            document.documentElement.setAttribute('data-theme-mode', theme === 'system' ? systemMode : theme);
+            themeSwitcher.setAttribute('data-theme-mode', theme);
+            themeSwitcher.querySelector(`.theme-switcher__${theme}-mode`).focus();
+            document.documentElement.classList.remove('no-transition');
+        });
+
+        themeSwitcher.setAttribute('data-theme-mode', preferredTheme);
+    })();
+});
+  
+
 /***/ })
 
 /******/ 	});
@@ -4485,6 +4602,18 @@ var module_default = src_default;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -4515,18 +4644,28 @@ var module_default = src_default;
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
+// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
+"use strict";
 /*!*************************!*\
   !*** ./src/js/index.js ***!
   \*************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/module.esm.js");
 /* harmony import */ var _alpinejs_focus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @alpinejs/focus */ "./node_modules/@alpinejs/focus/dist/module.esm.js");
+/* harmony import */ var _components_search__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/search */ "./src/js/components/search.js");
+/* harmony import */ var _theme_switcher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./theme-switcher */ "./src/js/theme-switcher.js");
+/* harmony import */ var _theme_switcher__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_theme_switcher__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _theme_detection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./theme-detection */ "./src/js/theme-detection.js");
+/* harmony import */ var _theme_detection__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_theme_detection__WEBPACK_IMPORTED_MODULE_4__);
 
 
- 
+
+
+
+
 window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"];
+window.searchComponent = _components_search__WEBPACK_IMPORTED_MODULE_2__["default"];
 alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"].plugin(_alpinejs_focus__WEBPACK_IMPORTED_MODULE_1__["default"])
 alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"].start();
 })();
