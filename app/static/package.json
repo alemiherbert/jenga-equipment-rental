@@ -7,8 +7,9 @@
 		"start": "webpack serve",
 		"dev": "webpack --mode development --watch",
 		"build": "webpack --mode production",
-		"sass-dev": "sass --watch --update --load-path=node_modules --style=expanded scss:dist/css",
-		"sass-prod": "sass --no-source-map --load-path=node_modules --style=compressed scss:dist/css"
+		"sass-dev": "sass --watch --update --load-path=node_modules -q --style=expanded src/scss:dist/css",
+		"sass-prod": "sass --no-source-map --load-path=node_modules -q --style=compressed src/scss:dist/css",
+		"dev:all": "concurrently \"npm run dev\" \"npm run sass-dev\""
 	},
 	"author": "Alemi Herbert <alemiherbert@gmail.com>",
 	"license": "MIT",
@@ -18,7 +19,9 @@
 		"sprucecss": "^2.3.3"
 	},
 	"devDependencies": {
+		"concurrently": "^9.1.0",
 		"sass": "^1.76.0",
+		"sass-loader": "^16.0.4",
 		"webpack": "^5.97.1",
 		"webpack-cli": "^5.1.4"
 	}
