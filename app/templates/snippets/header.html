@@ -1,29 +1,24 @@
 <header class="app-header">
     <div class="app-header__inner">
         <div class="app-header__column">
+            <div class="">
+                <a href="">Jenga</a>
+            </div>
             <nav class="site-navigation" aria-label="Site">
                 <button class="btn btn--primary btn--icon site-navigation__btn" data-action="navigation-toggle"
                     aria-controls="primary-menu" aria-expanded="false" aria-label="Menu">
                     <i>{{ feather.icon('menu', class='btn__icon') }}</i>
                 </button>
-                <ul class="navigation-menu">
-                    <li>
-                        <a href="#">Services</a>
-                    </li>
-                    <li>
-                        <a href="#">Products</a>
-                    </li>
-                    <li>
-                        <a href="#">About</a>
-                    </li>
-                    <li>
-                        <a href="#">Contact</a>
-                    </li>
+                <ul class="navigation-menu" id="primary-menu">
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Products</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
                 </ul>
             </nav>
         </div>
         <div class="app-header__actions">
-            <button class="btn btn--outline-primary">Login</button>
+            <button class="app-header__btn btn btn--outline-primary">Login</button>
         </div>
     </div>
 </header>
