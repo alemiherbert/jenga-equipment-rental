@@ -4470,42 +4470,70 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-const searchComponent = (() => ({
+var searchComponent = function () {
+  return {
     notificationOpen: false,
     sidebarOpen: false,
     search: {
-        blank: false,
-        count: window.search.length,
-        items: window.search,
-        open: false,
-        term: '',
-        show() {
-            this.open = true;
-            setTimeout(() => $focus.focus($refs.searchInput), 250);
-        },
-        close() {
-            this.open = false;
-            $refs.searchOpen.focus();
-        },
-        filteredItems() {
-            if (this.term === '') {
-                return this.items;
-            }
-            const result = this.items.filter((item) => {
-                return item.caption
-                    .replace(/ /g, '')
-                    .toLowerCase()
-                    .includes(this.term.replace(/ /g, '').toLowerCase());
-            });
-            this.blank = result.length === 0;
-            this.count = result.length;
-            return result;
+      blank: false,
+      count: window.search.length,
+      items: window.search,
+      open: false,
+      term: '',
+      show: function show() {
+        this.open = true;
+        setTimeout(function () {
+          return $focus.focus($refs.searchInput);
+        }, 250);
+      },
+      close: function close() {
+        this.open = false;
+        $refs.searchOpen.focus();
+      },
+      filteredItems: function filteredItems() {
+        var _this = this;
+        if (this.term === '') {
+          return this.items;
         }
+        var result = this.items.filter(function (item) {
+          return item.caption.replace(/ /g, '').toLowerCase().includes(_this.term.replace(/ /g, '').toLowerCase());
+        });
+        this.blank = result.length === 0;
+        this.count = result.length;
+        return result;
+      }
     }
-}))();
-
+  };
+}();
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (searchComponent);
 
+/***/ }),
+
+/***/ "./src/js/site-navigation.js":
+/*!***********************************!*\
+  !*** ./src/js/site-navigation.js ***!
+  \***********************************/
+/***/ (() => {
+
+document.addEventListener('DOMContentLoaded', function () {
+  var button = document.querySelector('[data-action="navigation-toggle"]');
+  var menu = document.querySelector('.navigation-menu');
+  var mq = window.matchMedia('(max-width: 64em)');
+  if (!menu || typeof button === 'undefined') return;
+  function widthChange(query) {
+    button.setAttribute('aria-expanded', !query.matches);
+  }
+  button.addEventListener('click', function () {
+    if (button.getAttribute('aria-expanded') === 'true') {
+      button.setAttribute('aria-expanded', 'false');
+    } else {
+      button.setAttribute('aria-expanded', 'true');
+      menu.querySelector('a').focus();
+    }
+  });
+  mq.addListener(widthChange);
+  widthChange(mq);
+});
 
 /***/ }),
 
@@ -4515,25 +4543,19 @@ const searchComponent = (() => ({
   \***********************************/
 /***/ (() => {
 
-(() => {
-    const systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const preferredTheme = localStorage.getItem('preferred-theme');
-
-    function setTheme(theme) {
-        document.documentElement.setAttribute('data-theme-mode', theme === 'system' ? systemMode : theme);
+(function () {
+  var systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  var preferredTheme = localStorage.getItem('preferred-theme');
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme-mode', theme === 'system' ? systemMode : theme);
+  }
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+    if (localStorage.getItem('preferred-theme') === 'system' || localStorage.getItem('preferred-theme') === null) {
+      setTheme(e.matches ? 'dark' : 'light');
     }
-
-    window
-        .matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', (e) => {
-            if (localStorage.getItem('preferred-theme') === 'system' || localStorage.getItem('preferred-theme') === null) {
-                setTheme(e.matches ? 'dark' : 'light');
-            }
-        });
-
-    setTheme(preferredTheme || systemMode);
+  });
+  setTheme(preferredTheme || systemMode);
 })();
-
 
 /***/ }),
 
@@ -4543,35 +4565,28 @@ const searchComponent = (() => ({
   \**********************************/
 /***/ (() => {
 
-document.addEventListener('DOMContentLoaded', () => {
-    (() => {
-        const themeSwitcher = document.querySelector('#theme-switcher');
-        const preferredTheme = localStorage.getItem('preferred-theme') ?? 'system';
-
-        if (!themeSwitcher) {
-            return;
-        }
-
-        themeSwitcher.addEventListener('click', (e) => {
-            if (!e.target.matches('[data-action]')) {
-                return;
-            }
-
-            const theme = e.target.getAttribute('data-action');
-            const systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            document.documentElement.classList.add('no-transition');
-
-            localStorage.setItem('preferred-theme', theme);
-            document.documentElement.setAttribute('data-theme-mode', theme === 'system' ? systemMode : theme);
-            themeSwitcher.setAttribute('data-theme-mode', theme);
-            themeSwitcher.querySelector(`.theme-switcher__${theme}-mode`).focus();
-            document.documentElement.classList.remove('no-transition');
-        });
-
-        themeSwitcher.setAttribute('data-theme-mode', preferredTheme);
-    })();
+document.addEventListener('DOMContentLoaded', function () {
+  var _localStorage$getItem;
+  var themeSwitcher = document.querySelector('#theme-switcher');
+  var preferredTheme = (_localStorage$getItem = localStorage.getItem('preferred-theme')) !== null && _localStorage$getItem !== void 0 ? _localStorage$getItem : 'system';
+  if (!themeSwitcher) {
+    return;
+  }
+  themeSwitcher.addEventListener('click', function (e) {
+    if (!e.target.matches('[data-action]')) {
+      return;
+    }
+    var theme = e.target.getAttribute('data-action');
+    var systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.classList.add('no-transition');
+    localStorage.setItem('preferred-theme', theme);
+    document.documentElement.setAttribute('data-theme-mode', theme === 'system' ? systemMode : theme);
+    themeSwitcher.setAttribute('data-theme-mode', theme);
+    themeSwitcher.querySelector(".theme-switcher__".concat(theme, "-mode")).focus();
+    document.documentElement.classList.remove('no-transition');
+  });
+  themeSwitcher.setAttribute('data-theme-mode', preferredTheme);
 });
-  
 
 /***/ })
 
@@ -4651,23 +4666,25 @@ var __webpack_exports__ = {};
   !*** ./src/js/index.js ***!
   \*************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/module.esm.js");
-/* harmony import */ var _alpinejs_focus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @alpinejs/focus */ "./node_modules/@alpinejs/focus/dist/module.esm.js");
-/* harmony import */ var _components_search__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/search */ "./src/js/components/search.js");
-/* harmony import */ var _theme_switcher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./theme-switcher */ "./src/js/theme-switcher.js");
-/* harmony import */ var _theme_switcher__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_theme_switcher__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _theme_detection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./theme-detection */ "./src/js/theme-detection.js");
-/* harmony import */ var _theme_detection__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_theme_detection__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _site_navigation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./site-navigation */ "./src/js/site-navigation.js");
+/* harmony import */ var _site_navigation__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_site_navigation__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _theme_switcher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./theme-switcher */ "./src/js/theme-switcher.js");
+/* harmony import */ var _theme_switcher__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_theme_switcher__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _theme_detection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./theme-detection */ "./src/js/theme-detection.js");
+/* harmony import */ var _theme_detection__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_theme_detection__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/module.esm.js");
+/* harmony import */ var _alpinejs_focus__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @alpinejs/focus */ "./node_modules/@alpinejs/focus/dist/module.esm.js");
+/* harmony import */ var _components_search__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/search */ "./src/js/components/search.js");
 
 
 
 
 
 
-window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"];
-window.searchComponent = _components_search__WEBPACK_IMPORTED_MODULE_2__["default"];
-alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"].plugin(_alpinejs_focus__WEBPACK_IMPORTED_MODULE_1__["default"])
-alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"].start();
+window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_3__["default"];
+window.searchComponent = _components_search__WEBPACK_IMPORTED_MODULE_5__["default"];
+alpinejs__WEBPACK_IMPORTED_MODULE_3__["default"].plugin(_alpinejs_focus__WEBPACK_IMPORTED_MODULE_4__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_3__["default"].start();
 })();
 
 /******/ })()
