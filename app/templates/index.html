@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-{% include 'snippets/header.html' %}
 
-<h1>Hello, World!</h1>
-<i>{{ feather.icon('sun', stroke_width=2) }}</i>
+{% include 'snippets/site-header.html' %}
+
+{% include "snippets/hero.html" %}
+
+{% include "snippets/featured-equipment.html" %}
+
+{% include "snippets/carousel.html" %}
+
+{% include "snippets/how-it-works.html" %}
+
+{% include "snippets/feature.html" %}
+
 {% endblock %}
