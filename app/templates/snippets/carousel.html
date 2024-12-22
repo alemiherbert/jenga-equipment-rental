@@ -1,0 +1,73 @@
+<section class="container">
+    <div class="carousel" x-data="carousel"
+        x-on:resize.window.debounce="maxScroll = $refs.container.scrollWidth - $refs.container.clientWidth">
+
+        <div class="carousel__heading">
+            <h2>Browse Equipment Categories</h2>
+            <p class="lead">From power tools to heavy machinery, find exactly what your project needs</p>
+        </div>
+
+        <div class="carousel__wrapper">
+            <button class="carousel__button carousel__button--prev" x-show="scroll > 0" @click="scrollPrev"
+                aria-label="Previous">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6" />
+                </svg>
+            </button>
+
+            <div class="carousel__inner" x-ref="container" @scroll.debounce="handleScroll($event)">
+                <div class="carousel__item">
+                    <div class="category-card">
+                        <span class="category-card__icon">🔨</span>
+                        <h3 class="category-card__title">Power Tools</h3>
+                        <p class="category-card__description">Drills, saws, sanders & more</p>
+                        <span class="category-card__count">45 items</span>
+                    </div>
+                </div>
+
+                <div class="carousel__item">
+                    <div class="category-card">
+                        <span class="category-card__icon">🚜</span>
+                        <h3 class="category-card__title">Heavy Equipment</h3>
+                        <p class="category-card__description">Excavators, loaders & lifts</p>
+                        <span class="category-card__count">28 items</span>
+                    </div>
+                </div>
+
+                <div class="carousel__item">
+                    <div class="category-card">
+                        <span class="category-card__icon">🌿</span>
+                        <h3 class="category-card__title">Lawn & Garden</h3>
+                        <p class="category-card__description">Mowers, tillers & trimmers</p>
+                        <span class="category-card__count">36 items</span>
+                    </div>
+                </div>
+
+                <div class="carousel__item">
+                    <div class="category-card">
+                        <span class="category-card__icon">🧱</span>
+                        <h3 class="category-card__title">Concrete & Masonry</h3>
+                        <p class="category-card__description">Mixers, saws & tools</p>
+                        <span class="category-card__count">32 items</span>
+                    </div>
+                </div>
+
+                <div class="carousel__item">
+                    <div class="category-card">
+                        <span class="category-card__icon">🔧</span>
+                        <h3 class="category-card__title">Plumbing Tools</h3>
+                        <p class="category-card__description">Wrenches, snakes & more</p>
+                        <span class="category-card__count">24 items</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="carousel__button carousel__button--next" x-show="scroll < maxScroll" @click="scrollNext"
+                aria-label="Next">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6" />
+                </svg>
+            </button>
+        </div>
+    </div>
+</section>
