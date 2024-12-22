@@ -1,7 +1,7 @@
 @use 'sprucecss/scss/spruce' as *;
 
 .site-navigation {
-  --inset-block-start: 6rem;
+  --inset-block-start: 4.5rem;
   font-family: config('font-family-heading', $typography);
 
   &__btn {

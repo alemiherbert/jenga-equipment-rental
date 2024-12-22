@@ -1,0 +1,13 @@
+@use 'sprucecss/scss/spruce' as *;
+
+.carousel {
+  border-block-start: 1px solid color('border');
+  display: flex;
+  flex-direction: column;
+  gap: spacer('s') spacer-clamp('m', 'l');
+  padding-block: spacer-clamp('l', 'xl');
+  
+  // Custom
+  min-height: 60vh;
+  background-color: cyan;
+}

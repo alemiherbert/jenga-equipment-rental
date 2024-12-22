@@ -4459,10 +4459,10 @@ var module_default = src_default;
 
 /***/ }),
 
-/***/ "./src/js/components/search.js":
-/*!*************************************!*\
-  !*** ./src/js/components/search.js ***!
-  \*************************************/
+/***/ "./src/js/carousel.js":
+/*!****************************!*\
+  !*** ./src/js/carousel.js ***!
+  \****************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4470,42 +4470,133 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-var searchComponent = function () {
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (function () {
   return {
-    notificationOpen: false,
-    sidebarOpen: false,
-    search: {
-      blank: false,
-      count: window.search.length,
-      items: window.search,
-      open: false,
-      term: '',
-      show: function show() {
-        this.open = true;
-        setTimeout(function () {
-          return $focus.focus($refs.searchInput);
-        }, 250);
-      },
-      close: function close() {
-        this.open = false;
-        $refs.searchOpen.focus();
-      },
-      filteredItems: function filteredItems() {
-        var _this = this;
-        if (this.term === '') {
-          return this.items;
-        }
-        var result = this.items.filter(function (item) {
-          return item.caption.replace(/ /g, '').toLowerCase().includes(_this.term.replace(/ /g, '').toLowerCase());
+    scroll: 0,
+    maxScroll: 0,
+    init: function init() {
+      var _this = this;
+      this.maxScroll = this.$refs.container.scrollWidth - this.$refs.container.clientWidth;
+      window.addEventListener('resize', function () {
+        _this.maxScroll = _this.$refs.container.scrollWidth - _this.$refs.container.clientWidth;
+      });
+      this.$watch('scroll', function (value) {
+        _this.$refs.container.scrollTo({
+          left: value,
+          behavior: 'smooth'
         });
-        this.blank = result.length === 0;
-        this.count = result.length;
-        return result;
-      }
+      });
+    },
+    scrollPrev: function scrollPrev() {
+      this.scroll = Math.max(0, this.scroll - 300);
+    },
+    scrollNext: function scrollNext() {
+      this.scroll = Math.min(this.maxScroll, this.scroll + 300);
+    },
+    handleScroll: function handleScroll(event) {
+      this.scroll = event.target.scrollLeft;
     }
   };
-}();
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (searchComponent);
+});
+
+/***/ }),
+
+/***/ "./src/js/featured-equipment.js":
+/*!**************************************!*\
+  !*** ./src/js/featured-equipment.js ***!
+  \**************************************/
+/***/ (() => {
+
+// featured-equipment.js
+document.addEventListener('alpine:init', function () {
+  Alpine.data('featuredEquipment', function () {
+    return {
+      equipment: [{
+        "id": "123",
+        "name": "20\" Chainsaw",
+        "category": "Power Tools",
+        "image": "/static/dist/img/hero.jpg",
+        "dayRate": 45.00,
+        "available": true,
+        "isNew": false
+      }, {
+        "id": "13",
+        "name": "20\" Chainsaw",
+        "category": "Power Tools",
+        "image": "/static/dist/img/hero.jpg",
+        "dayRate": 45.00,
+        "available": true,
+        "isNew": false
+      }, {
+        "id": "23",
+        "name": "20\" Chainsaw",
+        "category": "Power Tools",
+        "image": "/static/dist/img/hero.jpg",
+        "dayRate": 45.00,
+        "available": true,
+        "isNew": false
+      }, {
+        "id": "1263",
+        "name": "20\" Chainsaw",
+        "category": "Power Tools",
+        "image": "/static/dist/img/hero.jpg",
+        "dayRate": 45.00,
+        "available": true,
+        "isNew": false
+      }],
+      loading: true,
+      //false
+      error: null,
+      /*
+      async fetchEquipment() {
+          this.loading = true;
+          this.error = null;
+           try {
+              const response = await fetch('/api/featured-equipment');
+              if (!response.ok) {
+                  throw new Error('Failed to fetch equipment');
+              }
+              
+              this.equipment = await response.json();
+          } catch (err) {
+              this.error = 'Unable to load featured equipment. Please try again later.';
+              console.error('Error fetching equipment:', err);
+          } finally {
+              this.equipment = {
+                  "id": "123",
+                  "name": "20\" Chainsaw",
+                  "category": "Power Tools",
+                  "image": "/static/dist/img/hero.jpg",
+                  "dayRate": 45.00,
+                  "available": true,
+                  "isNew": false
+              };
+              this.loading = true; // false
+          }
+      },*/
+      rentEquipment: function rentEquipment(item) {
+        // Navigate to rental page or open rental modal
+        window.location.href = "/rent/".concat(item.id);
+      },
+      viewDetails: function viewDetails(item) {
+        // Navigate to equipment details page
+        window.location.href = "/equipment/".concat(item.id);
+      }
+    };
+  });
+});
+
+/* Expected API Response Format:
+{
+    "id": "123",
+    "name": "20\" Chainsaw",
+    "category": "Power Tools",
+    "image": "/static/dist/img/hero.jpg",
+    "dayRate": 45.00,
+    "available": true,
+    "isNew": false
+}
+*/
 
 /***/ }),
 
@@ -4672,19 +4763,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _theme_switcher__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_theme_switcher__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _theme_detection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./theme-detection */ "./src/js/theme-detection.js");
 /* harmony import */ var _theme_detection__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_theme_detection__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/module.esm.js");
-/* harmony import */ var _alpinejs_focus__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @alpinejs/focus */ "./node_modules/@alpinejs/focus/dist/module.esm.js");
-/* harmony import */ var _components_search__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/search */ "./src/js/components/search.js");
+/* harmony import */ var _featured_equipment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./featured-equipment */ "./src/js/featured-equipment.js");
+/* harmony import */ var _featured_equipment__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_featured_equipment__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _carousel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./carousel */ "./src/js/carousel.js");
+/* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/module.esm.js");
+/* harmony import */ var _alpinejs_focus__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @alpinejs/focus */ "./node_modules/@alpinejs/focus/dist/module.esm.js");
 
 
 
 
 
+'./carousel';
 
-window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_3__["default"];
-window.searchComponent = _components_search__WEBPACK_IMPORTED_MODULE_5__["default"];
-alpinejs__WEBPACK_IMPORTED_MODULE_3__["default"].plugin(_alpinejs_focus__WEBPACK_IMPORTED_MODULE_4__["default"]);
-alpinejs__WEBPACK_IMPORTED_MODULE_3__["default"].start();
+
+// import searchComponent from './components/search';
+
+window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_5__["default"];
+// window.searchComponent = searchComponent;
+alpinejs__WEBPACK_IMPORTED_MODULE_5__["default"].plugin(_alpinejs_focus__WEBPACK_IMPORTED_MODULE_6__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_5__["default"].data('carousel', _carousel__WEBPACK_IMPORTED_MODULE_4__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_5__["default"].start();
 })();
 
 /******/ })()

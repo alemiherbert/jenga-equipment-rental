@@ -15,7 +15,7 @@
     block-size: get-css-variable(--header-block-size);
     display: flex;
     flex-wrap: wrap;
-    gap: spacer-clamp('s', 'l');
+    gap: spacer-clamp('s', 'm');
     justify-content: space-between;
     margin-inline: get-css-variable(--container-gap);
   }
@@ -28,6 +28,17 @@
     justify-content: space-between; // Added
   }
 
+  &__site-title {
+    a{
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: color('heading');
+    }
+  }
+
   &__actions {
     align-items: center;
     display: flex;
@@ -36,10 +47,6 @@
     &--secondary {
       gap: spacer('s');
     }
-  }
-
-  &__btn {
-    padding: 0.5rem 1rem;
   }
 
   &__logo {
