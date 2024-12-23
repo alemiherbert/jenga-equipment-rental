@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use 'sprucecss/scss/spruce' as *;
 
 .featured-equipment {
@@ -14,10 +15,8 @@
     min-width: 280px;
     transition: all 0.2s ease;
     border: 1px solid color('border');
-    border-radius: 4px;
   
     &:hover {
-      border: 1px solid color('primary');
       transform: translateY(-4px);
     }
 
@@ -36,37 +35,42 @@
 
     &__badge {
         position: absolute;
-        top: var(--spacing-half);
-        right: var(--spacing-half);
+        top: spacer('m');
+        right: spacer('m');
         background: var(--primary);
-        color: var(--primary-contrast);
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--border-radius-sm);
+        color: red;
+        padding: 0.25rem 0.25rem;
+        border-radius: 1rem;
         font-size: var(--font-size-sm);
         font-weight: var(--font-weight-medium);
     }
 
     &__content {
-        padding: var(--spacing);
+        padding: spacer('s');
     }
 
     &__title {
         margin: 0;
-        font-size: var(--font-size-lg);
-        color: var(--heading-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+        font-family: 'Oswald';
+        color: color('heading');
+        text-transform: uppercase;
     }
 
     &__category {
-        color: var(--text-muted);
-        font-size: var(--font-size-sm);
-        margin: var(--spacing-quarter) 0;
+        color: color('primary');
+        background: color('primary-lightest');
+        font-size: 0.75rem;
+        margin: spacer('xs') 0;
+        padding: calc(spacer('xs') / 2) spacer('xs');
     }
 
     &__pricing {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: var(--spacing-half) 0;
+        margin: spacer('s') 0;
     }
 
     &__rate {
@@ -75,28 +79,29 @@
     }
 
     &__availability {
-        font-size: var(--font-size-sm);
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--border-radius-sm);
+        font-size: 0.75rem;
+        padding: 0 0.5rem;
+        border-radius: 1rem;
 
         &.is-available {
-            background: var(--success-light);
-            color: var(--success);
+            background: color.adjust(color('success', 'alert', $only-color: true), $lightness: 60%);
+            color: color.adjust(color('success', 'alert', $only-color: true), $lightness: -7.5%);
         }
 
         &.is-unavailable {
-            background: var(--danger-light);
-            color: var(--danger);
+            background: color.adjust(color('danger', 'alert', $only-color: true), $lightness: 45%);
+            color: color.adjust(color('danger', 'alert', $only-color: true), $lightness: -5%);
         }
     }
 
     &__actions {
         display: flex;
-        gap: var(--spacing-half);
+        gap: spacer('s');
         margin-top: var(--spacing);
 
         .btn {
             flex: 1;
+            height: 2rem !important;
         }
     }
 }

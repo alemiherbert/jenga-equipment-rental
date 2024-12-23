@@ -1,76 +1,81 @@
 @use 'sprucecss/scss/spruce' as *;
 
 .how-it-works {
-  padding: spacer('m') 0;
-  background: var(--color-background-alt);
-
-  &__heading {
-    text-align: center;
-    h2 {
-      margin-bottom: spacer('xs');
-      font-size: responsive-font-size(2rem, 20, '3vw + 1rem');
-    }
-  }
-
-  &__grid {
-    display: grid;
-    gap: spacer('l');
     padding: spacer('m') 0;
-    
-    @include breakpoint('md') {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    
-    @include breakpoint('lg') {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
+    background: var(--color-background-alt);
 
-  &__step {
-    background: var(--color-white);
-    padding: calc(spacer('m') * 1.5);
-    transition: all 0.3s ease;
-    border: 1px solid color('border');
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: spacer('m');
-    cursor: pointer;
+    &__heading {
+        text-align: center;
 
-    &.is-active {
-      transform: translateY(-4px);
-      border-color: color('primary');
-
-      .how-it-works__number {
-        color: color('primary');
-      }
-    }
-  }
-
-  &__number {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    background: color('primary-lightest');
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-
-  &__content {
-    h3 {
-      margin-bottom: spacer('xs');
-      font-size: var(--font-size-lg);
+        h2 {
+            margin-bottom: spacer('xs');
+            font-size: responsive-font-size(2rem, 20, '3vw + 1rem');
+        }
     }
 
-    p {
-      color: var(--color-text-muted);
-      margin: 0;
-      font-size: var(--font-size-base);
-      line-height: var(--line-height-relaxed);
+    &__grid {
+        display: grid;
+        gap: spacer('l');
+        padding: spacer('m') 0;
+
+        @include breakpoint('md') {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @include breakpoint('lg') {
+            grid-template-columns: repeat(4, 1fr);
+        }
     }
-  }
+
+    &__step {
+        background: var(--color-white);
+        padding: calc(spacer('m') * 1.5);
+        transition: all 0.3s ease;
+        border: 1px solid color('border');
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: spacer('m');
+        cursor: pointer;
+
+        &.is-active {
+            transform: translateY(-4px);
+            border-color: color('primary');
+
+            .how-it-works__number {
+                color: color('primary');
+            }
+            .how-it-works__content{
+                h3 {
+                    color: color('primary');
+                }
+            }
+        }
+    }
+
+    &__number {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        background: color('primary-lightest');
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    &__content {
+        h3 {
+            margin: 0px;
+            font-size: 1.125rem;
+        }
+
+        p {
+            margin: 0;
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-relaxed);
+        }
+    }
 }
