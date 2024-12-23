@@ -3,10 +3,11 @@ export default () => ({
     maxScroll: 0,
     
     init() {
-        this.maxScroll = this.$refs.container.scrollWidth - this.$refs.container.clientWidth;
+
+        this.updateMaxScroll();
         
         window.addEventListener('resize', () => {
-            this.maxScroll = this.$refs.container.scrollWidth - this.$refs.container.clientWidth;
+            this.updateMaxScroll();
         });
         
         this.$watch('scroll', value => {
@@ -15,6 +16,12 @@ export default () => ({
                 behavior: 'smooth' 
             });
         });
+    },
+
+    updateMaxScroll() {
+        if (this.$refs.container) {
+            this.maxScroll = this.$refs.container.scrollWidth - this.$refs.container.clientWidth;
+        }
     },
     
     scrollPrev() {
