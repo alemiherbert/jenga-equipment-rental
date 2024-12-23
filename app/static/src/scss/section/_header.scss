@@ -15,7 +15,7 @@
     block-size: get-css-variable(--header-block-size);
     display: flex;
     flex-wrap: wrap;
-    gap: spacer-clamp('s', 'l');
+    gap: spacer-clamp('s', 'm');
     justify-content: space-between;
     margin-inline: get-css-variable(--container-gap);
   }
@@ -25,6 +25,18 @@
     display: flex;
     flex-grow: 1;
     gap: spacer-clamp('s', 'm');
+    justify-content: space-between; // Added
+  }
+
+  &__site-title {
+    a{
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      color: color('heading');
+    }
   }
 
   &__actions {

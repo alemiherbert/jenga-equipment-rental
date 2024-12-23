@@ -1,0 +1,66 @@
+<section class="container">
+    <div class="featured-equipment carousel" x-data="featuredEquipment">
+        
+        <div class="carousel__heading">
+            <h2>Featured Equipment</h2>
+            <p class="lead">Discover our most popular rentals and latest additions</p>
+        </div>
+
+        <div class="carousel__wrapper">
+            <button class="carousel__button carousel__button--prev" x-show="scroll > 0" @click="scrollPrev"
+                aria-label="Previous">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6" />
+                </svg>
+            </button>
+
+            <div class="carousel__inner" x-ref="container" @scroll.debounce="handleScroll($event)"
+                x-show="!loading || !error">
+                <template x-for="item in equipment" :key="item.id">
+                    <div class="carousel__item">
+                        <div class="equipment-card" @click="viewDetails(item)">
+                            <div class="equipment-card__image">
+                                <img :src="item.image" :alt="item.name">
+                                <span x-show="item.isNew" class="equipment-card__badge">New</span>
+                            </div>
+                            <div class="equipment-card__content">
+                                <h3 class="equipment-card__title" x-text="item.name"></h3>
+                                <div class="equipment-card__categories">
+                                    <span class="equipment-card__category" x-text="item.category"></span>
+                                </div>
+                                <div class="equipment-card__pricing">
+                                    <span class="equipment-card__rate">
+                                        $<span x-text="item.dayRate"></span>/day
+                                    </span>
+                                    <span class="equipment-card__availability"
+                                        :class="item.available ? 'is-available' : 'is-unavailable'"
+                                        x-text="item.available ? 'Available' : 'Unavailable'">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <button class="carousel__button carousel__button--next" x-show="scroll < maxScroll" @click="scrollNext"
+                aria-label="Next">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6" />
+                </svg>
+            </button>
+
+            <!-- Loading State -->
+            <div x-show="loading" class="featured-equipment__loading">
+                <div class="spinner"></div>
+                <p>Loading equipment...</p>
+            </div>
+
+            <!-- Error State -->
+            <div x-show="error" class="featured-equipment__error">
+                <p x-text="error"></p>
+                <button @click="fetchEquipment" class="btn btn--secondary">Try Again</button>
+            </div>
+
+        </div>
+</section>

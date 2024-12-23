@@ -8,17 +8,22 @@
 @use 'sprucecss/scss/spruce' as *;
 
 :root {
-  @include set-css-variable((
-    --sidebar-inline-size: 20rem,
-    --header-block-size: 4.5rem,
-    --container-gap: spacer-clamp('m', 'l')
-  ));
+  @include set-css-variable((--sidebar-inline-size: 20rem,
+      --header-block-size: 4.5rem,
+      --container-gap: spacer-clamp('m', 'l')));
 }
 
 body {
   overflow-x: hidden;
-  background-color: beige;
+
+  .lead {
+    margin-top: spacer('xs');
+    margin-bottom: spacer('xs');
+    font-size: 1.0625rem;
+  }
 }
+
+
 
 [x-cloak] {
   visibility: hidden !important;

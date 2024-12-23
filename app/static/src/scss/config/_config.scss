@@ -5,6 +5,8 @@ $color-primary: hsl(214deg 98% 49%);
 $color-secondary: hsl(160 89% 46%);
 $color-primary-lightest: hsl(210deg 60% 98%);
 $color-danger: hsl(0deg 71% 51%);
+$color-black: hsl(205deg 100% 2%);
+$color-gray: hsl(208deg 9% 42%);
 
 @use 'sprucecss/scss/spruce' with (
   $btn: (
@@ -18,6 +20,16 @@ $color-danger: hsl(0deg 71% 51%);
     'base': (
       'border': hsl(215deg 100% 96%),
       'primary-lightest': $color-primary-lightest,
+      'blockquote-border': $color-primary,
+      'heading': $color-black,
+      'link': $color-primary,
+      'link-hover': color.scale($color-primary, $lightness: -20%),
+      'mark-background': hsl(50deg 100% 80%),
+      'mark-foreground': $color-black,
+      'marker': $color-primary,
+      'primary': $color-primary,
+      'secondary': $color-secondary,
+      'text': $color-gray,
     ),
     'btn': (
       'dark-background': hsl(205deg 100% 2%),

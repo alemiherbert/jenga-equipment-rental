@@ -1,0 +1,53 @@
+<section class="how-it-works" x-data="{ 
+    activeStep: 1,
+    init() {
+        setInterval(() => {
+            this.activeStep = this.activeStep === 4 ? 1 : this.activeStep + 1;
+        }, 3000);
+    }
+    }">
+    <div class="container">
+        <div class="how-it-works__heading">
+            <h2>How It Works</h2>
+            <p class="lead">Renting equipment is easy with our simple 4-step process</p>
+        </div>
+
+        <div class="how-it-works__grid">
+            <div class="how-it-works__step" :class="{ 'is-active': activeStep === 1 }" @mouseenter="activeStep = 1"
+                @mouseleave="activeStep = activeStep">
+                <div class="how-it-works__number">1</div>
+                <div class="how-it-works__content">
+                    <h3>Browse</h3>
+                    <p>Search our extensive catalog of equipment</p>
+                </div>
+            </div>
+
+            <div class="how-it-works__step" :class="{ 'is-active': activeStep === 2 }" @mouseenter="activeStep = 2"
+                @mouseleave="activeStep = activeStep">
+                <div class="how-it-works__number">2</div>
+                <div class="how-it-works__content">
+                    <h3>Book</h3>
+                    <p>Select your dates and complete reservation.</p>
+                </div>
+            </div>
+
+            <div class="how-it-works__step" :class="{ 'is-active': activeStep === 3 }" @mouseenter="activeStep = 3"
+                @mouseleave="activeStep = activeStep">
+                <div class="how-it-works__number">3</div>
+                <div class="how-it-works__content">
+                    <h3>Pickup</h3>
+                    <p>Collect your equipment, or opt for delivery.</p>
+                </div>
+            </div>
+
+            <div class="how-it-works__step" :class="{ 'is-active': activeStep === 4 }" @mouseenter="activeStep = 4"
+                @mouseleave="activeStep = activeStep">
+                <div class="how-it-works__number">4</div>
+                <div class="how-it-works__content">
+                    <h3>Return</h3>
+                    <p>Bring back the equipment or schedule a pickup.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
