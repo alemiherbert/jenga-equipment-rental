@@ -5,6 +5,13 @@
   font-weight: 400 800;
   src: url("../font/Lexend-VariableFont_wght.woff2") format("woff2");
 }
+@font-face {
+  font-display: woff2;
+  font-family: "Oswald";
+  font-style: normal;
+  font-weight: 400 800;
+  src: url("../font/Oswald-VariableFont_wght.woff2") format("woff2");
+}
 /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 /* Document
   ========================================================================== */
@@ -4740,77 +4747,80 @@ legend {
   min-width: 280px;
   transition: all 0.2s ease;
   border: 1px solid var(--root-base-color-border);
-  border-radius: 4px;
+  border-bottom: 0.125rem solid var(--root-base-color-border);
+  cursor: pointer;
 }
 .equipment-card:hover {
-  border: 1px solid var(--root-base-color-primary);
   transform: translateY(-4px);
+}
+.equipment-card:hover .equipment-card__title {
+  color: var(--root-base-color-primary);
+}
+.equipment-card:hover .equipment-card__image img {
+  filter: none;
 }
 .equipment-card__image {
   position: relative;
   aspect-ratio: 4/3;
-  background: var(--gray-100);
+  background: var(--root-base-color-primary-lightest);
   overflow: hidden;
 }
 .equipment-card__image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: sepia(50%);
 }
 .equipment-card__badge {
   position: absolute;
-  top: var(--spacing-half);
-  right: var(--spacing-half);
-  background: var(--primary);
-  color: var(--primary-contrast);
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-sm);
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--root-base-color-primary-lightest);
+  color: var(--root-base-color-primary);
+  padding: 0 0.5rem;
+  margin: 0px;
+  font-size: 0.75rem;
   font-weight: var(--font-weight-medium);
 }
 .equipment-card__content {
-  padding: var(--spacing);
+  padding: 1rem;
 }
 .equipment-card__title {
   margin: 0;
-  font-size: var(--font-size-lg);
-  color: var(--heading-color);
+  font-size: 1.25rem;
+  font-family: "Oswald";
+  color: var(--root-base-color-heading);
+  text-transform: uppercase;
 }
 .equipment-card__category {
-  color: var(--text-muted);
-  font-size: var(--font-size-sm);
-  margin: var(--spacing-quarter) 0;
+  color: var(--root-base-color-primary);
+  background: var(--root-base-color-primary-lightest);
+  font-size: 0.75rem;
+  margin: 0.5rem 0;
+  padding: 0.25rem 0.5rem;
 }
 .equipment-card__pricing {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: var(--spacing-half) 0;
+  margin: 0.5rem 0;
 }
 .equipment-card__rate {
   font-weight: var(--font-weight-bold);
   color: var(--primary);
 }
 .equipment-card__availability {
-  font-size: var(--font-size-sm);
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--border-radius-sm);
+  font-size: 0.75rem;
+  padding: 0 0.5rem;
+  border-radius: 1rem;
 }
 .equipment-card__availability.is-available {
-  background: var(--success-light);
-  color: var(--success);
+  background: hsl(150, 100%, 93%);
+  color: hsl(150, 100%, 25.5%);
 }
 .equipment-card__availability.is-unavailable {
-  background: var(--danger-light);
-  color: var(--danger);
-}
-.equipment-card__actions {
-  display: flex;
-  gap: var(--spacing-half);
-  margin-top: var(--spacing);
-}
-.equipment-card__actions .btn {
-  flex: 1;
+  background: hsl(0, 71%, 96%);
+  color: hsl(0, 71%, 46%);
 }
 
 .spinner {
@@ -4919,15 +4929,17 @@ legend {
 }
 
 .category-card {
-  background: var(--root-base-color-background);
+  background: var(--root-base-color-code-background);
   padding: 2.25rem;
   min-width: 280px;
   transition: all 0.2s ease;
-  border: 1px solid var(--root-base-color-border);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
 }
 .category-card:hover {
-  border: 1px solid var(--root-base-color-primary);
   transform: translateY(-4px);
+}
+.category-card:hover .category-card__title {
+  color: var(--root-base-color-primary);
 }
 .category-card__icon {
   font-size: 2.5rem;
@@ -4935,12 +4947,14 @@ legend {
   margin-bottom: 1rem;
 }
 .category-card__title {
-  font-size: var(--font-size-lg);
-  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-size: 1.25rem;
+  font-family: "Oswald";
+  margin: 0px;
 }
 .category-card__description {
   color: var(--color-text-muted);
-  margin-bottom: 0.5rem;
+  margin: 0px;
 }
 .category-card__count {
   font-size: var(--font-size-sm);
@@ -4983,12 +4997,15 @@ legend {
   flex-direction: column;
   gap: 1.5rem;
   cursor: pointer;
+  border-bottom: 0.125rem solid var(--root-base-color-border);
 }
 .how-it-works__step.is-active {
   transform: translateY(-4px);
-  border-color: var(--root-base-color-primary);
 }
 .how-it-works__step.is-active .how-it-works__number {
+  color: var(--root-base-color-primary);
+}
+.how-it-works__step.is-active .how-it-works__content h3 {
   color: var(--root-base-color-primary);
 }
 .how-it-works__number {
@@ -5004,11 +5021,12 @@ legend {
   transition: all 0.3s ease;
 }
 .how-it-works__content h3 {
-  margin-bottom: 0.5rem;
-  font-size: var(--font-size-lg);
+  text-transform: uppercase;
+  font-size: 1.25rem;
+  font-family: "Oswald";
+  margin: 0px;
 }
 .how-it-works__content p {
-  color: var(--color-text-muted);
   margin: 0;
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);

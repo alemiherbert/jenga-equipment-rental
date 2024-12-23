@@ -18,14 +18,16 @@
                 x-show="!loading || !error">
                 <template x-for="item in equipment" :key="item.id">
                     <div class="carousel__item">
-                        <div class="equipment-card">
+                        <div class="equipment-card" @click="viewDetails(item)">
                             <div class="equipment-card__image">
                                 <img :src="item.image" :alt="item.name">
                                 <span x-show="item.isNew" class="equipment-card__badge">New</span>
                             </div>
                             <div class="equipment-card__content">
                                 <h3 class="equipment-card__title" x-text="item.name"></h3>
-                                <p class="equipment-card__category" x-text="item.category"></p>
+                                <div class="equipment-card__categories">
+                                    <span class="equipment-card__category" x-text="item.category"></span>
+                                </div>
                                 <div class="equipment-card__pricing">
                                     <span class="equipment-card__rate">
                                         $<span x-text="item.dayRate"></span>/day
@@ -34,15 +36,6 @@
                                         :class="item.available ? 'is-available' : 'is-unavailable'"
                                         x-text="item.available ? 'Available' : 'Unavailable'">
                                     </span>
-                                </div>
-                                <div class="equipment-card__actions">
-                                    <button class="btn btn--primary" :disabled="!item.available"
-                                        @click="rentEquipment(item)">
-                                        Rent Now
-                                    </button>
-                                    <button class="btn btn--outline" @click="viewDetails(item)">
-                                        Details
-                                    </button>
                                 </div>
                             </div>
                         </div>

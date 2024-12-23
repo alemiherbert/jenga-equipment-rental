@@ -15,33 +15,44 @@
     min-width: 280px;
     transition: all 0.2s ease;
     border: 1px solid color('border');
-  
+    border-bottom: 0.125rem solid color('border');
+    cursor: pointer;
+
     &:hover {
-      transform: translateY(-4px);
+        transform: translateY(-4px);
+
+        & .equipment-card__title {
+            color: color('primary');
+        }
+
+        & .equipment-card__image img {
+            filter: none;
+        }
     }
 
     &__image {
         position: relative;
         aspect-ratio: 4 / 3;
-        background: var(--gray-100);
+        background: color('primary-lightest');
         overflow: hidden;
 
         img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            filter: sepia(50%);
         }
     }
 
     &__badge {
         position: absolute;
-        top: spacer('m');
-        right: spacer('m');
-        background: var(--primary);
-        color: red;
-        padding: 0.25rem 0.25rem;
-        border-radius: 1rem;
-        font-size: var(--font-size-sm);
+        top: spacer('xs');
+        right: spacer('xs');
+        background: color('primary-lightest');
+        color: color('primary');
+        padding: 0 0.5rem;
+        margin: 0px;
+        font-size: 0.75rem;
         font-weight: var(--font-weight-medium);
     }
 
@@ -52,7 +63,6 @@
     &__title {
         margin: 0;
         font-size: 1.25rem;
-        font-weight: 600;
         font-family: 'Oswald';
         color: color('heading');
         text-transform: uppercase;
@@ -70,7 +80,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: spacer('s') 0;
+        margin: spacer('xs') 0;
     }
 
     &__rate {
@@ -91,17 +101,6 @@
         &.is-unavailable {
             background: color.adjust(color('danger', 'alert', $only-color: true), $lightness: 45%);
             color: color.adjust(color('danger', 'alert', $only-color: true), $lightness: -5%);
-        }
-    }
-
-    &__actions {
-        display: flex;
-        gap: spacer('s');
-        margin-top: var(--spacing);
-
-        .btn {
-            flex: 1;
-            height: 2rem !important;
         }
     }
 }

@@ -16,6 +16,7 @@
 	"dependencies": {
 		"@alpinejs/focus": "^3.14.7",
 		"alpinejs": "^3.14.7",
+		"motion": "^11.15.0",
 		"sprucecss": "^2.3.3"
 	},
 	"devDependencies": {

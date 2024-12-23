@@ -73,6 +73,10 @@
 
 	&:hover {
 		transform: translateY(-4px);
+
+		& .category-card__title {
+			color: color('primary');
+		}
 	}
 
 	&__icon {
@@ -82,13 +86,15 @@
 	}
 
 	&__title {
-		font-size: var(--font-size-lg);
-		margin-bottom: spacer('xs');
+		text-transform: uppercase;
+		font-size: 1.25rem;
+		font-family: 'Oswald';
+		margin: 0px;
 	}
 
 	&__description {
 		color: var(--color-text-muted);
-		margin-bottom: spacer('xs');
+		margin: 0px;
 	}
 
 	&__count {

@@ -37,10 +37,10 @@
         flex-direction: column;
         gap: spacer('m');
         cursor: pointer;
+        border-bottom: 0.125rem solid color('border');
 
         &.is-active {
             transform: translateY(-4px);
-            border-color: color('primary');
 
             .how-it-works__number {
                 color: color('primary');
@@ -68,8 +68,10 @@
 
     &__content {
         h3 {
+            text-transform: uppercase;
+            font-size: 1.25rem;
+            font-family: 'Oswald';
             margin: 0px;
-            font-size: 1.125rem;
         }
 
         p {

@@ -1,172 +1,148 @@
 export default () => ({
-    equipment: [
-        {
-            "id": "123",
-            "name": "20\" Chainsaw",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": true,
-            "isNew": false
-        },
-        {
-            "id": "13",
-            "name": "20\" Chainsaw",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": true,
-            "isNew": false
-        },
-        {
-            "id": "23",
-            "name": "20\" Chainsaw",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": true,
-            "isNew": false
-        },
-        {
-            "id": "1263",
-            "name": "20\" Chainsaw",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": true,
-            "isNew": false
-        },
-        {
-            "id": "12638",
-            "name": "20\" Chainsaw",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": true,
-            "isNew": false
-        }
-    ],
-    loading: true,
-    error: null,
-    autoplayInterval: null,
-    scroll: 0,
-    maxScroll: 0,
-    scrollAmount: 300,
-
-    init() {
-        this.$nextTick(() => {
-            this.updateMaxScroll();
-        });
-
-        this.$watch('equipment', () => {
+        equipment: [
+            {
+                "id": "7451",
+                "name": "15\" Circular Saw",
+                "category": "Power Tools",
+                "image": "/static/dist/img/hero.jpg",
+                "dayRate": 45.00,
+                "available": false,
+                "isNew": false
+            },
+            {
+                "id": "5849",
+                "name": "18\" Electric Drill",
+                "category": "Power Tools",
+                "image": "/static/dist/img/hero.jpg",
+                "dayRate": 45.00,
+                "available": true,
+                "isNew": true
+            },
+            {
+                "id": "9037",
+                "name": "12\" Angle Grinder",
+                "category": "Power Tools",
+                "image": "/static/dist/img/hero.jpg",
+                "dayRate": 45.00,
+                "available": true,
+                "isNew": false
+            },
+            {
+                "id": "3094",
+                "name": "8\" Hammer Drill",
+                "category": "Power Tools",
+                "image": "/static/dist/img/hero.jpg",
+                "dayRate": 45.00,
+                "available": true,
+                "isNew": false
+            },
+            {
+                "id": "8272",
+                "name": "10\" Jigsaw",
+                "category": "Power Tools",
+                "image": "/static/dist/img/hero.jpg",
+                "dayRate": 45.00,
+                "available": true,
+                "isNew": false
+            }
+        ],
+        loading: false,
+        error: null,
+        autoplayInterval: null,
+        scroll: 0,
+        maxScroll: 0,
+        isAutoplayEnabled: true,
+    
+        init() {
             this.$nextTick(() => {
                 this.updateMaxScroll();
+                if (this.isAutoplayEnabled) {
+                    this.startAutoplay();
+                }
             });
-        });
-
-        window.addEventListener('resize', () => {
-            this.updateMaxScroll();
-        });
-
-        this.$watch('scroll', value => {
-            this.$refs.container.scrollTo({
-                left: value,
-                behavior: 'smooth'
+    
+            this.$watch('equipment', () => {
+                this.$nextTick(() => {
+                    this.updateMaxScroll();
+                });
             });
-        });
-
-        // Start autoplay after initialization
-        this.startAutoplay();
-    },
-
-    updateMaxScroll() {
-        if (this.$refs.container) {
-            this.maxScroll = this.$refs.container.scrollWidth - this.$refs.container.clientWidth;
-        }
-    },
-
-    scrollPrev() {
-        if (this.scroll === 0) {
-            // If at the start, jump to end
-            this.scroll = this.maxScroll;
-        } else {
-            this.scroll = Math.max(0, this.scroll - this.scrollAmount);
-        }
-    },
-
-    scrollNext() {
-        if (this.scroll >= this.maxScroll) {
-            // If at the end, smoothly reset to start
-            this.scroll = 0;
-        } else {
-            this.scroll = Math.min(this.maxScroll, this.scroll + this.scrollAmount);
-        }
-    },
-
-    handleScroll(event) {
-        this.scroll = event.target.scrollLeft;
-    },
-
-    startAutoplay() {
-        this.autoplayInterval = setInterval(() => {
-            if (!document.hidden) {
-                this.scrollNext();
-            }
-        }, 5000); // Rotate every 5 seconds
-
-        // Stop autoplay when tab is not visible
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
+    
+            window.addEventListener('resize', () => {
+                this.updateMaxScroll();
+            });
+    
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    this.stopAutoplay();
+                } else if (this.isAutoplayEnabled) {
+                    this.startAutoplay();
+                }
+            });
+    
+            this.$refs.container.addEventListener('mouseenter', () => {
                 this.stopAutoplay();
-            } else {
-                this.startAutoplay();
-            }
-        });
-
-        // Stop autoplay on user interaction
-        this.$refs.container.addEventListener('mouseenter', () => this.stopAutoplay());
-        this.$refs.container.addEventListener('mouseleave', () => this.startAutoplay());
-        this.$refs.container.addEventListener('touchstart', () => this.stopAutoplay());
-        this.$refs.container.addEventListener('touchend', () => this.startAutoplay());
-    },
-
-    stopAutoplay() {
-        if (this.autoplayInterval) {
-            clearInterval(this.autoplayInterval);
-            this.autoplayInterval = null;
-        }
-    },
-
-    async fetchEquipment() {
-        this.loading = true;
-        this.error = null;
-
-        try {
-            const response = await fetch('/api/featured-equipment');
-            if (!response.ok) {
-                throw new Error('Failed to fetch equipment');
-            }
-
-            this.equipment = await response.json();
-
-            this.$nextTick(() => {
-                this.updateMaxScroll();
             });
-        } catch (err) {
-            this.error = 'Unable to load featured equipment. Please try again later.';
-            console.error('Error fetching equipment:', err);
-        } finally {
-            this.loading = false;
+    
+            this.$refs.container.addEventListener('mouseleave', () => {
+                if (this.isAutoplayEnabled) {
+                    this.startAutoplay();
+                }
+            });
+    
+            this.$watch('scroll', value => {
+                this.$refs.container.scrollTo({ 
+                    left: value, 
+                    behavior: 'smooth' 
+                });
+            });
+        },
+    
+        updateMaxScroll() {
+            if (this.$refs.container) {
+                this.maxScroll = this.$refs.container.scrollWidth - this.$refs.container.clientWidth;
+            }
+        },
+    
+        scrollPrev() {
+            this.stopAutoplay();
+            this.scroll = Math.max(0, this.scroll - 300);
+        },
+    
+        scrollNext() {
+            this.scroll = Math.min(this.maxScroll, this.scroll + 300);
+        },
+    
+        handleScroll(event) {
+            this.scroll = event.target.scrollLeft;
+        },
+    
+        startAutoplay() {
+            this.stopAutoplay();            
+            this.autoplayInterval = setInterval(() => {
+                if (!document.hidden) {
+                    if (this.scroll >= this.maxScroll) {
+                        this.scroll = 0;
+                    } else {
+                        this.scrollNext();
+                    }
+                }
+            }, 3000);
+        },
+    
+        stopAutoplay() {
+            if (this.autoplayInterval) {
+                clearInterval(this.autoplayInterval);
+                this.autoplayInterval = null;
+            }
+        },
+    
+        rentEquipment(item) {
+            this.stopAutoplay();
+            window.location.href = `/rent/${item.id}`;
+        },
+    
+        viewDetails(item) {
+            this.stopAutoplay();
+            window.location.href = `/equipment/${item.id}`;
         }
-    },
-
-    rentEquipment(item) {
-        this.stopAutoplay();
-        window.location.href = `/rent/${item.id}`;
-    },
-
-    viewDetails(item) {
-        this.stopAutoplay();
-        window.location.href = `/equipment/${item.id}`;
-    }
-});
+    });
