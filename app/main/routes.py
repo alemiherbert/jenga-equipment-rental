@@ -24,6 +24,8 @@ def index():
 
 
 @main.route("/signin")
+@main.route("/login")
+
 def signin():
     """
     Login
@@ -34,6 +36,7 @@ def signin():
 
 
 @main.route("/signup")
+@main.route("/register")
 def signup():
     """
     Sign Up
