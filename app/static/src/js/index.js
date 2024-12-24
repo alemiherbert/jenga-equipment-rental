@@ -2,6 +2,7 @@ import './site-navigation';
 import './theme-switcher';
 import './theme-detection';
 import './featured-equipment';
+import './register';
 import carousel from './carousel';
 import featuredEquipment from './featured-equipment';
 import Alpine from 'alpinejs';
