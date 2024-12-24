@@ -4668,11 +4668,11 @@ document.addEventListener('alpine:init', function () {
       form: {
         name: '',
         email: '',
+        phone: '',
+        company: '',
         password: '',
         passwordConfirmation: '',
-        agreement: false,
-        phone: '',
-        company: ''
+        agreement: false
       },
       errors: {},
       error: null,
@@ -4700,64 +4700,89 @@ document.addEventListener('alpine:init', function () {
                 _this2.isSubmitting = true;
                 _context.prev = 4;
                 _context.next = 7;
-                return fetch('/register', {
+                return fetch('/api/register', {
                   method: 'POST',
                   headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                   },
                   body: JSON.stringify({
                     name: _this2.form.name,
                     email: _this2.form.email,
-                    password: _this2.form.password,
                     phone: _this2.form.phone,
-                    company: _this2.form.company
+                    company: _this2.form.company,
+                    password: _this2.form.password
                   })
                 });
               case 7:
                 response = _context.sent;
-                _context.next = 10;
+                _context.prev = 8;
+                _context.next = 11;
                 return response.json();
-              case 10:
+              case 11:
                 data = _context.sent;
+                _context.next = 17;
+                break;
+              case 14:
+                _context.prev = 14;
+                _context.t0 = _context["catch"](8);
+                throw new Error('Invalid JSON response from server');
+              case 17:
                 if (response.ok) {
-                  _context.next = 21;
+                  _context.next = 28;
                   break;
                 }
-                _context.t0 = response.status;
-                _context.next = _context.t0 === 409 ? 15 : _context.t0 === 400 ? 17 : 19;
+                _context.t1 = response.status;
+                _context.next = _context.t1 === 409 ? 21 : _context.t1 === 400 ? 23 : _context.t1 === 500 ? 25 : 26;
                 break;
-              case 15:
-                _this2.errors.email = 'This email is already registered';
-                return _context.abrupt("break", 20);
-              case 17:
-                _this2.handleValidationErrors(data);
-                return _context.abrupt("break", 20);
-              case 19:
-                throw new Error(data.msg || 'Registration failed');
-              case 20:
-                return _context.abrupt("return");
               case 21:
-                if (data.tokens) {
-                  // Store tokens
-                  _this2.storeAuthTokens(data.tokens);
-                  // Redirect to dashboard
-                  window.location.href = '/dashboard';
-                }
-                _context.next = 27;
-                break;
-              case 24:
-                _context.prev = 24;
-                _context.t1 = _context["catch"](4);
-                _this2.error = _context.t1.message;
+                _this2.errors.email = 'This email is already registered';
+                return _context.abrupt("break", 27);
+              case 23:
+                _this2.handleValidationErrors(data);
+                return _context.abrupt("break", 27);
+              case 25:
+                throw new Error('Server error. Please try again later.');
+              case 26:
+                throw new Error(data.msg || 'Registration failed');
               case 27:
-                _context.prev = 27;
+                return _context.abrupt("return");
+              case 28:
+                if (!data.tokens) {
+                  _context.next = 33;
+                  break;
+                }
+                _this2.storeAuthTokens(data.tokens);
+                window.location.href = '/home';
+                _context.next = 34;
+                break;
+              case 33:
+                throw new Error('Invalid server response: missing tokens');
+              case 34:
+                _context.next = 41;
+                break;
+              case 36:
+                _context.prev = 36;
+                _context.t2 = _context["catch"](4);
+                // Log the error for debugging
+                console.error('Registration error:', _context.t2);
+
+                // Set user-friendly error message
+                _this2.error = _context.t2.message || 'An unexpected error occurred. Please try again.';
+
+                // Handle specific network errors
+                if (_context.t2 instanceof TypeError && _context.t2.message === 'Failed to fetch') {
+                  _this2.error = 'Unable to connect to the server. Please check your internet connection.';
+                }
+              case 41:
+                _context.prev = 41;
                 _this2.isSubmitting = false;
-                return _context.finish(27);
-              case 30:
+                return _context.finish(41);
+              case 44:
               case "end":
                 return _context.stop();
             }
-          }, _callee, null, [[4, 24, 27, 30]]);
+          }, _callee, null, [[4, 36, 41, 44], [8, 14]]);
         }))();
       },
       validateForm: function validateForm() {
@@ -4778,6 +4803,21 @@ document.addEventListener('alpine:init', function () {
           isValid = false;
         } else if (!this.isValidEmail(this.form.email)) {
           this.errors.email = 'Please enter a valid email';
+          isValid = false;
+        }
+
+        // Phone validation
+        if (!this.form.phone.trim()) {
+          this.errors.phone = 'Phone number is required';
+          isValid = false;
+        } else if (!this.isValidPhone(this.form.phone)) {
+          this.errors.phone = 'Please enter a valid phone number';
+          isValid = false;
+        }
+
+        // Company name validation
+        if (!this.form.company.trim()) {
+          this.errors.company = 'Company name is required';
           isValid = false;
         }
 
@@ -4805,6 +4845,9 @@ document.addEventListener('alpine:init', function () {
       },
       isValidEmail: function isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      },
+      isValidPhone: function isValidPhone(phone) {
+        return /^\+?[\d\s-]{10,}$/.test(phone);
       },
       isValidPassword: function isValidPassword(password) {
         return password.length >= 8 && /\d/.test(password);

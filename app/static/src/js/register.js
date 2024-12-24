@@ -4,11 +4,11 @@ document.addEventListener('alpine:init', () => {
         form: {
             name: '',
             email: '',
+            phone: '',
+            company: '',
             password: '',
             passwordConfirmation: '',
-            agreement: false,
-            phone: '',
-            company: ''
+            agreement: false
         },
         errors: {},
         error: null,
@@ -30,21 +30,27 @@ document.addEventListener('alpine:init', () => {
             this.isSubmitting = true;
 
             try {
-                const response = await fetch('/register', {
+                const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
                         name: this.form.name,
                         email: this.form.email,
-                        password: this.form.password,
                         phone: this.form.phone,
-                        company: this.form.company
+                        company: this.form.company,
+                        password: this.form.password
                     })
                 });
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    throw new Error('Invalid JSON response from server');
+                }
 
                 if (!response.ok) {
                     switch (response.status) {
@@ -54,6 +60,8 @@ document.addEventListener('alpine:init', () => {
                         case 400:
                             this.handleValidationErrors(data);
                             break;
+                        case 500:
+                            throw new Error('Server error. Please try again later.');
                         default:
                             throw new Error(data.msg || 'Registration failed');
                     }
@@ -61,13 +69,22 @@ document.addEventListener('alpine:init', () => {
                 }
 
                 if (data.tokens) {
-                    // Store tokens
                     this.storeAuthTokens(data.tokens);
-                    // Redirect to dashboard
-                    window.location.href = '/dashboard';
+                    window.location.href = '/home';
+                } else {
+                    throw new Error('Invalid server response: missing tokens');
                 }
             } catch (error) {
-                this.error = error.message;
+                // Log the error for debugging
+                console.error('Registration error:', error);
+                
+                // Set user-friendly error message
+                this.error = error.message || 'An unexpected error occurred. Please try again.';
+                
+                // Handle specific network errors
+                if (error instanceof TypeError && error.message === 'Failed to fetch') {
+                    this.error = 'Unable to connect to the server. Please check your internet connection.';
+                }
             } finally {
                 this.isSubmitting = false;
             }
@@ -91,6 +108,21 @@ document.addEventListener('alpine:init', () => {
                 isValid = false;
             } else if (!this.isValidEmail(this.form.email)) {
                 this.errors.email = 'Please enter a valid email';
+                isValid = false;
+            }
+
+            // Phone validation
+            if (!this.form.phone.trim()) {
+                this.errors.phone = 'Phone number is required';
+                isValid = false;
+            } else if (!this.isValidPhone(this.form.phone)) {
+                this.errors.phone = 'Please enter a valid phone number';
+                isValid = false;
+            }
+
+            // Company name validation
+            if (!this.form.company.trim()) {
+                this.errors.company = 'Company name is required';
                 isValid = false;
             }
 
@@ -120,6 +152,10 @@ document.addEventListener('alpine:init', () => {
 
         isValidEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        },
+
+        isValidPhone(phone) {
+            return /^\+?[\d\s-]{10,}$/.test(phone);
         },
 
         isValidPassword(password) {
