@@ -13,7 +13,7 @@ def index():
     Homepage
     """
     return render_template(
-        "index.html",
+        "layouts/index.html",
         notifications = [
             {
                 "status": "unread",
@@ -21,3 +21,32 @@ def index():
                 "body": "A simple notification"
             }
         ])
+
+
+@main.route("/signin")
+def signin():
+    """
+    Login
+    """
+    return render_template(
+        "layouts/sign-in.html"
+    )
+
+
+@main.route("/signup")
+def signup():
+    """
+    Sign Up
+    """
+    return render_template(
+        "layouts/sign-up.html"
+    )
+    
+@main.route("/password-reset")
+def reset_password():
+    """
+    Password Reset
+    """
+    return render_template(
+        "layouts/password-reset.html"
+    )
