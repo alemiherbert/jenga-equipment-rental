@@ -18,10 +18,11 @@
                     <div class="form-group-stack">
                         <div class="form-group">
                             <label class="form-label" for="email">Email</label>
-                            <input class="form-control form-control--lg" :class="{'is-invalid': errors.email}"
-                                id="email" type="text" x-model="form.email" required="required" autocomplete="off"
-                                autofocus="autofocus" />
-                            <div x-show="errors.email" class="invalid-feedback" x-text="errors.email"></div>
+                            <input class="form-control form-control--lg" id="email" type="email" name="email"
+                                x-model="form.email" :class="{'form-control--invalid': errors.email}" required />
+                            <template x-if="errors.email">
+                                <small class="field-feedback--invalid" x-text="errors.email"></small>
+                            </template>
                         </div>
 
                         <div class="form-group">
@@ -29,10 +30,12 @@
                                 Password
                                 <a href="{{ url_for('main.reset_password') }}">Forgot your password?</a>
                             </label>
-                            <input class="form-control form-control--lg" :class="{'is-invalid': errors.password}"
-                                id="password" type="password" x-model="form.password" required="required"
-                                autocomplete="off" />
-                            <div x-show="errors.password" class="invalid-feedback" x-text="errors.password"></div>
+                            <input class="form-control form-control--lg" id="password" type="password"
+                                name="password" x-model="form.password"
+                                :class="{'form-control--invalid': errors.password}" required />
+                            <template x-if="errors.password">
+                                <small class="field-feedback--invalid" x-text="errors.password"></small>
+                            </template>
                         </div>
 
                         <div class="form-group">

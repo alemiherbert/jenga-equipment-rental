@@ -4,6 +4,8 @@ import './theme-detection';
 import './featured-equipment';
 import './register';
 import './login';
+import './check-auth'
+import './fetch-interceptor';
 import carousel from './carousel';
 import featuredEquipment from './featured-equipment';
 import Alpine from 'alpinejs';

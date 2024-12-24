@@ -2038,7 +2038,7 @@ legend {
   align-items: center;
   border: 1px solid;
   border-left: 0.4rem solid;
-  border-radius: var(--root-border-radius-sm);
+  border-radius: 0px;
   display: flex;
   gap: 1.5rem;
   justify-content: space-between;
@@ -4666,7 +4666,7 @@ legend {
 .site-header__actions {
   align-items: center;
   display: flex;
-  gap: clamp(1rem, 5vw, 3rem);
+  gap: clamp(1rem, 5vw, 1.5rem);
 }
 .site-header__logo {
   display: inline-flex;

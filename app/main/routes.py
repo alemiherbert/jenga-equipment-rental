@@ -4,6 +4,7 @@ Main app routes
 
 from app.main import main
 from flask import render_template, jsonify
+from flask_jwt_extended import jwt_required, current_user
 
 
 @main.route("/")
