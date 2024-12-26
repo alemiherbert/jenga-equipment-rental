@@ -38,6 +38,16 @@ def get_users():
     )), 200
 
 
+@api.route("/users/me", methods=["GET"])
+@jwt_required()
+def get_self():
+    """Return the current user"""
+    return jsonify({
+        "id": current_user.id,
+        "name": current_user.name.split()[0]
+    })
+
+
 @api.route("/users/<int:user_id>", methods=["GET"])
 @jwt_required()
 def get_user(user_id):

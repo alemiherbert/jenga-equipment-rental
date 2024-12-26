@@ -1,16 +1,12 @@
 @use 'sprucecss/scss/spruce' as *;
+@use './mixins' as *;
 
 .how-it-works {
     padding: spacer('m') 0;
     background: var(--color-background-alt);
 
     &__heading {
-        text-align: center;
-
-        h2 {
-            margin-bottom: spacer('xs');
-            font-size: responsive-font-size(2rem, 20, '3vw + 1rem');
-        }
+        @include heading(2rem);
     }
 
     &__grid {

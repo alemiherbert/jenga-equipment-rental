@@ -1,0 +1,107 @@
+{% extends "auth.html" %}
+
+{% block content %}
+<main class="l-auth" x-data="registration">
+    <div class="l-auth__inner">
+        <div class="l-auth__form">
+            <a class="l-auth__logo" href="{{ url_for('main.index') }}">
+                <img src="https://ui.sprucecss.com/img/cone-logo.svg" alt="Cone" height="48" width="48" />
+            </a>
+            <div class="auth-form">
+                <h2 class="auth-form__title">Sign In</h1>
+                    <p class="lead">Hey there Welcome!</p>
+
+                    <!-- Error Alert -->
+                    <template x-if="error">
+                        <div class="alert alert--danger" x-text="error"></div>
+                    </template>
+
+                    <form @submit.prevent="handleSubmit">
+                        <div class="form-group-stack">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Name</label>
+                                <input class="form-control form-control--lg" id="name" type="text" name="name"
+                                    x-model="form.name" :class="{'form-control--invalid': errors.name}" required />
+                                <template x-if="errors.name">
+                                    <small class="field-feedback--invalid" x-text="errors.name"></small>
+                                </template>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email</label>
+                                <input class="form-control form-control--lg" id="email" type="email" name="email"
+                                    x-model="form.email" :class="{'form-control--invalid': errors.email}" required />
+                                <template x-if="errors.email">
+                                    <small class="field-feedback--invalid" x-text="errors.email"></small>
+                                </template>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="phone">Phone</label>
+                                <input class="form-control form-control--lg" id="phone" type="tel" name="phone"
+                                    x-model="form.phone" :class="{'form-control--invalid': errors.phone}" required />
+                                <template x-if="errors.phone">
+                                    <small class="field-feedback--invalid" x-text="errors.phone"></small>
+                                </template>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="company">Company</label>
+                                <input class="form-control form-control--lg" id="company" type="text" name="company"
+                                    x-model="form.company" :class="{'form-control--invalid': errors.company}" required />
+                                <template x-if="errors.company">
+                                    <small class="field-feedback--invalid" x-text="errors.company"></small>
+                                </template>
+                            </div>
+
+                            <div class="form-row--mixed">
+                                <div class="form-group">
+                                    <label class="form-label" for="password">Password</label>
+                                    <input class="form-control form-control--lg" id="password" type="password"
+                                        name="password" x-model="form.password"
+                                        :class="{'form-control--invalid': errors.password}" required />
+                                    <template x-if="errors.password">
+                                        <small class="field-feedback--invalid" x-text="errors.password"></small>
+                                    </template>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="passwordConfirmation">Confirm Password</label>
+                                    <input class="form-control form-control--lg" id="passwordConfirmation"
+                                        type="password" name="passwordConfirmation" x-model="form.passwordConfirmation"
+                                        :class="{'form-control--invalid': errors.passwordConfirmation}" required />
+                                    <template x-if="errors.passwordConfirmation">
+                                        <small class="field-feedback--invalid" x-text="errors.passwordConfirmation"></small>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-check form-check--lg" for="agreement">
+                                    <input class="form-check__control" id="agreement" type="checkbox" name="agreement"
+                                        x-model="form.agreement" />
+                                    <span class="form-label form-check__label">
+                                        I agree with the <a href="#">User Agreement</a> and <a href="#">Privacy
+                                            Policy</a>
+                                    </span>
+                                </label>
+                                <template x-if="errors.agreement">
+                                    <small class="field-feedback--invalid" x-text="errors.agreement"></small>
+                                </template>
+                            </div>
+
+                            <div class="form-group">
+                                <button class="btn btn--primary btn--lg btn--block" :disabled="isSubmitting"
+                                    x-text="isSubmitting ? 'Signing up...' : 'Sign Up'"></button>
+                            </div>
+                        </div>
+                    </form>
+            </div>
+            <div class="l-auth__footer">
+                <p>Already a member? <a href="{{ url_for('main.signin') }}">Sign in</a></p>
+            </div>
+        </div>
+        <div class="l-auth__sidebar"></div>
+    </div>
+</main>
+{% endblock %}

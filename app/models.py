@@ -176,7 +176,10 @@ class Equipment(PaginatedAPIMixin, db.Model):
     # images: Mapped[List[str]] = mapped_column(JSON, default=List)
     price_per_day: Mapped[float] = mapped_column(Float, nullable=False, default=100_000.0)
     transport_cost_per_km: Mapped[float] = mapped_column(Float, nullable=False, default=5_000.0)
-    
+
+    # Category shall later have to be a model
+    category: Mapped[Optional[str]] = mapped_column(String(64))
+
     stripe_product_id: Mapped[Optional[str]] = mapped_column(String(128))
 
     class Status(enum.Enum):
