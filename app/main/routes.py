@@ -54,3 +54,14 @@ def reset_password():
     return render_template(
         "layouts/password-reset.html"
     )
+    
+
+@main.route("/equipment")
+@main.route("/equipment/all")
+def equipment():
+    """
+    Equipment
+    """
+    return render_template(
+        "layouts/equipment.html"    
+    )

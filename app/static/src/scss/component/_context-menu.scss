@@ -9,12 +9,12 @@
   background-color: color('background');
   border: 1px solid color('border');
   border-radius: config('border-radius-sm', $display);
-  box-shadow: 0 0 spacer('xxs') hsl(201deg 72% 32% / 5%);
   inline-size: var(--inline-size);
   opacity: 0;
   position: absolute;
   scale: 0.85;
   visibility: hidden;
+  padding: 0.5rem;
   z-index: 10;
 
   &--inline-start {
@@ -36,22 +36,17 @@
     flex-direction: column;
   }
 
-  > li + li {
-    border-block-start: 1px solid color('border');
-    margin-block-start: 0;
-  }
-
   &__item {
     align-items: center;
     background: none;
-    block-size: 2.25rem;
+    block-size: 2rem;
     border: 0;
     border-radius: config('border-radius-sm', $display);
     color: color('text');
     display: flex;
     justify-content: space-between;
     line-height: config('line-height-md', $typography);
-    margin: 0.15em;
+    margin: 0.05em;
     padding-block: 0.25em;
     padding-inline: 0.6em;
     text-decoration: none;

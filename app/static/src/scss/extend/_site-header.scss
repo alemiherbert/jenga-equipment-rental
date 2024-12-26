@@ -21,7 +21,7 @@
   }
 
   &__btn {
-    padding: 0.5rem 1rem;
+    padding: 0.425rem 1rem;
   }
 
   &__actions {
@@ -40,15 +40,6 @@
     }
   }
 
-  &__email {
-    display: none;
-    text-decoration: none;
-
-    @include breakpoint('sm') {
-      display: inline-block;
-    }
-  }
-
   &__navigation {
     margin-inline-start: auto;
 
@@ -64,4 +55,12 @@
       }
     }
   }
+}
+
+#navigation-toggle {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  padding: spacer('xs');
 }

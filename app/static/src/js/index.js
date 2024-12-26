@@ -8,6 +8,7 @@ import './check-auth'
 import './fetch-interceptor';
 import carousel from './carousel';
 import featuredEquipment from './featured-equipment';
+import equipmentGrid from './equipment-grid';
 import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus'
 // import searchComponent from './components/search';
@@ -17,4 +18,5 @@ window.Alpine = Alpine;
 Alpine.plugin(focus)
 Alpine.data('carousel', carousel);
 Alpine.data('featuredEquipment', featuredEquipment);
+Alpine.data('equipmentGrid', equipmentGrid);
 Alpine.start();

@@ -1,8 +1,11 @@
 @use 'sprucecss/scss/spruce' as *;
+@use '../extend/mixins' as *;
 
 .auth-form {
   @include layout-stack('s');
   margin-block: auto;
+  @include heading(2rem);
+  text-align: left;
 
   &__title {
     font-weight: 700;

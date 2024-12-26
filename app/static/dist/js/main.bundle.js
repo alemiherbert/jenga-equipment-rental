@@ -4635,6 +4635,92 @@ document.addEventListener('alpine:init', function () {
 
 /***/ }),
 
+/***/ "./src/js/equipment-grid.js":
+/*!**********************************!*\
+  !*** ./src/js/equipment-grid.js ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (function () {
+  return {
+    equipment: [{
+      "id": "7451",
+      "name": "15\" Circular Saw",
+      "category": "Power Tools",
+      "image": "/static/dist/img/hero.jpg",
+      "dayRate": 45.00,
+      "available": false,
+      "isNew": false
+    }, {
+      "id": "5849",
+      "name": "18\" Electric Drill",
+      "category": "Power Tools",
+      "image": "/static/dist/img/hero.jpg",
+      "dayRate": 45.00,
+      "available": true,
+      "isNew": true
+    }, {
+      "id": "9037",
+      "name": "12\" Angle Grinder",
+      "category": "Power Tools",
+      "image": "/static/dist/img/hero.jpg",
+      "dayRate": 45.00,
+      "available": true,
+      "isNew": false
+    }, {
+      "id": "3094",
+      "name": "8\" Hammer Drill",
+      "category": "Power Tools",
+      "image": "/static/dist/img/hero.jpg",
+      "dayRate": 45.00,
+      "available": true,
+      "isNew": false
+    }, {
+      "id": "8272",
+      "name": "10\" Jigsaw",
+      "category": "Power Tools",
+      "image": "/static/dist/img/hero.jpg",
+      "dayRate": 45.00,
+      "available": true,
+      "isNew": false
+    }, {
+      "id": "1123",
+      "name": "20\" Chainsaw",
+      "category": "Power Tools",
+      "image": "/static/dist/img/hero.jpg",
+      "dayRate": 60.00,
+      "available": true,
+      "isNew": true
+    }, {
+      "id": "4567",
+      "name": "Cordless Screwdriver",
+      "category": "Power Tools",
+      "image": "/static/dist/img/hero.jpg",
+      "dayRate": 30.00,
+      "available": false,
+      "isNew": false
+    }, {
+      "id": "7890",
+      "name": "7\" Tile Saw",
+      "category": "Power Tools",
+      "image": "/static/dist/img/hero.jpg",
+      "dayRate": 50.00,
+      "available": true,
+      "isNew": true
+    }],
+    loading: false,
+    error: null,
+    init: function init() {}
+  };
+});
+
+/***/ }),
+
 /***/ "./src/js/featured-equipment.js":
 /*!**************************************!*\
   !*** ./src/js/featured-equipment.js ***!
@@ -5476,8 +5562,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _check_auth__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_check_auth__WEBPACK_IMPORTED_MODULE_6__);
 /* harmony import */ var _fetch_interceptor__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./fetch-interceptor */ "./src/js/fetch-interceptor.js");
 /* harmony import */ var _carousel__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./carousel */ "./src/js/carousel.js");
-/* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/module.esm.js");
-/* harmony import */ var _alpinejs_focus__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @alpinejs/focus */ "./node_modules/@alpinejs/focus/dist/module.esm.js");
+/* harmony import */ var _equipment_grid__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./equipment-grid */ "./src/js/equipment-grid.js");
+/* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/module.esm.js");
+/* harmony import */ var _alpinejs_focus__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @alpinejs/focus */ "./node_modules/@alpinejs/focus/dist/module.esm.js");
+
 
 
 
@@ -5492,12 +5580,13 @@ __webpack_require__.r(__webpack_exports__);
 
 // import searchComponent from './components/search';
 
-window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_9__["default"];
+window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_10__["default"];
 // window.searchComponent = searchComponent;
-alpinejs__WEBPACK_IMPORTED_MODULE_9__["default"].plugin(_alpinejs_focus__WEBPACK_IMPORTED_MODULE_10__["default"]);
-alpinejs__WEBPACK_IMPORTED_MODULE_9__["default"].data('carousel', _carousel__WEBPACK_IMPORTED_MODULE_8__["default"]);
-alpinejs__WEBPACK_IMPORTED_MODULE_9__["default"].data('featuredEquipment', _featured_equipment__WEBPACK_IMPORTED_MODULE_3__["default"]);
-alpinejs__WEBPACK_IMPORTED_MODULE_9__["default"].start();
+alpinejs__WEBPACK_IMPORTED_MODULE_10__["default"].plugin(_alpinejs_focus__WEBPACK_IMPORTED_MODULE_11__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_10__["default"].data('carousel', _carousel__WEBPACK_IMPORTED_MODULE_8__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_10__["default"].data('featuredEquipment', _featured_equipment__WEBPACK_IMPORTED_MODULE_3__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_10__["default"].data('equipmentGrid', _equipment_grid__WEBPACK_IMPORTED_MODULE_9__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_10__["default"].start();
 })();
 
 /******/ })()
