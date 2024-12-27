@@ -3,7 +3,7 @@
 
 {% include 'snippets/site-header.html' %}
 <div class="container">
-    <div class="equipment">
+    <div class="equipment" x-data="equipmentGrid">
         <div class="equipment__header">
             <div class="app-header__column">
                 <ol class="breadcrumb-list app-header__breadcrumb">
@@ -11,12 +11,12 @@
                         <a href="/">Equipment</a>
                     </li>
                     <li>
-                        <span aria-current="page">All</span>
+                        <span x-text="breadcrumb" aria-current="page">All</span>
                     </li>
                 </ol>
             </div>
             <div class="app-card__actions">
-                <form class="search-form" @submit.prevent="">
+                <form class="search-form" @submit.prevent="fetchEquipment">
                     <svg aria-hidden="true" focusable="false" height="24" role="img" style="fill: currentColor"
                         viewBox="0 0 24 24" width="24" xmlns:xlink="http://www.w3.org/1999/xlink"
                         xmlns="http://www.w3.org/2000/svg" class="search-form__icon">
@@ -25,7 +25,7 @@
                         </path>
                     </svg>
                     <input x-model="search" class="search-form__control" type="text" placeholder="Search..."
-                        title="Search">
+                        @input.debounce.300ms="fetchEquipment">
                 </form>
                 <div class="data-table-filter" x-data="{ open: false }" @click.outside="open = false">
                     <button class="btn btn--light btn--icon btn--counter data-table-filter__toggle"
@@ -43,23 +43,31 @@
                         <form @submit.prevent="submitForm(formData)"
                             class="form-group-stack form-group-stack--bordered form-group-container">
                             <div class="form-group">
-                                <label class="form-label" for="status">Status</label>
-                                <select class="form-control" id="status" x-model="formData.status">
+                                <label class="form-label" for="location">Location</label>
+                                <select class="form-control" id="location" x-model="formData.location">
                                     <option>All</option>
-                                    <option>In stock</option>
-                                    <option>Out of stock</option>
+                                    <option>Kampala</option>
+                                    <option>Jinja</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label class="form-label" for="status">Category</label>
+                                <select class="form-control" id="status" x-model="formData.category">
+                                    <option>All</option>
+                                    <option>Earthmoving</option>
+                                    <option>Material Handling</option>
+                                </select>
+                            </div>
+
                             <div class="data-table-filter__actions">
-                                <button class="btn btn--primary btn--sm">Filter</button>
-                                <button @click="filters = []" type="reset" class="btn btn--light btn--sm">Reset</button>
+                                <button @click="resetFilters" type="reset" class="btn btn--light btn--sm">Reset</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="equipment__grid equipment__grid--even" x-data="equipmentGrid">
+        <div class="equipment__grid equipment__grid--even">
             <template x-for="item in equipment" :key="item.id">
                 <div class="gallery-item gallery-item--1">
                     <div class="equipment-card" @click="viewDetails(item)">

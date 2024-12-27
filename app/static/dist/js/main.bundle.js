@@ -4656,38 +4656,69 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     equipment: [],
     loading: false,
     error: null,
+    page: 1,
+    totalPages: 1,
+    breadcrumb: 'All',
+    search: '',
+    formData: {
+      location: 'All',
+      category: 'All'
+    },
+    filters: [],
     init: function init() {
+      var _this = this;
       this.fetchEquipment();
       this.$watch('equipment', function () {
         feather_icons__WEBPACK_IMPORTED_MODULE_0___default().replace();
-        console.log('fdkjgbkjfdbbgkdjf b');
+      });
+      this.$watch('search', function () {
+        _this.page = 1;
+        _this.fetchEquipment();
+      });
+      this.$watch('formData', function () {
+        _this.submitForm(_this.formData);
+      }, {
+        deep: true
       });
     },
     fetchEquipment: function fetchEquipment() {
-      var _this = this;
+      var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var response, data;
+        var params, response, data;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              _this.loading = true;
-              _this.error = null;
+              _this2.loading = true;
+              _this2.error = null;
               _context.prev = 2;
-              _context.next = 5;
-              return fetch('/api/equipment');
-            case 5:
+              params = new URLSearchParams({
+                page: _this2.page,
+                per_page: 12
+              });
+              if (_this2.search) {
+                params.append('search', _this2.search);
+              }
+              if (_this2.formData.location !== 'All') {
+                params.append('location', _this2.formData.location);
+              }
+              if (_this2.formData.category !== 'All') {
+                params.append('category', _this2.formData.category);
+              }
+              _context.next = 9;
+              return fetch("/api/equipment?".concat(params.toString()));
+            case 9:
               response = _context.sent;
               if (response.ok) {
-                _context.next = 8;
+                _context.next = 12;
                 break;
               }
               throw new Error('Failed to fetch equipment');
-            case 8:
-              _context.next = 10;
+            case 12:
+              _context.next = 14;
               return response.json();
-            case 10:
+            case 14:
               data = _context.sent;
-              _this.equipment = data.items.map(function (item) {
+              _this2.equipment = data.items.map(function (item) {
                 return {
                   id: item.id,
                   name: item.name,
@@ -4699,23 +4730,67 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   isNew: false
                 };
               });
-              _context.next = 18;
+              _this2.totalPages = data._meta.total_pages;
+              _this2.updateBreadcrumb();
+              _context.next = 24;
               break;
-            case 14:
-              _context.prev = 14;
+            case 20:
+              _context.prev = 20;
               _context.t0 = _context["catch"](2);
-              _this.error = _context.t0.message;
+              _this2.error = _context.t0.message;
               console.error('Error fetching equipment:', _context.t0);
-            case 18:
-              _context.prev = 18;
-              _this.loading = false;
-              return _context.finish(18);
-            case 21:
+            case 24:
+              _context.prev = 24;
+              _this2.loading = false;
+              return _context.finish(24);
+            case 27:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[2, 14, 18, 21]]);
+        }, _callee, null, [[2, 20, 24, 27]]);
       }))();
+    },
+    submitForm: function submitForm(formData) {
+      this.filters = [];
+      if (formData.location !== 'All') {
+        this.filters.push("Location: ".concat(formData.location));
+      }
+      if (formData.category !== 'All') {
+        this.filters.push("Category: ".concat(formData.category));
+      }
+      this.page = 1;
+      console.log(this.filters);
+      this.fetchEquipment();
+    },
+    updateBreadcrumb: function updateBreadcrumb() {
+      if (this.filters.length > 0) {
+        this.breadcrumb = this.filters.join(', ');
+      } else if (this.page > 1) {
+        this.breadcrumb = "Page ".concat(this.page);
+      } else {
+        this.breadcrumb = 'All';
+      }
+    },
+    prevPage: function prevPage() {
+      if (this.page > 1) {
+        this.page--;
+        this.fetchEquipment();
+      }
+    },
+    nextPage: function nextPage() {
+      if (this.page < this.totalPages) {
+        this.page++;
+        this.fetchEquipment();
+      }
+    },
+    resetFilters: function resetFilters() {
+      this.formData = {
+        location: 'All',
+        category: 'All'
+      };
+      this.filters = [];
+      this.page = 1;
+      this.fetchEquipment();
     }
   };
 });

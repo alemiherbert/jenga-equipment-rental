@@ -27,22 +27,17 @@ def get_equipment_list():
     per_page = min(request.args.get("per_page", 12, type=int), 100)
     query = select(Equipment)
     
-    # Add filters if provided
-    if request.args.get("status"):
-        try:
-            status = Equipment.Status(request.args.get("status"))
-            query = query.where(Equipment.status == status)
-        except ValueError:
-            return error_response("Invalid status value", 400)
+    if request.args.get("search"):
+        search = f"%{request.args.get('search')}%"
+        query = query.where(Equipment.name.ilike(search))
     
-    if request.args.get("location_id"):
-        query = query.where(Equipment.location_id == request.args.get("location_id", type=int))
+    if request.args.get("location"):
+        query = query.where(Equipment.location.city == request.args.get("location"))
     
-    # Add price range filter
-    if request.args.get("min_price"):
-        query = query.where(Equipment.price_per_day >= float(request.args.get("min_price")))
-    if request.args.get("max_price"):
-        query = query.where(Equipment.price_per_day <= float(request.args.get("max_price")))
+    if request.args.get("category"):
+        query = query.where(Equipment.category == request.args.get("category"))
+    
+    print(request.args)
     
     return jsonify(Equipment.to_collection_dict(
         query=query,

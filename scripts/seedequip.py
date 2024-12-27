@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import create_engine, select
 from app.models import Equipment, Location
+import random
 
 # Database connection
 from app import db
@@ -68,18 +69,61 @@ equipment_data = [
     {"name": "Husqvarna PG 820 Grinder", "category": "Paving and Concrete", "price_per_day": 90000, "transport_cost_per_km": 4500},
 ]
 
-# Function to seed equipment data
+# Sample locations in Kampala
+locations_data = [
+    {"name": "Kololo", "address": "Plot 30A, Acacia Avenue", "city": "Kampala", "region": "Central", "latitude": 0.3300, "longitude": 32.5833},
+    {"name": "Nakasero", "address": "Plot 1, Colville Street", "city": "Kampala", "region": "Central", "latitude": 0.3167, "longitude": 32.5833},
+    {"name": "Ntinda", "address": "Plot 10, Ntinda View Crescent", "city": "Kampala", "region": "Central", "latitude": 0.3500, "longitude": 32.6167},
+    {"name": "Kamwokya", "address": "Plot 8, Bukoto Street", "city": "Kampala", "region": "Central", "latitude": 0.3333, "longitude": 32.5833},
+    {"name": "Old Kampala", "address": "Plot 4, Martin Road", "city": "Kampala", "region": "Central", "latitude": 0.3167, "longitude": 32.5667},
+    {"name": "Nakawa", "address": "Plot 8, Port Bell Road", "city": "Kampala", "region": "Central", "latitude": 0.3167, "longitude": 32.6167},
+    {"name": "Kisugu", "address": "Plot 15, Ntinda Road", "city": "Kampala", "region": "Central", "latitude": 0.3000, "longitude": 32.6000},
+    {"name": "Lugogo", "address": "Plot 10, Kyadondo Road", "city": "Kampala", "region": "Central", "latitude": 0.3167, "longitude": 32.6000},
+    {"name": "Buziga", "address": "Plot 1, Baskerville Avenue", "city": "Kampala", "region": "Central", "latitude": 0.3000, "longitude": 32.6167},
+    {"name": "Muyenga", "address": "Plot 10, Bukoto Street", "city": "Kampala", "region": "Central", "latitude": 0.3000, "longitude": 32.6333},
+]
+
+# Function to seed locations data
+def seed_locations():
+    for item in locations_data:
+        location = Location(
+            name=item["name"],
+            address=item["address"],
+            city=item["city"],
+            region=item["region"],
+            country="Uganda",
+            latitude=item["latitude"],
+            longitude=item["longitude"]
+        )
+        db.session.add(location)
+    db.session.commit()
+    print("Locations data seeded successfully!")
+
+# Function to seed equipment data with random locations
 def seed_equipment():
+    # Fetch all locations from the database
+    locations = Location.query.all()
+    if not locations:
+        print("No locations found. Please seed locations first.")
+        return
+
     for item in equipment_data:
+        # Randomly assign a location
+        location = random.choice(locations)
         equipment = Equipment(
             name=item["name"],
             category=item["category"],
             price_per_day=item["price_per_day"],
             transport_cost_per_km=item["transport_cost_per_km"],
-            created_at=datetime.now(timezone.utc)
+            created_at=datetime.now(timezone.utc),
+            location=location
         )
         db.session.add(equipment)
     db.session.commit()
     print("Equipment data seeded successfully!")
 
+# Seed locations first
+seed_locations()
+
+# Seed equipment with random locations
 seed_equipment()
