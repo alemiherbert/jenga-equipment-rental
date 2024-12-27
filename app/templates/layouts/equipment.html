@@ -69,12 +69,16 @@
                         </div>
                         <div class="equipment-card__content">
                             <h3 class="equipment-card__title" x-text="item.name"></h3>
-                            <div class="equipment-card__categories">
+                            <div class="equipment-card__meta">
                                 <span class="equipment-card__category" x-text="item.category"></span>
+                                <span class="equipment-card__location">
+                                    <i data-feather="map-pin" width="12"></i>
+                                    <span x-text="item.location"></span>
+                                </span>
                             </div>
                             <div class="equipment-card__pricing">
                                 <span class="equipment-card__rate">
-                                    $<span x-text="item.dayRate"></span>/day
+                                    UGX <span x-text="item.dayRate"></span>/day
                                 </span>
                                 <span class="equipment-card__availability"
                                     :class="item.available ? 'is-available' : 'is-unavailable'"

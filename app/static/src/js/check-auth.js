@@ -15,7 +15,6 @@ document.addEventListener('alpine:init', () => {
                 const data = await response.json();
                 this.isAuthenticated = true;
             } catch (error) {
-                console.warn('Authentication check failed:', error);
                 this.isAuthenticated = false;
             }
         },
@@ -56,7 +55,6 @@ document.addEventListener('alpine:init', () => {
                 const data = await response.json();
                 this.userName = data.name || 'User';
             } catch (error) {
-                console.warn('Unable to fetch user:', error);
                 this.userName = 'Guest';
             }
         }

@@ -12,7 +12,6 @@ document.addEventListener('alpine:init', () => {
             const originalFetch = window.fetch;
             window.fetch = async function (...args) {
                 let [url, options = {}] = args;
-                console.log("Fetch called with args: ", args)
 
                 const token = localStorage.getItem('access_token');
                 if (token) {
@@ -63,7 +62,7 @@ Alpine.data('userState', () => ({
             const data = await response.json();
             this.userName = data.name;
         } catch (error) {
-            console.error('Auth check failed:', error);
+            // console.error('Auth check failed:', error);
             this.userName = 'guest';
         }
     }

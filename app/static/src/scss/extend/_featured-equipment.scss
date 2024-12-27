@@ -75,12 +75,28 @@
         text-overflow: ellipsis;
     }
 
+    &__meta {
+        display: flex;
+        gap: spacer('xxs');
+
+        >* {
+            font-size: 0.75rem;
+            margin: spacer('xs') 0;
+            padding-inline: spacer('xs');
+        }
+    }
+
     &__category {
         color: color('primary');
         background: color('primary-lightest');
-        font-size: 0.75rem;
-        margin: spacer('xs') 0;
-        padding: calc(spacer('xs') / 2) spacer('xs');
+
+    }
+
+    &__location {
+        color: color.adjust(color('danger', 'alert', $only-color: true), $lightness: -5%);
+        display: flex;
+        align-items: center;
+        gap: spacer('xxs');
     }
 
     &__pricing {

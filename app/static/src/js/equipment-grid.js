@@ -1,3 +1,5 @@
+import feather from 'feather-icons';
+
 export default () => ({
     equipment: [],
     loading: false,
@@ -5,6 +7,10 @@ export default () => ({
 
     init() {
         this.fetchEquipment();
+        this.$watch('equipment', () => {
+            feather.replace();
+            console.log('fdkjgbkjfdbbgkdjf b')
+        });
     },
 
     async fetchEquipment() {
@@ -21,6 +27,7 @@ export default () => ({
                 id: item.id,
                 name: item.name,
                 category: item.category,
+                location: item.location || "Kampala",
                 image: "/static/dist/img/hero.jpg",
                 dayRate: item.price_per_day,
                 available: item.status === "available",

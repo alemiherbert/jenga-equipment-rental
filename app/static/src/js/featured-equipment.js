@@ -1,5 +1,7 @@
+import feather from 'feather-icons';
+
 export default () => ({
-    equipment: [], // Initialize equipment as an empty array
+    equipment: [],
     loading: false,
     error: null,
     autoplayInterval: null,
@@ -8,7 +10,7 @@ export default () => ({
     isAutoplayEnabled: true,
 
     init() {
-        this.fetchFeaturedEquipment(); // Fetch featured equipment on initialization
+        this.fetchFeaturedEquipment();
 
         this.$nextTick(() => {
             this.updateMaxScroll();
@@ -21,6 +23,7 @@ export default () => ({
             this.$nextTick(() => {
                 this.updateMaxScroll();
             });
+            feather.replace();
         });
 
         window.addEventListener('resize', () => {
@@ -67,10 +70,11 @@ export default () => ({
                 id: item.id,
                 name: item.name,
                 category: item.category,
-                image: "/static/dist/img/hero.jpg", // Default image (can be replaced with actual image URLs if available)
+                image: "/static/dist/img/hero.jpg",
+                location: item.location || "Kampala",
                 dayRate: item.price_per_day,
                 available: item.status === "available",
-                isNew: false // Assuming no "isNew" field in the API response
+                isNew: false
             }));
         } catch (error) {
             this.error = error.message;

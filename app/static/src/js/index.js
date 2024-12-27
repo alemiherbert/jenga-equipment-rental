@@ -10,8 +10,10 @@ import carousel from './carousel';
 import featuredEquipment from './featured-equipment';
 import equipmentGrid from './equipment-grid';
 import Alpine from 'alpinejs';
-import focus from '@alpinejs/focus'
+import focus from '@alpinejs/focus';
+import feather from 'feather-icons'
 // import searchComponent from './components/search';
+feather.replace();
 
 window.Alpine = Alpine;
 // window.searchComponent = searchComponent;

@@ -6,7 +6,7 @@
         <div class="app-notification__header">
             <h2 class="app-notification__title">Notifications</h2>
             <button class="btn btn--sm btn--icon btn--light" aria-label="Close modal" @click="notificationOpen = false">
-                <i>{{ feather.icon('x', class='btn__icon') }}</i>
+                <i data-feather="x" class="btn__icon"></i>
             </button>
         </div>
         <div class="app-notification__list">
@@ -16,7 +16,7 @@
                 x-data="{ notificationOpen: false }">
                 <div class="notification-card__header">
                     <div class="notification-card__icon notification-card__icon--{{ notification.type }}">
-                        <i>{{ feather.icon('bell', class='btn__icon') }}</i>
+                        <i data-feather="bell" class="btn__icon"></i>
                     </div>
                     <div class="notification-card__caption">
                         <h3 id="notification-{{ loop.index }}" class="notification-card__title">
@@ -31,7 +31,7 @@
                     <button @click="notificationOpen = ! notificationOpen" aria-label="Toggle notification"
                         aria-describedby="notification-{{ loop.index }}"
                         class="btn btn--primary btn--sm btn--icon notification-card__control">
-                        <i>{{ feather.icon('plus', class='btn__icon') }}</i>
+                        <i data-feather="plus" class="btn__icon"></i>
                     </button>
                     {% endif %}
                 </div>

@@ -4892,12 +4892,24 @@ legend {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.equipment-card__meta {
+  display: flex;
+  gap: 0.25rem;
+}
+.equipment-card__meta > * {
+  font-size: 0.75rem;
+  margin: 0.5rem 0;
+  padding-inline: 0.5rem;
+}
 .equipment-card__category {
   color: var(--root-base-color-primary);
   background: var(--root-base-color-primary-lightest);
-  font-size: 0.75rem;
-  margin: 0.5rem 0;
-  padding: 0.25rem 0.5rem;
+}
+.equipment-card__location {
+  color: hsl(0, 71%, 46%);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 .equipment-card__pricing {
   display: flex;
