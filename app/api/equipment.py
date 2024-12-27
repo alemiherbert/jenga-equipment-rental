@@ -57,7 +57,6 @@ def get_featured_equipment():
     """Get a list of featured equipment."""
     query = select(Equipment).where(Equipment.featured == True)
     featured_equipment = db.session.execute(query).scalars().all()
-    update_all_featured_status()
     return jsonify({
         "featured_equipment": [equipment.to_dict() for equipment in featured_equipment]
     }), 200
