@@ -1,82 +1,36 @@
 export default () => ({
-    equipment: [
-        {
-            "id": "7451",
-            "name": "15\" Circular Saw",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": false,
-            "isNew": false
-        },
-        {
-            "id": "5849",
-            "name": "18\" Electric Drill",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": true,
-            "isNew": true
-        },
-        {
-            "id": "9037",
-            "name": "12\" Angle Grinder",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": true,
-            "isNew": false
-        },
-        {
-            "id": "3094",
-            "name": "8\" Hammer Drill",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": true,
-            "isNew": false
-        },
-        {
-            "id": "8272",
-            "name": "10\" Jigsaw",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 45.00,
-            "available": true,
-            "isNew": false
-        },
-        {
-            "id": "1123",
-            "name": "20\" Chainsaw",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 60.00,
-            "available": true,
-            "isNew": true
-        },
-        {
-            "id": "4567",
-            "name": "Cordless Screwdriver",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 30.00,
-            "available": false,
-            "isNew": false
-        },
-        {
-            "id": "7890",
-            "name": "7\" Tile Saw",
-            "category": "Power Tools",
-            "image": "/static/dist/img/hero.jpg",
-            "dayRate": 50.00,
-            "available": true,
-            "isNew": true
-        }
-    ],
+    equipment: [],
     loading: false,
     error: null,
 
     init() {
-        
+        this.fetchEquipment();
+    },
+
+    async fetchEquipment() {
+        this.loading = true;
+        this.error = null;
+
+        try {
+            const response = await fetch('/api/equipment');
+            if (!response.ok) {
+                throw new Error('Failed to fetch equipment');
+            }
+            const data = await response.json();
+            this.equipment = data.items.map(item => ({
+                id: item.id,
+                name: item.name,
+                category: item.category,
+                image: "/static/dist/img/hero.jpg",
+                dayRate: item.price_per_day,
+                available: item.status === "available",
+                isNew: false
+            }));
+        } catch (error) {
+            this.error = error.message;
+            console.error('Error fetching equipment:', error);
+        } finally {
+            this.loading = false;
+        }
     }
 });

@@ -24,7 +24,7 @@ def update_all_featured_status():
 def get_equipment_list():
     """Get paginated list of equipment"""
     page = request.args.get("page", 1, type=int)
-    per_page = min(request.args.get("per_page", 10, type=int), 100)
+    per_page = min(request.args.get("per_page", 12, type=int), 100)
     query = select(Equipment)
     
     # Add filters if provided

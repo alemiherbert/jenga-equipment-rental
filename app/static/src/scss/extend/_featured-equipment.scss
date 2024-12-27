@@ -8,6 +8,10 @@
         text-align: center;
         padding: var(--spacing-double);
     }
+
+    .equipment-card {
+        width: 300px;
+    }
 }
 
 .equipment-card {
@@ -66,6 +70,9 @@
         font-family: 'Oswald';
         color: color('heading');
         text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     &__category {

@@ -4835,6 +4835,9 @@ legend {
   text-align: center;
   padding: var(--spacing-double);
 }
+.featured-equipment .equipment-card {
+  width: 300px;
+}
 
 .equipment-card {
   background: var(--root-base-color-background);
@@ -4885,6 +4888,9 @@ legend {
   font-family: "Oswald";
   color: var(--root-base-color-heading);
   text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .equipment-card__category {
   color: var(--root-base-color-primary);

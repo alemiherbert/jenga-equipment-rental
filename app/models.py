@@ -243,13 +243,13 @@ class Equipment(PaginatedAPIMixin, db.Model):
     def update_featured_status(self):
         """Update the featured status based on the feature score."""
         self.featured = self.calculate_feature_score() >= 0.7 
-        
-    
+
     def to_dict(self) -> dict:
         """Serialize equipment object to dictionary"""
         return {
             'id': self.id,
             'name': self.name,
+            'category': self.category,
             'price_per_day': self.price_per_day,
             'transport_cost_per_km': self.transport_cost_per_km,
             'status': self.status.value,
