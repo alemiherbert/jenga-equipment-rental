@@ -11,6 +11,15 @@ from flask_jwt_extended import jwt_required, current_user
 from sqlalchemy import select
 
 
+# Todo: Delegate this to a CRON job
+def update_all_featured_status():
+    """Recalculate and update the featured status for all equipment."""
+    equipment_list = db.session.query(Equipment).all()
+    for equipment in equipment_list:
+        equipment.update_featured_status()
+    db.session.commit()
+
+
 @api.route("/equipment", methods=["GET"])
 def get_equipment_list():
     """Get paginated list of equipment"""
@@ -41,6 +50,18 @@ def get_equipment_list():
         per_page=per_page,
         endpoint="api.get_equipment_list"
     )), 200
+
+
+@api.route("/equipment/featured", methods=["GET"])
+def get_featured_equipment():
+    """Get a list of featured equipment."""
+    query = select(Equipment).where(Equipment.featured == True)
+    featured_equipment = db.session.execute(query).scalars().all()
+    update_all_featured_status()
+    return jsonify({
+        "featured_equipment": [equipment.to_dict() for equipment in featured_equipment]
+    }), 200
+
 
 
 @api.route("/equipment/<int:equipment_id>", methods=["GET"])

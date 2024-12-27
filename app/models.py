@@ -3,7 +3,7 @@ Application Models
 """
 from app import db
 from sqlalchemy.orm import mapped_column, relationship, Mapped
-from sqlalchemy import select, String, Float, ForeignKey, DateTime, Enum, Numeric
+from sqlalchemy import select, String, Float, ForeignKey, DateTime, Enum, Numeric, Boolean
 # from sqlalchemy.dialects.postgresql import JSON
 from flask import url_for
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -188,12 +188,64 @@ class Equipment(PaginatedAPIMixin, db.Model):
         RENTED = "rented"
     
     status: Mapped[Status] = mapped_column(Enum(Status), default=Status.AVAILABLE)
-
+    featured: Mapped[bool] = mapped_column(Boolean, default=False)
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("location.id"))
     location: Mapped[Optional["Location"]] = relationship("Location", back_populates="equipment")
     bookings: Mapped[List["Booking"]] = relationship("Booking", back_populates="equipment")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc))
+
+    def calculate_feature_score(self) -> float:
+        """Calculate the feature score based on weighted criteria:
+        1. Rental Frequency: 25% - Based on last 90 days rentals
+        2. Availability Status: 45% - Based on current status
+        3. Recent Additions: 10% - Added within last 30 days
+        4. Profitability: 20% - Normalized price per day
+        """
+        now = datetime.now(timezone.utc)
+        
+        rental_count = db.session.query(
+            db.func.count(Booking.id)
+        ).filter(
+            Booking.equipment_id == self.id,
+            Booking.start_date >= now - timedelta(days=90),
+            Booking.status != Booking.Status.CANCELLED
+        ).scalar() or 0
+        
+        max_rentals = 10
+        rental_score = min(rental_count / max_rentals, 1.0)
+        
+        availability_score = 1 if self.status == self.Status.AVAILABLE else 0
+        # Ensure created_at has timezone info
+        created_at = self.created_at.replace(tzinfo=timezone.utc) if self.created_at and self.created_at.tzinfo is None else self.created_at
+        recent_addition_score = 1 if (
+            created_at and
+            created_at >= now - timedelta(days=30)
+        ) else 0
+        
+        max_price = db.session.query(db.func.max(Equipment.price_per_day)).scalar()
+        if not max_price or max_price <= 0:
+            profitability_score = 0
+        else:
+            profitability_score = min(self.price_per_day / max_price, 1.0)
+        
+        feature_score = (
+            rental_score * 0.25 +
+            availability_score * 0.45 +
+            recent_addition_score * 0.1 +
+            profitability_score * 0.2
+        )
+        
+        return round(feature_score, 3)
+
+    def update_featured_status(self):
+        """Update the featured status based on the feature score."""
+        self.featured = self.calculate_feature_score() >= 0.7 
+        
     
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """Serialize equipment object to dictionary"""
         return {
             'id': self.id,
@@ -201,6 +253,7 @@ class Equipment(PaginatedAPIMixin, db.Model):
             'price_per_day': self.price_per_day,
             'transport_cost_per_km': self.transport_cost_per_km,
             'status': self.status.value,
+            'featured': self.featured,
             'location': self.location.name if self.location else None,
             'stripe_product_id': self.stripe_product_id,
             '_links': {
