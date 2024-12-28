@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% include 'snippets/site-header.html' %}
+<div class="container">
+    <div class="equipment" x-data="equipmentDetails">
+        <div class="equipment-details__header">
+            <div class="app-header__breadcrumb">
+                <ol class="breadcrumb-list">
+                    <li>
+                        <a href="/equipment">Equipment</a>
+                    </li>
+                    <li>
+                        <a :href="`/equipment/${equipment.id}`" x-text="equipment.name" aria-current="page"></a>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <section class="l-feature">
+            <div class="container">
+                <div class="feature feature--end">
+                    <img class="feature__thumbnail" src="/api/placeholder/400/320" alt="Equipment for sale" />
+                    <div class="feature__caption">
+                        <h2 class="feature__title">Equipment Name</h2>
+                        <p class="lead">Invest in your success with our premium equipment</p>
+                        <div class="equipment__meta">
+                            <p class="equipment__price">Price: $0.00</p>
+                            <p class="equipment__location">Location: Kampala</p>
+                            <p class="equipment__availability">Available</p>
+                        </div>
+                        <a class="btn btn--secondary btn--lg feature__btn" href="#">
+                            Book Equipment
+                            <svg aria-hidden='true' fill='none' focusable='false' height='24' stroke-linecap='round'
+                                stroke-linejoin='round' stroke-width='3.5' stroke='currentColor' viewBox='0 0 24 24'
+                                width='24' xmlns='http://www.w3.org/2000/svg' class='btn__icon'>
+                                <line x1='5' y1='12' x2='19' y2='12'></line>
+                                <polyline points='12 5 19 12 12 19'></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

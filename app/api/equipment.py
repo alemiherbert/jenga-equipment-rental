@@ -5,7 +5,7 @@ Equipment app routes
 from app import db
 from app.api import api
 from app.api.utils import error_response
-from app.models import Equipment
+from app.models import Equipment, Location
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user
 from sqlalchemy import select
@@ -25,20 +25,18 @@ def get_equipment_list():
     """Get paginated list of equipment"""
     page = request.args.get("page", 1, type=int)
     per_page = min(request.args.get("per_page", 12, type=int), 100)
-    query = select(Equipment)
+    query = select(Equipment).join(Equipment.location)
     
     if request.args.get("search"):
         search = f"%{request.args.get('search')}%"
         query = query.where(Equipment.name.ilike(search))
     
     if request.args.get("location"):
-        query = query.where(Equipment.location.city == request.args.get("location"))
+        query = query.where(Location.name == request.args.get("location"))
     
     if request.args.get("category"):
         query = query.where(Equipment.category == request.args.get("category"))
-    
-    print(request.args)
-    
+        
     return jsonify(Equipment.to_collection_dict(
         query=query,
         page=page,

@@ -4791,6 +4791,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.filters = [];
       this.page = 1;
       this.fetchEquipment();
+    },
+    viewDetails: function viewDetails(item) {
+      window.location.href = "/equipment/".concat(item.id);
     }
   };
 });

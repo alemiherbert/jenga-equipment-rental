@@ -121,5 +121,9 @@ export default () => ({
         this.filters = [];
         this.page = 1;
         this.fetchEquipment();
+    },
+
+    viewDetails(item) {
+        window.location.href = `/equipment/${item.id}`;
     }
 });

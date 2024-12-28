@@ -25,11 +25,9 @@ def index():
 
 
 @main.route("/signin")
-@main.route("/login")
-
 def signin():
     """
-    Login
+    Sign in
     """
     return render_template(
         "layouts/sign-in.html"
@@ -37,7 +35,6 @@ def signin():
 
 
 @main.route("/signup")
-@main.route("/register")
 def signup():
     """
     Sign Up
@@ -58,10 +55,20 @@ def reset_password():
 
 @main.route("/equipment")
 @main.route("/equipment/all")
-def equipment():
+def get_equipment_list():
     """
     Equipment
     """
     return render_template(
         "layouts/equipment.html"    
+    )
+
+
+@main.route("/equipment/<int:equipment_id>")
+def get_equipment(equipment_id):
+    """
+    Equipment
+    """
+    return render_template(
+        "layouts/equipment-details.html"    
     )
