@@ -48,7 +48,8 @@
                             <div class="form-group">
                                 <label class="form-label" for="company">Company</label>
                                 <input class="form-control form-control--lg" id="company" type="text" name="company"
-                                    x-model="form.company" :class="{'form-control--invalid': errors.company}" required />
+                                    x-model="form.company" :class="{'form-control--invalid': errors.company}"
+                                    required />
                                 <template x-if="errors.company">
                                     <small class="field-feedback--invalid" x-text="errors.company"></small>
                                 </template>
@@ -71,7 +72,8 @@
                                         type="password" name="passwordConfirmation" x-model="form.passwordConfirmation"
                                         :class="{'form-control--invalid': errors.passwordConfirmation}" required />
                                     <template x-if="errors.passwordConfirmation">
-                                        <small class="field-feedback--invalid" x-text="errors.passwordConfirmation"></small>
+                                        <small class="field-feedback--invalid"
+                                            x-text="errors.passwordConfirmation"></small>
                                     </template>
                                 </div>
                             </div>

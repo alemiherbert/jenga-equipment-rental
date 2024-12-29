@@ -6,6 +6,7 @@ import './register';
 import './login';
 import './check-auth'
 import './fetch-interceptor';
+import './display-equipment';
 import carousel from './carousel';
 import featuredEquipment from './featured-equipment';
 import equipmentGrid from './equipment-grid';
