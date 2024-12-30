@@ -11,77 +11,94 @@
                         <a href="/equipment">Equipment</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a href="/equipment?category=" x-text="equipment.category"></a>
-                    </li>
-                    <li class="breadcrumb-item">
                         <a :href="`/equipment/${equipment.id}`" x-text="equipment.name" aria-current="page"></a>
                     </li>
                 </ol>
             </nav>
         </div>
-        <div class="equipment-details__content l-feature">
-            <div class="feature feature--end">
-                <div>
-                    <div class="equipment-details__gallery-main">
-                        <img class="equipment-details__gallery-image" :src="equipment.image" alt="Equipment Image" />
-                    </div>
-                    <div class="equipment-details__gallery-thumbnails">
-                        <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
-                            alt="Equipment Thumbnail" />
-                        <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
-                            alt="Equipment Thumbnail" />
-                        <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
-                            alt="Equipment Thumbnail" />
-                        <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
-                            alt="Equipment Thumbnail" />
-                    </div>
+        <div class="equipment-details__content">
+            <div class="equipment-details__gallery-main">
+                <img class="equipment-details__gallery-image" :src="equipment.image" alt="Equipment Image" />
+                <div class="equipment-details__gallery-thumbnails">
+                    <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
+                        alt="Equipment Thumbnail" />
+                    <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
+                        alt="Equipment Thumbnail" />
+                    <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
+                        alt="Equipment Thumbnail" />
+                    <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
+                        alt="Equipment Thumbnail" />
                 </div>
-                <div class="feature__caption">
-                    <h1 class="feature__title" x-text="equipment.name"></h1>
-                    <p class="lead" x-text="equipment.description"></p>
-                    <div class="feature__meta">
-                        <p class="feature__price"><span>UGX</span><span x-text="equipment.price_per_day + '/day'"></span></p>
-                        <p class="feature__location"><i data-feather="map-pin" width="16"></i> <span
-                                x-text="equipment.location"></span></p>
-                        <p class="feature__availability" x-text="equipment.availability"></p>
-                    </div>
-                    <a class="btn btn--primary btn--lg feature__btn" href="#">
-                        Book Equipment
-                        <svg aria-hidden='true' fill='none' focusable='false' height='24' stroke-linecap='round'
-                            stroke-linejoin='round' stroke-width='3.5' stroke='currentColor' viewBox='0 0 24 24'
-                            width='24' xmlns='http://www.w3.org/2000/svg' class='btn__icon'>
-                            <line x1='5' y1='12' x2='19' y2='12'></line>
-                            <polyline points='12 5 19 12 12 19'></polyline>
-                        </svg>
-                    </a>
+            </div>
+            <div class="equipment-details__info">
+                <h1 class="equipment-details__title" x-text="equipment.name"></h1>
+                <p class="lead" x-text="equipment.description"></p>
+                <div class="equipment-details__meta">
+                    <p class="equipment-details__price">
+                        <span>UGX</span>
+                        <span x-text="formatCurrency(equipment.price_per_day) + '/day'"></span>
+                    </p>
+                    <p class="equipment-details__location">
+                        <i data-feather="map-pin" width="16"></i>
+                        <span x-text="equipment.location"></span>
+                    </p>
+                    <p class="equipment-details__availability"
+                        :class="{ 'is-available': isEquipmentAvailable, 'is-unavailable': !isEquipmentAvailable }">
+                        <span x-text="equipment.status"></span>
+                    </p>
                 </div>
+
+                <div class="alert alert--info" x-show="isEquipmentInCart">
+                    This equipment has been added to your cart
+                    <button class="btn btn--primary btn--sm" @click="removeFromCart()">Remove from Cart</button>
+                </div>
+                <div class="alert alert--danger" x-show="!isEquipmentAvailable">
+                    This equipment is currently not available
+                </div>
+
+                <!-- Booking Form -->
+                <template x-if="isEquipmentAvailable && !isEquipmentInCart">
+                    <div class="equipment-details__booking-form">
+                        <div class="form-row--mixed">
+                            <div class="form-group">
+                                <label class="form-label" for="startdate">Start Date</label>
+                                <input class="form-control" id="startdate" name="start" type="date"
+                                    x-model="booking.startDate" :min="today" @change="validateDates()" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="enddate">End Date</label>
+                                <input class="form-control" id="enddate" name="enddate" type="date"
+                                    x-model="booking.endDate" :min="booking.startDate || today"
+                                    @change="validateDates()" />
+                            </div>
+                        </div>
+
+                        <div class="alert alert--danger" x-show="dateError" x-text="dateError"></div>
+
+                        <div class="equipment-details__cost-summary" x-show="isValidBooking">
+                            <p>Equipment Cost: UGX <span x-text="formatCurrency(equipmentCost)"></span></p>
+                            <p>Transport Cost: UGX <span x-text="formatCurrency(transportCost)"></span></p>
+                            <p class="text-lg font-bold">Total Cost: UGX <span
+                                    x-text="formatCurrency(totalCost)"></span></p>
+                        </div>
+                        <div>
+                            <button class="btn btn--primary btn--lg equipment-details__btn" @click="addToCart()"
+                                :disabled="!canAddToCart">
+                                Add to Cart
+                                <svg aria-hidden="true" fill="none" focusable="false" height="24" stroke-linecap="round"
+                                    stroke-linejoin="round" stroke-width="3.5" stroke="currentColor" viewBox="0 0 24 24"
+                                    width="24" xmlns="http://www.w3.org/2000/svg" class="btn__icon">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+
+                    </div>
+                </template>
             </div>
         </div>
     </div>
-    <section class="l-feature">
-        <div class="feature feature--end">
-            <img class="feature__thumbnail" src="/api/placeholder/400/320" alt="Equipment for sale" />
-            <div class="feature__caption">
-                <h2 class="feature__title">Equipment Name</h2>
-                <p class="lead">Invest in your success with our premium equipment</p>
-                <div class="feature__meta">
-                    <p class="feature__price"><span>UGX</span><span>50000/day</span></p>
-                    <p class="feature__location"><i data-feather="map-pin" width="16"></i> <span>Ntinda</span>
-                    </p>
-                    <p class="feature__availability">Available</p>
-                </div>
-                <a class="btn btn--secondary btn--lg feature__btn" href="#">
-                    Book Equipment
-                    <svg aria-hidden='true' fill='none' focusable='false' height='24' stroke-linecap='round'
-                        stroke-linejoin='round' stroke-width='3.5' stroke='currentColor' viewBox='0 0 24 24' width='24'
-                        xmlns='http://www.w3.org/2000/svg' class='btn__icon'>
-                        <line x1='5' y1='12' x2='19' y2='12'></line>
-                        <polyline points='12 5 19 12 12 19'></polyline>
-                    </svg>
-                </a>
-            </div>
-        </div>
-    </section>
-</div>
+    </template>
 </div>
 {% endblock %}

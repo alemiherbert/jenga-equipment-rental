@@ -1,3 +1,5 @@
+import feather from 'feather-icons';
+
 document.addEventListener('alpine:init', () => {
     Alpine.data('equipmentDetails', () => ({
         equipment: {
@@ -8,16 +10,20 @@ document.addEventListener('alpine:init', () => {
             name: '',
             price_per_day: 0,
             status: '',
-            availabilty: '',
             transport_cost_per_km: 0
         },
         loading: true,
         error: null,
+        dateError: null,
         showBookingForm: false,
         booking: {
             startDate: '',
-            endDate: '',
-            distance: 0
+            endDate: ''
+        },
+        cart: [],
+
+        get today() {
+            return new Date().toISOString().split('T')[0];
         },
 
         init() {
@@ -31,9 +37,45 @@ document.addEventListener('alpine:init', () => {
             }
 
             this.fetchEquipmentDetails(equipmentId);
+
+            const savedCart = localStorage.getItem('bookingCart');
+            this.cart = savedCart ? JSON.parse(savedCart) : [];
         },
-        get today() {
-            return new Date().toISOString().split('T')[0];
+
+        get isEquipmentInCart() {
+            return this.cart.some(item => item.equipment_id === this.equipment.id);
+        },
+
+        get isEquipmentAvailable() {
+            return this.equipment.status === 'available';
+        },
+
+        get canAddToCart() {
+            return this.isValidBooking &&
+                !this.isEquipmentInCart &&
+                this.isEquipmentAvailable &&
+                !this.dateError;
+        },
+
+        validateDates() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const startDate = new Date(this.booking.startDate);
+            const endDate = new Date(this.booking.endDate);
+
+            if (startDate < today) {
+                this.dateError = 'Start date cannot be in the past';
+                return false;
+            }
+
+            if (endDate < startDate) {
+                this.dateError = 'End date must be after start date';
+                return false;
+            }
+
+            this.dateError = null;
+            return true;
         },
 
         get totalDays() {
@@ -41,7 +83,7 @@ document.addEventListener('alpine:init', () => {
             const start = new Date(this.booking.startDate);
             const end = new Date(this.booking.endDate);
             const diff = end - start;
-            return Math.ceil(diff / (1000 * 60 * 60 * 24));
+            return Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
         },
 
         get equipmentCost() {
@@ -49,7 +91,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         get transportCost() {
-            return this.booking.distance * this.equipment.transport_cost_per_km * 2; // Round trip
+            return 100000; // Flat transportation cost
         },
 
         get totalCost() {
@@ -59,8 +101,7 @@ document.addEventListener('alpine:init', () => {
         get isValidBooking() {
             return this.booking.startDate &&
                 this.booking.endDate &&
-                this.booking.distance >= 0 &&
-                new Date(this.booking.endDate) >= new Date(this.booking.startDate);
+                this.validateDates();
         },
 
         formatCurrency(amount) {
@@ -89,40 +130,48 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        async submitBooking() {
-            if (!this.isValidBooking) return;
+        addToCart() {
+            if (!this.canAddToCart) return;
 
-            this.loading = true;
-            this.error = null;
+            const cartItem = {
+                equipment_id: this.equipment.id,
+                equipment_name: this.equipment.name,
+                start_date: this.booking.startDate,
+                end_date: this.booking.endDate,
+                equipment_cost: this.equipmentCost,
+                transport_cost: this.transportCost,
+                total_amount: this.totalCost
+            };
 
-            try {
-                const response = await fetch('/api/bookings', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        equipment_id: this.equipment.id,
-                        start_date: this.booking.startDate,
-                        end_date: this.booking.endDate,
-                        distance: this.booking.distance,
-                        equipment_cost: this.equipmentCost,
-                        transport_cost: this.transportCost,
-                        total_amount: this.totalCost
-                    })
-                });
+            this.cart.push(cartItem);
+            localStorage.setItem('bookingCart', JSON.stringify(this.cart));
+            this.showNotification('Equipment added to cart successfully', 'success');
+            this.resetForm();
+        },
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Booking failed');
-                }
+        removeFromCart() {
+            this.cart = this.cart.filter(item => item.equipment_id !== this.equipment.id);
+            localStorage.setItem('bookingCart', JSON.stringify(this.cart));
+            this.showNotification('Equipment removed from cart', 'success');
+        },
 
-                window.location.href = '/bookings/success';
-            } catch (error) {
-                this.error = error.message || 'Failed to create booking. Please try again.';
-            } finally {
-                this.loading = false;
-            }
+        resetForm() {
+            this.booking = {
+                startDate: '',
+                endDate: ''
+            };
+            this.dateError = null;
+        },
+
+        showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification--${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
     }));
 });

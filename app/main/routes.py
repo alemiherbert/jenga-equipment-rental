@@ -72,3 +72,14 @@ def get_equipment(equipment_id):
     return render_template(
         "layouts/equipment-details.html"    
     )
+
+
+@main.route("/cart")
+def cart():
+    """
+    Cart
+    """
+    return render_template(
+        "layouts/cart.html"
+    )
+    

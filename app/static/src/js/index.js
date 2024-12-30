@@ -7,6 +7,8 @@ import './login';
 import './check-auth'
 import './fetch-interceptor';
 import './display-equipment';
+import './range-group';
+import './cart';
 import carousel from './carousel';
 import featuredEquipment from './featured-equipment';
 import equipmentGrid from './equipment-grid';
