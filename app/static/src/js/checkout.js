@@ -92,58 +92,53 @@ document.addEventListener('alpine:init', () => {
             this.error = null;
 
             try {
-                const bookingData = {
-                    billing: this.billing,
-                    payment_method: this.paymentMethod,
-                    items: this.cart,
-                    total_amount: this.totalAmount
-                };
-
-                // Create booking
-                const bookingResponse = await fetch('/api/bookings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(bookingData)
-                });
-
-                if (!bookingResponse.ok) {
-                    throw new Error('Failed to process booking');
-                }
-
-                const bookingResult = await bookingResponse.json();
-
-                // Only pesa pay works right now
-                if (this.paymentMethod === 'pesa-pay') {
-                    const paymentResponse = await fetch('/api/payments', {
+                const bookingPromises = this.cart.map(async (item) => {
+                    const bookingData = {
+                        equipment_id: item.equipment_id,
+                        start_date: item.start_date,
+                        end_date: item.end_date,
+                    };
+                    console.log(bookingData);
+        
+                    const bookingResponse = await fetch('/api/bookings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            booking_id: bookingResult.booking_id,
-                            rental_amount: this.totalAmount,
-                            transport_amount: 0, // Transport cost is included in total_amount
-                            total_amount: this.totalAmount,
-                            currency: 'UGX'
-                        })
+                        body: JSON.stringify(bookingData)
                     });
-
-                    if (!paymentResponse.ok) {
-                        throw new Error('Failed to process payment');
+        
+                    if (!bookingResponse.ok) {
+                        throw new Error('Failed to create booking');
                     }
-
-                    const paymentResult = await paymentResponse.json();
-
-                    // Redirect to payment confirmation page
-                    window.location.href = `/payment-confirmation/${paymentResult.payment_id}`;
-                } else {
-                    // Redirect to booking confirmation page for cash on delivery
-                    window.location.href = `/booking-confirmation/${bookingResult.booking_id}`;
+        
+                    return bookingResponse.json();
+                });
+        
+                // Wait for all bookings to be created
+                const bookingResults = await Promise.all(bookingPromises);
+        
+                // Process payment
+                const paymentResponse = await fetch('/api/payments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        booking_id: bookingResults[0].booking_id,
+                        rental_amount: bookingResults[0].rental_amount,
+                        transport_amount: bookingResults[0].transport_amount,
+                        total_amount: bookingResults[0].total_amount,
+                        card_details: this.paymentDetails
+                    })
+                });
+        
+                if (!paymentResponse.ok) {
+                    throw new Error('Failed to process payment');
                 }
-
-                // Clear cart after successful booking
-                localStorage.removeItem('bookingCart');
+        
+                const paymentResult = await paymentResponse.json();
+        
+                // Redirect to payment confirmation page
+                window.location.href = `/payment-confirmation/${paymentResult.payment_reference}`;
             } catch (error) {
-                console.log(error);
-                this.error = 'Failed to process your booking. Please try again.';
+                this.error = 'Failed to process your order. Please try again.';
                 this.showNotification(this.error, 'error');
             } finally {
                 this.loading = false;
