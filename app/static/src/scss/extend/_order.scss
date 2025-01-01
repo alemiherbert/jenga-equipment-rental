@@ -10,10 +10,15 @@
         justify-content: center;
         align-items: center;
     }
+
     &__items {
         display: flex;
         flex-direction: column;
         gap: spacer('m');
+    }
+
+    &__summary {
+        padding-block: spacer('m');
     }
 }
 

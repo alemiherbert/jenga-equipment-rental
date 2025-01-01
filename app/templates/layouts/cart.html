@@ -59,13 +59,12 @@
 
                 <!-- Cart Summary -->
                 <div class="cart__summary">
-                    <h2 class="cart__summary-title">Order Summary</h2>
                     <div class="cart__summary-content">
-                        <p class="cart__summary-total">
-                            Total Equipment: <span x-text="cart.length"></span>
+                        <p class="cart__summary-total lead">
+                            Total Equipment: <strong x-text="cart.length"></strong>
                         </p>
-                        <p class="cart__summary-amount">
-                            Total Amount: UGX <span x-text="formatCurrency(totalAmount)"></span>
+                        <p class="cart__summary-amount lead">
+                            Total Amount: UGX <strong x-text="formatCurrency(totalAmount)"></strong>
                         </p>
                         <button class="btn btn--primary btn--lg cart__checkout" @click="checkout">
                             Proceed to Checkout

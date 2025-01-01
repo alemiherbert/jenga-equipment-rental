@@ -38,6 +38,7 @@ document.addEventListener('alpine:init', () => {
 
         checkout() {
             console.log('Proceeding to checkout with items:', this.cart);
+            window.location.href = '/checkout';
         },
 
         showNotification(message, type = 'success') {

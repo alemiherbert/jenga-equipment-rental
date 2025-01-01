@@ -82,4 +82,13 @@ def cart():
     return render_template(
         "layouts/cart.html"
     )
-    
+
+
+@main.route("/checkout")
+def checkout():
+    """
+    Checkout
+    """
+    return render_template(
+        "layouts/checkout.html"
+    )

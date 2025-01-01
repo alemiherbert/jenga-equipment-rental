@@ -9,6 +9,7 @@ import './fetch-interceptor';
 import './display-equipment';
 import './range-group';
 import './cart';
+import './checkout';
 import carousel from './carousel';
 import featuredEquipment from './featured-equipment';
 import equipmentGrid from './equipment-grid';
