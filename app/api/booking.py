@@ -65,61 +65,71 @@ def get_booking(booking_id):
 @api.route("/bookings", methods=["POST"])
 @jwt_required()
 def create_booking():
-    """Create new booking"""
+    """Create new booking(s)"""
     if not request.is_json:
         return error_response("Missing JSON in request", 400)
     
     data = request.json
     
-    # Required fields
-    required_fields = ["equipment_id", "start_date", "end_date"]
-    if not all(field in data for field in required_fields):
-        return error_response(f"Missing required fields: {', '.join(required_fields)}", 400)
+    # Check if the request contains a single booking or multiple bookings
+    if "bookings" in data and isinstance(data["bookings"], list):
+        # Handle multiple bookings
+        bookings_data = data["bookings"]
+    else:
+        # Handle single booking
+        bookings_data = [data]
     
     try:
-        # Validate equipment exists and is available
-        equipment = Equipment.query.get(data["equipment_id"])
-        if not equipment:
-            return error_response("Equipment not found", 404)
+        bookings = []
+        for booking_data in bookings_data:
+            # Validate required fields for each booking
+            required_fields = ["equipment_id", "start_date", "end_date"]
+            if not all(field in booking_data for field in required_fields):
+                return error_response(f"Missing required fields in one or more bookings: {', '.join(required_fields)}", 400)
+            
+            # Validate equipment exists and is available
+            equipment = Equipment.query.get(booking_data["equipment_id"])
+            if not equipment:
+                return error_response(f"Equipment not found: {booking_data['equipment_id']}", 404)
+            
+            if equipment.status != Equipment.Status.AVAILABLE:
+                return error_response(f"Equipment is not available: {booking_data['equipment_id']}", 400)
+            
+            # Calculate booking amounts
+            start_date = datetime.fromisoformat(booking_data["start_date"])
+            end_date = datetime.fromisoformat(booking_data["end_date"])
+            days = (end_date - start_date).days + 1
+            rental_amount = equipment.price_per_day * days
+            transport_amount = 100_000  # Flat rate for now
+            total_amount = rental_amount + transport_amount
+            
+            # Create booking
+            booking = Booking(
+                user_id=current_user.id,
+                equipment_id=booking_data["equipment_id"],
+                start_date=start_date,
+                end_date=end_date,
+                distance_km=booking_data.get("distance_km", 0),
+                rental_amount=rental_amount,
+                transport_amount=transport_amount,
+                total_amount=total_amount
+            )
+            
+            # Update equipment status
+            equipment.status = Equipment.Status.RENTED
+            
+            db.session.add(booking)
+            bookings.append(booking)
         
-        if equipment.status != Equipment.Status.AVAILABLE:
-            return error_response("Equipment is not available", 400)
-        
-        # Calculate booking amounts (simplified calculation)
-        start_date = datetime.fromisoformat(data["start_date"])
-        end_date = datetime.fromisoformat(data["end_date"])
-        days = (end_date - start_date).days + 1
-        rental_amount = equipment.price_per_day * days
-        # transport_amount = equipment.transport_cost_per_km * data["distance_km"]
-        # For now, use a flat rate of UGX 100,000 as transport cost
-        transport_amount = 100_000
-        total_amount = rental_amount + transport_amount
-        
-        booking = Booking(
-            user_id=current_user.id,
-            equipment_id=data["equipment_id"],
-            start_date=start_date,
-            end_date=end_date,
-            distance_km=0, # To be implemented properly later
-            rental_amount=rental_amount,
-            transport_amount=transport_amount,
-            total_amount=total_amount
-        )
-        
-        # Update equipment status
-        equipment.status = Equipment.Status.RENTED
-        
-        db.session.add(booking)
         db.session.commit()
         
         return jsonify({
-            "msg": "Booking created successfully",
-            "booking": booking.to_dict()
+            "msg": "Bookings created successfully",
+            "bookings": [booking.to_dict() for booking in bookings]
         }), 201
     except Exception as e:
         db.session.rollback()
-        return error_response(f"Error creating booking: {str(e)}", 500)
-
+        return error_response(f"Error creating bookings: {str(e)}", 500)
 
 @api.route("/bookings/<int:booking_id>", methods=["PUT"])
 @jwt_required()

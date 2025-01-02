@@ -4799,83 +4799,82 @@ document.addEventListener('alpine:init', function () {
       },
       submitCheckout: function submitCheckout() {
         var _this = this;
-        return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-          var paymentValidationError, bookingPromises, cart, paymentPayload, paymentResponse, paymentResult;
-          return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-            while (1) switch (_context2.prev = _context2.next) {
+        return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+          var paymentValidationError, cart, bookingsPayload, bookingsResponse, errorResponse, bookingsResult, paymentPayload, paymentResponse, _errorResponse, paymentResult;
+          return _regeneratorRuntime().wrap(function _callee$(_context) {
+            while (1) switch (_context.prev = _context.next) {
               case 0:
                 if (_this.canCheckout) {
-                  _context2.next = 2;
+                  _context.next = 2;
                   break;
                 }
-                return _context2.abrupt("return");
+                return _context.abrupt("return");
               case 2:
                 paymentValidationError = _this.validatePaymentDetails();
                 if (!paymentValidationError) {
-                  _context2.next = 6;
+                  _context.next = 6;
                   break;
                 }
                 _this.showNotification(paymentValidationError, 'error');
-                return _context2.abrupt("return");
+                return _context.abrupt("return");
               case 6:
                 _this.loading = true;
                 _this.error = null;
-                _context2.prev = 8;
-                bookingPromises = _this.cart.map(/*#__PURE__*/function () {
-                  var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(item) {
-                    var bookingData, bookingResponse;
-                    return _regeneratorRuntime().wrap(function _callee$(_context) {
-                      while (1) switch (_context.prev = _context.next) {
-                        case 0:
-                          bookingData = {
-                            equipment_id: item.equipment_id,
-                            start_date: item.start_date,
-                            end_date: item.end_date
-                          };
-                          _context.next = 3;
-                          return fetch('/api/bookings', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(bookingData)
-                          });
-                        case 3:
-                          bookingResponse = _context.sent;
-                          if (bookingResponse.ok) {
-                            _context.next = 6;
-                            break;
-                          }
-                          throw new Error('Failed to create booking');
-                        case 6:
-                          return _context.abrupt("return", bookingResponse.json());
-                        case 7:
-                        case "end":
-                          return _context.stop();
-                      }
-                    }, _callee);
-                  }));
-                  return function (_x) {
-                    return _ref.apply(this, arguments);
-                  };
-                }());
+                _context.prev = 8;
+                // Load cart from local storage
                 cart = JSON.parse(localStorage.getItem('bookingCart') || '[]');
                 if (!(cart.length === 0)) {
-                  _context2.next = 13;
+                  _context.next = 12;
                   break;
                 }
                 throw new Error('Your cart is empty. Please add equipment to proceed.');
-              case 13:
+              case 12:
+                // Prepare payload for multiple bookings
+                bookingsPayload = cart.map(function (item) {
+                  return {
+                    equipment_id: item.equipment_id,
+                    start_date: item.start_date,
+                    end_date: item.end_date,
+                    distance_km: item.distance_km || 0
+                  };
+                }); // Create multiple bookings at once
+                _context.next = 15;
+                return fetch('/api/bookings', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    bookings: bookingsPayload
+                  })
+                });
+              case 15:
+                bookingsResponse = _context.sent;
+                if (bookingsResponse.ok) {
+                  _context.next = 22;
+                  break;
+                }
+                _context.next = 19;
+                return bookingsResponse.json();
+              case 19:
+                errorResponse = _context.sent;
+                console.error('Bookings Error:', errorResponse);
+                throw new Error('Failed to create bookings');
+              case 22:
+                _context.next = 24;
+                return bookingsResponse.json();
+              case 24:
+                bookingsResult = _context.sent;
                 paymentPayload = {
-                  equipment_id: cart[0].equipment_id,
-                  rental_amount: cart[0].equipment_cost,
-                  transport_amount: cart[0].transport_cost,
+                  booking_ids: bookingsResult.bookings.map(function (booking) {
+                    return booking.id;
+                  }),
                   total_amount: _this.totalAmount,
                   billing: _this.billing,
                   card_details: _this.paymentDetails
                 };
                 console.log('Payment Payload:', paymentPayload);
-                _context2.next = 17;
+                _context.next = 29;
                 return fetch('/api/payments', {
                   method: 'POST',
                   headers: {
@@ -4883,36 +4882,44 @@ document.addEventListener('alpine:init', function () {
                   },
                   body: JSON.stringify(paymentPayload)
                 });
-              case 17:
-                paymentResponse = _context2.sent;
+              case 29:
+                paymentResponse = _context.sent;
                 if (paymentResponse.ok) {
-                  _context2.next = 20;
+                  _context.next = 36;
                   break;
                 }
-                throw new Error('Failed to process payment');
-              case 20:
-                _context2.next = 22;
+                _context.next = 33;
                 return paymentResponse.json();
-              case 22:
-                paymentResult = _context2.sent;
+              case 33:
+                _errorResponse = _context.sent;
+                console.error('Payment Error:', _errorResponse);
+                throw new Error('Failed to process payment');
+              case 36:
+                _context.next = 38;
+                return paymentResponse.json();
+              case 38:
+                paymentResult = _context.sent;
                 // Redirect to payment confirmation page
                 window.location.href = "/payment-confirmation/".concat(paymentResult.payment_reference);
-                _context2.next = 30;
+
+                // Clear cart after successful payment
+                localStorage.removeItem('bookingCart');
+                _context.next = 47;
                 break;
-              case 26:
-                _context2.prev = 26;
-                _context2.t0 = _context2["catch"](8);
-                _this.error = 'Failed to process your order. Please try again.';
+              case 43:
+                _context.prev = 43;
+                _context.t0 = _context["catch"](8);
+                _this.error = _context.t0.message || 'Failed to process your order. Please try again.';
                 _this.showNotification(_this.error, 'error');
-              case 30:
-                _context2.prev = 30;
+              case 47:
+                _context.prev = 47;
                 _this.loading = false;
-                return _context2.finish(30);
-              case 33:
+                return _context.finish(47);
+              case 50:
               case "end":
-                return _context2.stop();
+                return _context.stop();
             }
-          }, _callee2, null, [[8, 26, 30, 33]]);
+          }, _callee, null, [[8, 43, 47, 50]]);
         }))();
       },
       // Show notification

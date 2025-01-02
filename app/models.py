@@ -142,7 +142,7 @@ class User(PaginatedAPIMixin, db.Model):
             "access_token": access_token,
             "refresh_token": refresh_token,
             "token_type": "bearer",
-            "expires_in": 900
+            "expires_in": 90000 # 900
         }
     
     def revoke_tokens(self) -> None:

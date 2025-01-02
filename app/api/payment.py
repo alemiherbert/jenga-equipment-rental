@@ -85,29 +85,28 @@ def create_payment():
     data = request.json
     
     # Required fields
-    required_fields = ["equipment_ids", "total_amount", "card_details"]
+    required_fields = ["booking_ids", "total_amount", "billing", "card_details"]
     if not all(field in data for field in required_fields):
         return error_response(f"Missing required fields: {', '.join(required_fields)}", 400)
     
     try:
-        # Validate booking exists and is eligible for payment
-        booking = Booking.query.get(data["booking_id"])
-        print(data)
-        if not booking:
-            return error_response("Booking not found", 404)
+        # Validate bookings exist and are eligible for payment
+        bookings = Booking.query.filter(Booking.id.in_(data["booking_ids"])).all()
+        if len(bookings) != len(data["booking_ids"]):
+            return error_response("One or more bookings not found", 404)
         
-        if booking.status not in [Booking.Status.PAYMENT_REQUIRED, Booking.Status.PENDING]:
-            return error_response("Booking is not eligible for payment", 400)
+        for booking in bookings:
+            if booking.status not in [Booking.Status.PAYMENT_REQUIRED, Booking.Status.PENDING]:
+                return error_response("One or more bookings are not eligible for payment", 400)
         
         # Prepare payment request for PESA Pay API
         payment_request = {
             "amount": data["total_amount"],
             "currency": "UGX",
-            "description": f"Payment for booking {data['booking_id']}",
+            "description": f"Payment for bookings {', '.join(map(str, data['booking_ids']))}",
             "metadata": {
-                "booking_id": data["booking_id"],
-                "rental_amount": data["rental_amount"],
-                "transport_amount": data["transport_amount"]
+                "booking_ids": data["booking_ids"],
+                "total_amount": data["total_amount"]
             },
             "card_details": data["card_details"]
         }
@@ -128,18 +127,16 @@ def create_payment():
         
         # Create payment record in your database
         payment = Payment(
-            booking_id=data["booking_id"],
             user_id=current_user.id,
-            rental_amount=data["rental_amount"],
-            transport_amount=data["transport_amount"],
             total_amount=data["total_amount"],
             currency="UGX",
             status=payment_result["status"],
             payment_reference=payment_result["id"]
         )
         
-        # Update booking status
-        booking.status = Booking.Status.CONFIRMED
+        # Update booking statuses
+        for booking in bookings:
+            booking.status = Booking.Status.CONFIRMED
         
         db.session.add(payment)
         db.session.commit()

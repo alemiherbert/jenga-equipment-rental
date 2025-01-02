@@ -92,33 +92,37 @@ document.addEventListener('alpine:init', () => {
             this.error = null;
 
             try {
-                const bookingPromises = this.cart.map(async (item) => {
-                    const bookingData = {
-                        equipment_id: item.equipment_id,
-                        start_date: item.start_date,
-                        end_date: item.end_date,
-                    };
-
-                    const bookingResponse = await fetch('/api/bookings', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(bookingData)
-                    });
-
-                    if (!bookingResponse.ok) {
-                        throw new Error('Failed to create booking');
-                    }
-
-                    return bookingResponse.json();
-                });
-
+                // Load cart from local storage
                 const cart = JSON.parse(localStorage.getItem('bookingCart') || '[]');
                 if (cart.length === 0) {
                     throw new Error('Your cart is empty. Please add equipment to proceed.');
                 }
 
+                // Prepare payload for multiple bookings
+                const bookingsPayload = cart.map(item => ({
+                    equipment_id: item.equipment_id,
+                    start_date: item.start_date,
+                    end_date: item.end_date,
+                    distance_km: item.distance_km || 0
+                }));
+
+                // Create multiple bookings at once
+                const bookingsResponse = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookings: bookingsPayload })
+                });
+
+                if (!bookingsResponse.ok) {
+                    const errorResponse = await bookingsResponse.json();
+                    console.error('Bookings Error:', errorResponse);
+                    throw new Error('Failed to create bookings');
+                }
+
+                const bookingsResult = await bookingsResponse.json();
+
                 const paymentPayload = {
-                    equipment_ids: cart.map(item => item.equipment_id),
+                    booking_ids: bookingsResult.bookings.map(booking => booking.id),
                     total_amount: this.totalAmount,
                     billing: this.billing,
                     card_details: this.paymentDetails
@@ -132,6 +136,8 @@ document.addEventListener('alpine:init', () => {
                 });
 
                 if (!paymentResponse.ok) {
+                    const errorResponse = await paymentResponse.json();
+                    console.error('Payment Error:', errorResponse);
                     throw new Error('Failed to process payment');
                 }
 
@@ -139,8 +145,11 @@ document.addEventListener('alpine:init', () => {
 
                 // Redirect to payment confirmation page
                 window.location.href = `/payment-confirmation/${paymentResult.payment_reference}`;
+
+                // Clear cart after successful payment
+                localStorage.removeItem('bookingCart');
             } catch (error) {
-                this.error = 'Failed to process your order. Please try again.';
+                this.error = error.message || 'Failed to process your order. Please try again.';
                 this.showNotification(this.error, 'error');
             } finally {
                 this.loading = false;
