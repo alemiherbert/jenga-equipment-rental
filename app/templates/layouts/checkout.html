@@ -40,19 +40,45 @@
                     <h2 class="l-checkout__title">Payment method</h2>
                     <div class="payment-card">
                         <label class="form-check">
-                            <input class="form-check__control" type="radio" name="payment-type" value="mobile_money" x-model="paymentMethod" checked="checked" />
+                            <input class="form-check__control" type="radio" name="payment-type" value="pesa-pay" x-model="paymentMethod" />
                             <div class="payment-card__caption">
-                                <i data-feather="smartphone" class="payment-card__logo"></i>
+                                <i data-feather="credit-card" class="payment-card__logo"></i>
                                 <p class="payment-card__description">Pay with Pesa Pay</p>
                             </div>
                         </label>
                     </div>
+                    <template x-if="paymentMethod === 'pesa-pay'">
+                        <div class="payment-details">
+                            <div class="form-group">
+                                <label class="form-label" for="card_number">Card Number</label>
+                                <input class="form-control" type="text" id="card_number" x-model="paymentDetails.cardNumber" required />
+                            </div>
+                            <div class="form-row--mixed">
+                                <div class="form-group">
+                                    <label class="form-label" for="expiry_month">Expiry Month</label>
+                                    <input class="form-control" type="text" id="expiry_month" x-model="paymentDetails.expiryMonth" placeholder="MM" required />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="expiry_year">Expiry Year</label>
+                                    <input class="form-control" type="text" id="expiry_year" x-model="paymentDetails.expiryYear" placeholder="YYYY" required />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="cvv">CVV</label>
+                                    <input class="form-control" type="text" id="cvv" x-model="paymentDetails.cvv" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="cardholder_name">Cardholder Name</label>
+                                <input class="form-control" type="text" id="cardholder_name" x-model="paymentDetails.cardholderName" required />
+                            </div>
+                        </div>
+                    </template>
                     <div class="payment-card">
                         <label class="form-check">
                             <input class="form-check__control" type="radio" name="payment-type" value="cash" x-model="paymentMethod" />
                             <div class="payment-card__caption">
                                 <i data-feather="dollar-sign" class="payment-card__logo"></i>
-                                <p class="payment-card__description">Pay with Cash on Delivery</p>
+                                <p class="payment-card__description">Pay with Cash</p>
                             </div>
                         </label>
                     </div>
@@ -65,13 +91,13 @@
                     <h2 class="l-checkout__title">Order summary</h2>
                     
                     <template x-if="cart.length === 0">
-                        <div class="notice notice--info">
+                        <div class="alert alert--info">
                             Your cart is empty. Please add equipment to proceed.
                         </div>
                     </template>
 
                     <template x-if="cart.length > 0">
-                        <div>
+                        <div class="order-cards">
                             <template x-for="item in cart" :key="item.equipment_id">
                                 <div class="order-card">
                                     <div class="order-card__data">

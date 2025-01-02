@@ -4724,16 +4724,26 @@ document.addEventListener('alpine:init', function () {
         city: '',
         address: ''
       },
-      paymentMethod: 'mobile_money',
+      paymentMethod: 'pesa-pay',
+      paymentDetails: {
+        cardNumber: '',
+        expiryMonth: '',
+        expiryYear: '',
+        cvv: '',
+        cardholderName: ''
+      },
       acceptedTerms: false,
       loading: false,
       error: null,
       init: function init() {
+        this.loadCart();
+        this.$nextTick(function () {
+          return feather_icons__WEBPACK_IMPORTED_MODULE_0___default().replace();
+        });
+      },
+      loadCart: function loadCart() {
         var savedCart = localStorage.getItem('bookingCart');
         this.cart = savedCart ? JSON.parse(savedCart) : [];
-        this.$nextTick(function () {
-          feather_icons__WEBPACK_IMPORTED_MODULE_0___default().replace();
-        });
       },
       get totalAmount() {
         return this.cart.reduce(function (sum, item) {
@@ -4759,73 +4769,153 @@ document.addEventListener('alpine:init', function () {
         });
         localStorage.setItem('bookingCart', JSON.stringify(this.cart));
         this.showNotification('Item removed from cart');
-        feather_icons__WEBPACK_IMPORTED_MODULE_0___default().replace();
+        this.$nextTick(function () {
+          return feather_icons__WEBPACK_IMPORTED_MODULE_0___default().replace();
+        });
+      },
+      validatePaymentDetails: function validatePaymentDetails() {
+        if (this.paymentMethod === 'pesa-pay') {
+          var _this$paymentDetails = this.paymentDetails,
+            cardNumber = _this$paymentDetails.cardNumber,
+            expiryMonth = _this$paymentDetails.expiryMonth,
+            expiryYear = _this$paymentDetails.expiryYear,
+            cvv = _this$paymentDetails.cvv,
+            cardholderName = _this$paymentDetails.cardholderName;
+          console.log(this.paymentDetails);
+          if (!cardNumber || !expiryMonth || !expiryYear || !cvv || !cardholderName) {
+            return 'Please fill in all payment details.';
+          }
+          if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) {
+            return 'Invalid card number.';
+          }
+          if (expiryMonth.length !== 2 || expiryYear.length !== 4 || !/^\d+$/.test(expiryMonth) || !/^\d+$/.test(expiryYear)) {
+            return 'Invalid expiry date.';
+          }
+          if (cvv.length !== 3 || !/^\d+$/.test(cvv)) {
+            return 'Invalid CVV.';
+          }
+        }
+        return null;
       },
       submitCheckout: function submitCheckout() {
         var _this = this;
-        return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-          var orderData, response, result;
-          return _regeneratorRuntime().wrap(function _callee$(_context) {
-            while (1) switch (_context.prev = _context.next) {
+        return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+          var paymentValidationError, bookingPromises, cart, paymentPayload, paymentResponse, paymentResult;
+          return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+            while (1) switch (_context2.prev = _context2.next) {
               case 0:
                 if (_this.canCheckout) {
-                  _context.next = 2;
+                  _context2.next = 2;
                   break;
                 }
-                return _context.abrupt("return");
+                return _context2.abrupt("return");
               case 2:
+                paymentValidationError = _this.validatePaymentDetails();
+                if (!paymentValidationError) {
+                  _context2.next = 6;
+                  break;
+                }
+                _this.showNotification(paymentValidationError, 'error');
+                return _context2.abrupt("return");
+              case 6:
                 _this.loading = true;
                 _this.error = null;
-                _context.prev = 4;
-                orderData = {
+                _context2.prev = 8;
+                bookingPromises = _this.cart.map(/*#__PURE__*/function () {
+                  var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(item) {
+                    var bookingData, bookingResponse;
+                    return _regeneratorRuntime().wrap(function _callee$(_context) {
+                      while (1) switch (_context.prev = _context.next) {
+                        case 0:
+                          bookingData = {
+                            equipment_id: item.equipment_id,
+                            start_date: item.start_date,
+                            end_date: item.end_date
+                          };
+                          _context.next = 3;
+                          return fetch('/api/bookings', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(bookingData)
+                          });
+                        case 3:
+                          bookingResponse = _context.sent;
+                          if (bookingResponse.ok) {
+                            _context.next = 6;
+                            break;
+                          }
+                          throw new Error('Failed to create booking');
+                        case 6:
+                          return _context.abrupt("return", bookingResponse.json());
+                        case 7:
+                        case "end":
+                          return _context.stop();
+                      }
+                    }, _callee);
+                  }));
+                  return function (_x) {
+                    return _ref.apply(this, arguments);
+                  };
+                }());
+                cart = JSON.parse(localStorage.getItem('bookingCart') || '[]');
+                if (!(cart.length === 0)) {
+                  _context2.next = 13;
+                  break;
+                }
+                throw new Error('Your cart is empty. Please add equipment to proceed.');
+              case 13:
+                paymentPayload = {
+                  equipment_id: cart[0].equipment_id,
+                  rental_amount: cart[0].equipment_cost,
+                  transport_amount: cart[0].transport_cost,
+                  total_amount: _this.totalAmount,
                   billing: _this.billing,
-                  payment_method: _this.paymentMethod,
-                  items: _this.cart,
-                  total_amount: _this.totalAmount
+                  card_details: _this.paymentDetails
                 };
-                _context.next = 8;
-                return fetch('/api/orders', {
+                console.log('Payment Payload:', paymentPayload);
+                _context2.next = 17;
+                return fetch('/api/payments', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json'
                   },
-                  body: JSON.stringify(orderData)
+                  body: JSON.stringify(paymentPayload)
                 });
-              case 8:
-                response = _context.sent;
-                if (response.ok) {
-                  _context.next = 11;
+              case 17:
+                paymentResponse = _context2.sent;
+                if (paymentResponse.ok) {
+                  _context2.next = 20;
                   break;
                 }
-                throw new Error('Failed to process order');
-              case 11:
-                _context.next = 13;
-                return response.json();
-              case 13:
-                result = _context.sent;
-                // Clear cart after successful order
-                localStorage.removeItem('bookingCart');
-
-                // Redirect to confirmation page
-                window.location.href = "/order-confirmation/".concat(result.order_id);
-                _context.next = 22;
+                throw new Error('Failed to process payment');
+              case 20:
+                _context2.next = 22;
+                return paymentResponse.json();
+              case 22:
+                paymentResult = _context2.sent;
+                // Redirect to payment confirmation page
+                window.location.href = "/payment-confirmation/".concat(paymentResult.payment_reference);
+                _context2.next = 30;
                 break;
-              case 18:
-                _context.prev = 18;
-                _context.t0 = _context["catch"](4);
+              case 26:
+                _context2.prev = 26;
+                _context2.t0 = _context2["catch"](8);
                 _this.error = 'Failed to process your order. Please try again.';
                 _this.showNotification(_this.error, 'error');
-              case 22:
-                _context.prev = 22;
+              case 30:
+                _context2.prev = 30;
                 _this.loading = false;
-                return _context.finish(22);
-              case 25:
+                return _context2.finish(30);
+              case 33:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
-          }, _callee, null, [[4, 18, 22, 25]]);
+          }, _callee2, null, [[8, 26, 30, 33]]);
         }))();
       },
+      // Show notification
       showNotification: function showNotification(message) {
         var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';
         var notification = document.createElement('div');

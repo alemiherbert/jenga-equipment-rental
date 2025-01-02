@@ -5,6 +5,7 @@ def error_response(message, status_code):
     """
     Helper function to return error responses.
     """
+    print(message)
     return jsonify({"msg": message}), status_code
 
 

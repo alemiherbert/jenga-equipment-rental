@@ -98,43 +98,45 @@ document.addEventListener('alpine:init', () => {
                         start_date: item.start_date,
                         end_date: item.end_date,
                     };
-                    console.log(bookingData);
-        
+
                     const bookingResponse = await fetch('/api/bookings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(bookingData)
                     });
-        
+
                     if (!bookingResponse.ok) {
                         throw new Error('Failed to create booking');
                     }
-        
+
                     return bookingResponse.json();
                 });
-        
-                // Wait for all bookings to be created
-                const bookingResults = await Promise.all(bookingPromises);
-        
-                // Process payment
+
+                const cart = JSON.parse(localStorage.getItem('bookingCart') || '[]');
+                if (cart.length === 0) {
+                    throw new Error('Your cart is empty. Please add equipment to proceed.');
+                }
+
+                const paymentPayload = {
+                    equipment_ids: cart.map(item => item.equipment_id),
+                    total_amount: this.totalAmount,
+                    billing: this.billing,
+                    card_details: this.paymentDetails
+                };
+                console.log('Payment Payload:', paymentPayload);
+
                 const paymentResponse = await fetch('/api/payments', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        booking_id: bookingResults[0].booking_id,
-                        rental_amount: bookingResults[0].rental_amount,
-                        transport_amount: bookingResults[0].transport_amount,
-                        total_amount: bookingResults[0].total_amount,
-                        card_details: this.paymentDetails
-                    })
+                    body: JSON.stringify(paymentPayload)
                 });
-        
+
                 if (!paymentResponse.ok) {
                     throw new Error('Failed to process payment');
                 }
-        
+
                 const paymentResult = await paymentResponse.json();
-        
+
                 // Redirect to payment confirmation page
                 window.location.href = `/payment-confirmation/${paymentResult.payment_reference}`;
             } catch (error) {

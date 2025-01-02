@@ -5,6 +5,7 @@
         display: grid;
         gap: spacer-clamp('l', 'xl');
         grid-template-columns: minmax(0, 1fr);
+        padding-block-start: spacer('l');
 
         @include breakpoint('md') {
             grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
@@ -46,6 +47,12 @@
             margin-block-start: spacer('m');
         }
     }
+}
+
+.order-cards {
+    display: flex;
+    flex-direction: column;
+    gap: spacer('m');
 }
 
 .order-card {
@@ -120,4 +127,10 @@
         block-size: 1.75rem;
         inline-size: auto;
     }
+}
+
+.payment-details {
+    display: flex;
+    flex-direction: column;
+    gap: spacer('m');
 }

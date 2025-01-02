@@ -71,14 +71,14 @@ def create_booking():
     
     data = request.json
     
-    required_fields = ["equipment_id", "start_date", "end_date", "distance_km"]
-    
+    # Required fields
+    required_fields = ["equipment_id", "start_date", "end_date"]
     if not all(field in data for field in required_fields):
         return error_response(f"Missing required fields: {', '.join(required_fields)}", 400)
     
     try:
         # Validate equipment exists and is available
-        equipment = db.session.get(Equipment, data["equipment_id"])
+        equipment = Equipment.query.get(data["equipment_id"])
         if not equipment:
             return error_response("Equipment not found", 404)
         
@@ -90,7 +90,9 @@ def create_booking():
         end_date = datetime.fromisoformat(data["end_date"])
         days = (end_date - start_date).days + 1
         rental_amount = equipment.price_per_day * days
-        transport_amount = equipment.transport_cost_per_km * data["distance_km"]
+        # transport_amount = equipment.transport_cost_per_km * data["distance_km"]
+        # For now, use a flat rate of UGX 100,000 as transport cost
+        transport_amount = 100_000
         total_amount = rental_amount + transport_amount
         
         booking = Booking(
@@ -98,7 +100,7 @@ def create_booking():
             equipment_id=data["equipment_id"],
             start_date=start_date,
             end_date=end_date,
-            distance_km=data["distance_km"],
+            distance_km=0, # To be implemented properly later
             rental_amount=rental_amount,
             transport_amount=transport_amount,
             total_amount=total_amount
@@ -112,7 +114,8 @@ def create_booking():
         
         return jsonify({
             "msg": "Booking created successfully",
-            "booking": booking.to_dict()}), 201
+            "booking": booking.to_dict()
+        }), 201
     except Exception as e:
         db.session.rollback()
         return error_response(f"Error creating booking: {str(e)}", 500)

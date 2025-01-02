@@ -9,6 +9,13 @@ from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user
 from sqlalchemy import select
 from datetime import datetime
+from werkzeug.exceptions import HTTPException
+import requests
+
+
+# PESA Pay API configuration
+PESA_PAY_API_URL = "http://localhost:8000/v1/payments"
+PESA_PAY_API_KEY = "sk_test_123"
 
 @api.route("/payments", methods=["GET"])
 @jwt_required()
@@ -77,33 +84,58 @@ def create_payment():
     
     data = request.json
     
-    required_fields = ["booking_id", "rental_amount", "transport_amount", "total_amount"]
-    
+    # Required fields
+    required_fields = ["equipment_ids", "total_amount", "card_details"]
     if not all(field in data for field in required_fields):
         return error_response(f"Missing required fields: {', '.join(required_fields)}", 400)
     
     try:
-        # Validate booking exists and is in a state that allows payment
-        booking = db.session.get(Booking, data["booking_id"])
+        # Validate booking exists and is eligible for payment
+        booking = Booking.query.get(data["booking_id"])
+        print(data)
         if not booking:
             return error_response("Booking not found", 404)
         
-        # Check booking status and user
         if booking.status not in [Booking.Status.PAYMENT_REQUIRED, Booking.Status.PENDING]:
             return error_response("Booking is not eligible for payment", 400)
         
-        if current_user.role.name != "admin" and booking.user_id != current_user.id:
-            return error_response("Unauthorized access", 403)
+        # Prepare payment request for PESA Pay API
+        payment_request = {
+            "amount": data["total_amount"],
+            "currency": "UGX",
+            "description": f"Payment for booking {data['booking_id']}",
+            "metadata": {
+                "booking_id": data["booking_id"],
+                "rental_amount": data["rental_amount"],
+                "transport_amount": data["transport_amount"]
+            },
+            "card_details": data["card_details"]
+        }
         
+        # Call PESA Pay API
+        headers = {
+            "X-API-Key": PESA_PAY_API_KEY,
+            "Content-Type": "application/json"
+        }
+        response = requests.post(PESA_PAY_API_URL, json=payment_request, headers=headers)
+        
+        # Handle PESA Pay API response
+        if response.status_code != 201:
+            error_detail = response.json().get("detail", "Payment failed")
+            raise HTTPException(description=error_detail)
+        
+        payment_result = response.json()
+        
+        # Create payment record in your database
         payment = Payment(
             booking_id=data["booking_id"],
             user_id=current_user.id,
             rental_amount=data["rental_amount"],
             transport_amount=data["transport_amount"],
             total_amount=data["total_amount"],
-            currency=data.get("currency", "UGX"),
-            stripe_payment_intent_id=data.get("stripe_payment_intent_id"),
-            stripe_payment_method_id=data.get("stripe_payment_method_id")
+            currency="UGX",
+            status=payment_result["status"],
+            payment_reference=payment_result["id"]
         )
         
         # Update booking status
@@ -114,9 +146,14 @@ def create_payment():
         
         return jsonify({
             "msg": "Payment created successfully",
-            "payment": payment.to_dict()}), 201
+            "payment": payment.to_dict()
+        }), 201
+    except HTTPException as e:
+        db.session.rollback()
+        return error_response(str(e.description), e.code)
     except Exception as e:
         db.session.rollback()
+        print(e)
         return error_response(f"Error creating payment: {str(e)}", 500)
 
 

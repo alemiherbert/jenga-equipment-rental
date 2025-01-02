@@ -5380,6 +5380,7 @@ legend {
   display: grid;
   gap: clamp(3rem, 5vw, 4.5rem);
   grid-template-columns: minmax(0, 1fr);
+  padding-block-start: 3rem;
 }
 @media (min-width: 64em) {
   .l-checkout__inner {
@@ -5426,6 +5427,12 @@ legend {
 }
 .l-checkout__order .form-group--submit {
   margin-block-start: 1.5rem;
+}
+
+.order-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .order-card {
@@ -5497,6 +5504,12 @@ legend {
 .payment-card__logo {
   block-size: 1.75rem;
   inline-size: auto;
+}
+
+.payment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 @media (min-width: 32em) {
