@@ -2,7 +2,7 @@
     <div class="container">
         <div class="app-heading__inner">
             <div class="app-heading__caption">
-                <h1 class="app-heading__title">{{ heading.title }}</h1>
+                <h1 class="app-heading__title">heading.title</h1>
                 {% if heading.description %}
                     <div class="app-heading__description">
                         <p>{{ heading.description }}</p>
@@ -12,9 +12,9 @@
             {% if heading.actions %}
                 <div class="app-heading__actions">
                     {% for action in heading.actions %}
-                        <a href="{{ action.link }}" class="{{ action.class }}">
+                        <a href="action.link" class="action.class">
                             {% if action.icon %}
-                                {% svgIcon action.icon, 'btn__icon' %}
+                                <i class="btn__icon" data-feather="circle"></i>
                             {% endif %}
                             {{ action.label }}
                         </a>

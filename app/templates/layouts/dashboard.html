@@ -1,12 +1,12 @@
-{% extends "layout/base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
     <div class="l-main">
         <div class="l-main__sidebar" :class="{ 'l-main__sidebar--open': sidebarOpen }">
-            {% include "partial/sidebar.html" %}
+            {% include "snippets/sidebar.html" %}
         </div>
         <main id="content" class="l-main__body" data-item="body">
-            {% include "partial/header.html" %}
+            {% include "snippets/header.html" %}
             {% set heading = {
                 'title': title,
                 'description': 'Hey Adam, welcome back! Here is your personal dashboard.',
@@ -17,7 +17,7 @@
                     'class': 'btn btn--outline-primary btn--icon'
                 }]
             } %}
-            {% include "partial/heading.html" %}
+            {% include "snippets/heading.html" %}
             <div class="container">
                 <div class="app-body">
                     <div class="l-row l-row--column:sm:2 l-row--column:lg:3">
@@ -29,7 +29,7 @@
                             'chartData': '65',
                             'chartId': 'chart01'
                         } %}
-                        {% include 'partial/widget/chart.html' %}
+                        {% include 'snippets/widget/chart.html' %}
 
                         {% set widget = {
                             'class': null,
@@ -39,7 +39,7 @@
                             'chartData': '54',
                             'chartId': 'chart02'
                         } %}
-                        {% include 'partial/widget/chart.html' %}
+                        {% include 'snippets/widget/chart.html' %}
 
                         {% set widget = {
                             'class': null,
@@ -49,15 +49,14 @@
                             'chartData': '184',
                             'chartId': 'chart03'
                         } %}
-                        {% include 'partial/widget/chart.html' %}
+                        {% include 'snippets/widget/chart.html' %}
                     </div>
                     <div class="l-row l-row--column:sm:2 l-row--column:md:1 l-row--column:lg:2">
-                        {% include 'partial/card/orders-chart.html' %}
-                        {% include 'partial/card/active-users-chart.html' %}
+                        {% include 'snippets/card/orders-chart.html' %}
+                        {% include 'snippets/card/active-users-chart.html' %}
                     </div>
                 </div>
             </div>
-            {% include "partial/footer.html" %}
         </main>
     </div>
 {% endblock %}
