@@ -125,9 +125,14 @@ document.addEventListener('alpine:init', () => {
                     booking_ids: bookingsResult.bookings.map(booking => booking.id),
                     total_amount: this.totalAmount,
                     billing: this.billing,
-                    card_details: this.paymentDetails
+                    card_details: {
+                        card_number: this.paymentDetails.cardNumber,
+                        expiry_month: this.paymentDetails.expiryMonth,
+                        expiry_year: this.paymentDetails.expiryYear,
+                        cvv: this.paymentDetails.cvv,
+                        cardholder_name: this.paymentDetails.cardholderName
+                    }
                 };
-                console.log('Payment Payload:', paymentPayload);
 
                 const paymentResponse = await fetch('/api/payments', {
                     method: 'POST',
@@ -144,7 +149,7 @@ document.addEventListener('alpine:init', () => {
                 const paymentResult = await paymentResponse.json();
 
                 // Redirect to payment confirmation page
-                window.location.href = `/payment-confirmation/${paymentResult.payment_reference}`;
+                window.location.href = `/`;
 
                 // Clear cart after successful payment
                 localStorage.removeItem('bookingCart');

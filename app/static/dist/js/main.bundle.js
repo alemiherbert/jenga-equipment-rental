@@ -4871,10 +4871,15 @@ document.addEventListener('alpine:init', function () {
                   }),
                   total_amount: _this.totalAmount,
                   billing: _this.billing,
-                  card_details: _this.paymentDetails
+                  card_details: {
+                    card_number: _this.paymentDetails.cardNumber,
+                    expiry_month: _this.paymentDetails.expiryMonth,
+                    expiry_year: _this.paymentDetails.expiryYear,
+                    cvv: _this.paymentDetails.cvv,
+                    cardholder_name: _this.paymentDetails.cardholderName
+                  }
                 };
-                console.log('Payment Payload:', paymentPayload);
-                _context.next = 29;
+                _context.next = 28;
                 return fetch('/api/payments', {
                   method: 'POST',
                   headers: {
@@ -4882,44 +4887,44 @@ document.addEventListener('alpine:init', function () {
                   },
                   body: JSON.stringify(paymentPayload)
                 });
-              case 29:
+              case 28:
                 paymentResponse = _context.sent;
                 if (paymentResponse.ok) {
-                  _context.next = 36;
+                  _context.next = 35;
                   break;
                 }
-                _context.next = 33;
+                _context.next = 32;
                 return paymentResponse.json();
-              case 33:
+              case 32:
                 _errorResponse = _context.sent;
                 console.error('Payment Error:', _errorResponse);
                 throw new Error('Failed to process payment');
-              case 36:
-                _context.next = 38;
+              case 35:
+                _context.next = 37;
                 return paymentResponse.json();
-              case 38:
+              case 37:
                 paymentResult = _context.sent;
                 // Redirect to payment confirmation page
-                window.location.href = "/payment-confirmation/".concat(paymentResult.payment_reference);
+                window.location.href = "/";
 
                 // Clear cart after successful payment
                 localStorage.removeItem('bookingCart');
-                _context.next = 47;
+                _context.next = 46;
                 break;
-              case 43:
-                _context.prev = 43;
+              case 42:
+                _context.prev = 42;
                 _context.t0 = _context["catch"](8);
                 _this.error = _context.t0.message || 'Failed to process your order. Please try again.';
                 _this.showNotification(_this.error, 'error');
-              case 47:
-                _context.prev = 47;
+              case 46:
+                _context.prev = 46;
                 _this.loading = false;
-                return _context.finish(47);
-              case 50:
+                return _context.finish(46);
+              case 49:
               case "end":
                 return _context.stop();
             }
-          }, _callee, null, [[8, 43, 47, 50]]);
+          }, _callee, null, [[8, 42, 46, 49]]);
         }))();
       },
       // Show notification

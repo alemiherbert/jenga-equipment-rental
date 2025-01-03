@@ -26,7 +26,8 @@ def get_equipment_list():
     page = request.args.get("page", 1, type=int)
     per_page = min(request.args.get("per_page", 12, type=int), 100)
     query = select(Equipment).join(Equipment.location)
-    
+    update_all_featured_status()
+
     if request.args.get("search"):
         search = f"%{request.args.get('search')}%"
         query = query.where(Equipment.name.ilike(search))

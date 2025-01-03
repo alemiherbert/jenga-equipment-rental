@@ -125,12 +125,12 @@ def create_payment():
         
         payment_result = response.json()
         
-        # Create payment record in your database
+        # Create payment record in database
         payment = Payment(
             user_id=current_user.id,
             total_amount=data["total_amount"],
             currency="UGX",
-            status=payment_result["status"],
+            status=Payment.Status(payment_result["status"]),
             payment_reference=payment_result["id"]
         )
         
