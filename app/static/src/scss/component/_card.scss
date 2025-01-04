@@ -4,8 +4,6 @@
   $this: &;
   background-color: color('background');
   border: 1px solid color('border');
-  border-radius: config('border-radius-sm', $display);
-  box-shadow: 0 0 spacer('xxs') hsl(201deg 72% 32% / 5%);
 
   &:focus-within {
     z-index: 5;

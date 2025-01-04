@@ -50,7 +50,7 @@ def get_location(location_id):
 @jwt_required()
 def create_location():
     """Create new location"""
-    if not current_user.role or current_user.role.name != "admin":
+    if current_user != "admin":
         return error_response("Unauthorized access", 403)
     
     if not request.is_json:
@@ -88,8 +88,6 @@ def create_location():
 @jwt_required()
 def update_location(location_id):
     """Update location details"""
-    if not current_user.role or current_user.role.name != "admin":
-        return error_response("Unauthorized access", 403)
     
     if not request.is_json:
         return error_response("Missing JSON in request", 400)
@@ -119,7 +117,7 @@ def update_location(location_id):
 @jwt_required()
 def delete_location(location_id):
     """Delete location"""
-    if not current_user.role or current_user.role.name != "admin":
+    if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
     location = db.session.get(Location, location_id)

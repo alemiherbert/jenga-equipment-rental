@@ -71,7 +71,7 @@ def get_equipment(equipment_id):
 @jwt_required()
 def create_equipment():
     """Create new equipment"""
-    if not current_user.role or current_user.role.name != "admin":
+    if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
     if not request.is_json:
@@ -107,7 +107,7 @@ def create_equipment():
 @jwt_required()
 def update_equipment(equipment_id):
     """Update equipment details"""
-    if not current_user.role or current_user.role.name != "admin":
+    if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
     if not request.is_json:
@@ -144,7 +144,7 @@ def update_equipment(equipment_id):
 @jwt_required()
 def delete_equipment(equipment_id):
     """Delete equipment"""
-    if not current_user.role or current_user.role.name != "admin":
+    if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
     equipment = db.session.get(Equipment, equipment_id)

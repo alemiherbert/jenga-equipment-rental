@@ -6,9 +6,8 @@
   position: relative;
 
   &__image {
-    --size: 2.25rem;
+    --size: 3rem;
     block-size: var(--size);
-    border-radius: 50%;
     inline-size: var(--size);
   }
 

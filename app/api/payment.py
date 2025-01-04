@@ -26,7 +26,7 @@ def get_payment_list():
     query = select(Payment)
     
     # For non-admin users, only show their own payments
-    if current_user.role.name != "admin":
+    if current_user.role != "admin":
         query = query.where(Payment.user_id == current_user.id)
     
     # Add filters if provided
@@ -69,7 +69,7 @@ def get_payment(payment_id):
         return error_response("Payment not found", 404)
     
     # Ensure user can only access their own payments or admin can see all
-    if current_user.role.name != "admin" and payment.user_id != current_user.id:
+    if current_user.role != "admin" and payment.user_id != current_user.id:
         return error_response("Unauthorized access", 403)
     
     return jsonify(payment.to_dict()), 200
@@ -166,7 +166,7 @@ def update_payment(payment_id):
         return error_response("Payment not found", 404)
     
     # Ensure only admin can update payments
-    if current_user.role.name != "admin":
+    if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
     data = request.json
@@ -198,7 +198,7 @@ def update_payment(payment_id):
 @jwt_required()
 def delete_payment(payment_id):
     """Delete payment"""
-    if current_user.role.name != "admin":
+    if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
     payment = db.session.get(Payment, payment_id)

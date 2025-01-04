@@ -19,7 +19,7 @@ def get_booking_list():
     query = select(Booking)
     
     # For non-admin users, only show their own bookings
-    if current_user.role.name != "admin":
+    if current_user.role != "admin":
         query = query.where(Booking.user_id == current_user.id)
     
     # Add filters if provided
@@ -56,7 +56,7 @@ def get_booking(booking_id):
         return error_response("Booking not found", 404)
     
     # Ensure user can only access their own bookings or admin can see all
-    if current_user.role.name != "admin" and booking.user_id != current_user.id:
+    if current_user.role != "admin" and booking.user_id != current_user.id:
         return error_response("Unauthorized access", 403)
     
     return jsonify(booking.to_dict()), 200
@@ -143,7 +143,7 @@ def update_booking(booking_id):
         return error_response("Booking not found", 404)
     
     # Ensure user can only update their own bookings or admin can update any
-    if current_user.role.name != "admin" and booking.user_id != current_user.id:
+    if current_user.role != "admin" and booking.user_id != current_user.id:
         return error_response("Unauthorized access", 403)
     
     data = request.json
@@ -218,7 +218,7 @@ def delete_booking(booking_id):
         return error_response("Booking cannot be deleted in current status", 400)
     
     # Ensure user can only delete their own bookings or admin can delete any
-    if current_user.role.name != "admin" and booking.user_id != current_user.id:
+    if current_user.role != "admin" and booking.user_id != current_user.id:
         return error_response("Unauthorized access", 403)
     
     try:

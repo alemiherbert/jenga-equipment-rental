@@ -55,6 +55,8 @@ def create_app(test_config=None) -> Flask:
 
     from app.api import api
     from app.main import main
+    from app.admin import admin
     app.register_blueprint(api)
     app.register_blueprint(main)
+    app.register_blueprint(admin)
     return app

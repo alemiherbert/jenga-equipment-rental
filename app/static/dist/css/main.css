@@ -2368,8 +2368,6 @@ legend {
 .app-card {
   background-color: var(--root-base-color-background);
   border: 1px solid var(--root-base-color-border);
-  border-radius: var(--root-border-radius-sm);
-  box-shadow: 0 0 0.25rem hsla(201, 72%, 32%, 0.05);
 }
 .app-card:focus-within {
   z-index: 5;
@@ -2612,9 +2610,8 @@ legend {
   position: relative;
 }
 .data-table__image {
-  --size: 2.25rem;
+  --size: 3rem;
   block-size: var(--size);
-  border-radius: 50%;
   inline-size: var(--size);
 }
 .data-table__actions {
@@ -5594,6 +5591,9 @@ body .lead {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
   font-size: 1.0625rem;
+}
+body select {
+  border-radius: 0px !important;
 }
 
 [x-cloak] {

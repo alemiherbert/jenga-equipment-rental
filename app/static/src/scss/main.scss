@@ -21,6 +21,10 @@ body {
     margin-bottom: spacer('xs');
     font-size: 1.0625rem;
   }
+
+  select {
+    border-radius: 0px !important;
+  }
 }
 
 [x-cloak] {

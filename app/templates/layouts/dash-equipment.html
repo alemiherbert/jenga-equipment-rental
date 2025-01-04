@@ -7,10 +7,15 @@
     </div>
     <main id="content" class="l-main__body" data-item="body">
         {% include "snippets/header.html" %}
-        <div class="container" style="padding-block-start: 2rem;">
+        <div class="container" style="padding-block: 2.5rem;">
             <div class="app-body">
                 <div class="app-card" x-data="dataTable('products', ['name', 'status'])">
                     <div class="app-card__header">
+                        <button class="btn btn--icon btn--primary">
+                            <i data-feather="plus" width="20" height="20"></i>
+                            Add New Equipment
+                        </button>
+
                         <div class="app-card__actions">
                             <form class="search-form" @submit.prevent="">
                                 <svg aria-hidden="true" focusable="false" height="24" role="img"
@@ -170,19 +175,17 @@
                                                 </td>
                                                 <td>
                                                     <div class="data-table__actions">
-                                                        <a href="/item/view/" class="btn btn--light btn--sm btn--icon"
-                                                            aria-label="View">
+                                                        <a href="" class="btn btn--light btn--sm btn--icon"
+                                                            @click.prevent="viewItem(item)" aria-label="View">
                                                             <i data-feather="eye" width="12" height="12"></i>
-
                                                         </a>
-                                                        <a href="/item/edit/" class="btn btn--light btn--sm btn--icon"
-                                                            aria-label="Edit">
+                                                        <a href="#" class="btn btn--light btn--sm btn--icon"
+                                                            aria-label="Edit" @click.prevent="editItem(item)">
                                                             <i data-feather="edit" width="12" height="12"></i>
                                                         </a>
                                                         <a href="#" class="btn btn--delete btn--sm btn--icon"
-                                                            aria-label="Delete">
+                                                            aria-label="Delete" @click.prevent="deleteItem(item)">
                                                             <i data-feather="trash-2" width="12" height="12"></i>
-                                                            </svg>
                                                         </a>
                                                     </div>
                                                 </td>

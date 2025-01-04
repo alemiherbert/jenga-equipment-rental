@@ -63,10 +63,7 @@ class User(PaginatedAPIMixin, db.Model):
     email: Mapped[str] = mapped_column(String(64), index=True, unique=True)
     phone: Mapped[str] = mapped_column(String(64), index=True, unique=True)
     image_path: Mapped[Optional[str]] = mapped_column(String(256))
-    
-    # Role relationship (users can have multiple roles)
-    role_id: Mapped[Optional[int]] = mapped_column(ForeignKey("role.id"))
-    role: Mapped["Role"] = relationship("Role", backref="users")
+    role: Mapped[str] = mapped_column(String(128), default="customer")
 
     class Status(enum.Enum):
         PENDING = "pending"
@@ -95,7 +92,7 @@ class User(PaginatedAPIMixin, db.Model):
             'phone': self.phone,
             'company': self.company,
             'status': self.status.value,
-            'role': self.role.name if self.role else None,
+            'role': self.role if self.role else None,
             'location': self.location.name if self.location else None,
             'image_path': self.image_path,
             'last_login': self.last_login.isoformat() if self.last_login else None,
@@ -125,7 +122,7 @@ class User(PaginatedAPIMixin, db.Model):
             expires_delta=timedelta(minutes=15),
             additional_claims={
                 "token_version": self.token_version,
-                "role": self.role.name if self.role else None,
+                "role": self.role if self.role else None,
                 "status": self.status.value
             }
         )
@@ -157,14 +154,6 @@ class User(PaginatedAPIMixin, db.Model):
 
     def __repr__(self) -> str:
         return f"<User {self.name}>"
-
-
-class Role(db.Model):
-    """
-    Role model
-    """
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(64))
 
 
 class Equipment(PaginatedAPIMixin, db.Model):
