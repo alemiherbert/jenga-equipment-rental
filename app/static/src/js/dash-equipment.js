@@ -1,3 +1,4 @@
+import { data } from 'alpinejs';
 import feather from 'feather-icons';
 
 document.addEventListener('alpine:init', () => {
@@ -76,7 +77,7 @@ document.addEventListener('alpine:init', () => {
                     location: item.location,
                     price_per_day: item.price_per_day,
                     status: item.status,
-                    image: item.image || 'https://picsum.photos/80/80',
+                    image: item.image ? `/uploads/${item.image}` : 'https://picsum.photos/80/80',
                     selected: false
                 }));
                 this.total = data._meta.total_items;
@@ -294,6 +295,10 @@ document.addEventListener('alpine:init', () => {
 
         get pagedItems() {
             return this.equipment;
+        },
+
+        addNewEquipment() {
+            window.location.href = '/admin/equipment/new'
         }
     }));
 });

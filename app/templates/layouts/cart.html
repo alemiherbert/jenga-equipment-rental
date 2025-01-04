@@ -22,7 +22,7 @@
                         <div class="cart-item">
                             <div class="cart-item__info">
                                 <div class="cart-item__image">
-                                    <img src="../../static/dist/img/hero.jpg" alt="">
+                                    <img :src="item.image" :alt="item.equipment_name" />
                                 </div>
                                 <div class="cart-item__details">
                                     <h3 class="cart-item__title" x-text="item.equipment_name"></h3>

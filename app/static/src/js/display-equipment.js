@@ -10,6 +10,7 @@ document.addEventListener('alpine:init', () => {
             name: '',
             price_per_day: 0,
             status: '',
+            image: '',
             transport_cost_per_km: 0
         },
         loading: true,
@@ -91,7 +92,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         get transportCost() {
-            return 100000; // Flat transportation cost
+            return 100000; // Flat transportation cost for now
         },
 
         get totalCost() {
@@ -118,7 +119,11 @@ document.addEventListener('alpine:init', () => {
                     throw new Error('Failed to fetch equipment details');
                 }
                 const data = await response.json();
-                this.equipment = data;
+
+                this.equipment = {
+                    ...data,
+                    image: data.image ? `/uploads/${data.image}` : 'https://picsum.photos/600/400'
+                };
             } catch (error) {
                 this.error = 'Unable to load equipment details. Please try again later.';
                 console.error('Error:', error);
@@ -138,10 +143,12 @@ document.addEventListener('alpine:init', () => {
                 equipment_name: this.equipment.name,
                 start_date: this.booking.startDate,
                 end_date: this.booking.endDate,
+                image: this.equipment.image,
                 equipment_cost: this.equipmentCost,
                 transport_cost: this.transportCost,
                 total_amount: this.totalCost
             };
+            
 
             this.cart.push(cartItem);
             localStorage.setItem('bookingCart', JSON.stringify(this.cart));
@@ -153,6 +160,10 @@ document.addEventListener('alpine:init', () => {
             this.cart = this.cart.filter(item => item.equipment_id !== this.equipment.id);
             localStorage.setItem('bookingCart', JSON.stringify(this.cart));
             this.showNotification('Equipment removed from cart', 'success');
+        },
+
+        viewCart() {
+            window.location.href = '/cart';
         },
 
         resetForm() {

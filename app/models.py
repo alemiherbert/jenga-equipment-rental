@@ -4,7 +4,6 @@ Application Models
 from app import db
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from sqlalchemy import select, String, Float, ForeignKey, DateTime, Enum, Numeric, Boolean
-# from sqlalchemy.dialects.postgresql import JSON
 from flask import url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, create_refresh_token
@@ -162,11 +161,10 @@ class Equipment(PaginatedAPIMixin, db.Model):
     """
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(64))
-    # images: Mapped[List[str]] = mapped_column(JSON, default=List)
+    image: Mapped[str] = mapped_column(String(256), nullable=True)
     price_per_day: Mapped[float] = mapped_column(Float, nullable=False, default=100_000.0)
     transport_cost_per_km: Mapped[float] = mapped_column(Float, nullable=False, default=5_000.0)
 
-    # Category shall later have to be a model
     category: Mapped[Optional[str]] = mapped_column(String(64))
 
     stripe_product_id: Mapped[Optional[str]] = mapped_column(String(128))
@@ -244,7 +242,7 @@ class Equipment(PaginatedAPIMixin, db.Model):
             'status': self.status.value,
             'featured': self.featured,
             'location': self.location.name if self.location else None,
-            'stripe_product_id': self.stripe_product_id,
+            'image': self.image,
             '_links': {
                 'self': url_for('api.get_equipment', equipment_id=self.id)
             }

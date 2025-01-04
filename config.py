@@ -17,3 +17,5 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
     JWT_ERROR_MESSAGE_KEY = "msg"
+    MAX_CONTENT_LENGTH =  5 * 1024 * 1024
+    UPLOAD_FOLDER = path.join(path.dirname(path.abspath(__file__)), 'uploads')

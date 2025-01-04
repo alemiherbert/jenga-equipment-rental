@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "auth.html" %}
 
 {% block content %}
 <div class="l-main">
@@ -11,9 +11,9 @@
             <div class="app-body">
                 <div class="app-card" x-data="dataTable('products', ['name', 'status'])">
                     <div class="app-card__header">
-                        <button class="btn btn--icon btn--primary">
+                        <button class="btn btn--icon btn--primary" @click="addNewEquipment">
                             <i data-feather="plus" width="20" height="20"></i>
-                            Add New Equipment
+                            Add New
                         </button>
 
                         <div class="app-card__actions">
@@ -66,6 +66,9 @@
                                                 <option value="All">All Categories</option>
                                                 <option value="Earthmoving">Earthmoving</option>
                                                 <option value="Material Handling">Material Handling</option>
+                                                <option value="Construction Vehicles">Construction Vehicles</option>
+                                                <option value="Compaction">Compaction</option>
+                                                <option value="Paving and Concrete">Paving and Concrete</option>
                                             </select>
                                             <label class="form-label" for="status">Status</label>
                                             <select class="form-control" id="status" x-model="formData.status">
@@ -136,7 +139,7 @@
                                                     <i data-feather="chevrons-up"></i>
                                                 </button>
                                             </th>
-                                            <th>Price</th>
+                                            <th>Price (UGX)</th>
                                             <th>Status</th>
                                             <th>Actions</th>
                                             <th>&nbsp;</th>
@@ -163,7 +166,7 @@
                                                 </td>
                                                 <td x-text="item.name"></td>
                                                 <td x-text="item.location"></td>
-                                                <td x-text="`UGX ${item.price_per_day.toLocaleString()}`"></td>
+                                                <td x-text="item.price_per_day.toLocaleString()"></td>
                                                 <td>
                                                     <template x-if="item.status === 'available'">
                                                         <span class="status status--success"

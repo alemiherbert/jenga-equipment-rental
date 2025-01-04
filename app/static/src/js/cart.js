@@ -7,7 +7,12 @@ document.addEventListener('alpine:init', () => {
         init() {
             const savedCart = localStorage.getItem('bookingCart');
             this.cart = savedCart ? JSON.parse(savedCart) : [];
-            
+
+            this.cart = this.cart.map(item => ({
+                ...item,
+                image: item.image ? item.image : 'https://picsum.photos/200/150'
+            }));
+
             this.$nextTick(() => {
                 feather.replace();
             });

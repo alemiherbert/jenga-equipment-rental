@@ -24,7 +24,6 @@ def dashboard():
 
 
 @admin.route("/equipment")
-@admin.route("/equipment/all")
 def get_equipment_list():
     """
     Equipment
@@ -33,6 +32,15 @@ def get_equipment_list():
         "layouts/dash-equipment.html"    
     )
 
+
+@admin.route("/equipment/new")
+def add_equipment():
+    """
+    New equipment
+    """
+    return render_template(
+        "layouts/dash-new-equipment.html"    
+    )
 
 @admin.route("/equipment/<int:equipment_id>")
 def get_equipment(equipment_id):

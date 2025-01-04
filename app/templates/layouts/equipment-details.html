@@ -19,20 +19,9 @@
         <div class="equipment-details__content">
             <div class="equipment-details__gallery-main">
                 <img class="equipment-details__gallery-image" :src="equipment.image" alt="Equipment Image" />
-                <div class="equipment-details__gallery-thumbnails">
-                    <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
-                        alt="Equipment Thumbnail" />
-                    <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
-                        alt="Equipment Thumbnail" />
-                    <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
-                        alt="Equipment Thumbnail" />
-                    <img class="equipment-details__gallery-thumbnail" src="/api/placeholder/400/320"
-                        alt="Equipment Thumbnail" />
-                </div>
             </div>
             <div class="equipment-details__info">
                 <h1 class="equipment-details__title" x-text="equipment.name"></h1>
-                <p class="lead" x-text="equipment.description"></p>
                 <div class="equipment-details__meta">
                     <p class="equipment-details__price">
                         <span>UGX</span>
@@ -48,9 +37,12 @@
                     </p>
                 </div>
 
-                <div class="alert alert--info" x-show="isEquipmentInCart">
-                    This equipment has been added to your cart
-                    <button class="btn btn--primary btn--sm" @click="removeFromCart()">Remove from Cart</button>
+                <div class="alert alert--success" x-show="isEquipmentInCart">
+                    Equipment added to cart successfuly
+                    <div>
+                        <button class="btn btn--primary btn--sm" @click="removeFromCart()">Remove from Cart</button>
+                        <button class="btn btn--primary btn--sm" @click="viewCart()">View Cart</button>
+                    </div>
                 </div>
                 <div class="alert alert--danger" x-show="!isEquipmentAvailable">
                     This equipment is currently not available
@@ -76,10 +68,10 @@
                         <div class="alert alert--danger" x-show="dateError" x-text="dateError"></div>
 
                         <div class="equipment-details__cost-summary" x-show="isValidBooking">
-                            <p>Equipment Cost: UGX <span x-text="formatCurrency(equipmentCost)"></span></p>
-                            <p>Transport Cost: UGX <span x-text="formatCurrency(transportCost)"></span></p>
-                            <p class="text-lg font-bold">Total Cost: UGX <span
-                                    x-text="formatCurrency(totalCost)"></span></p>
+                            <p>Equipment Cost: UGX <strong x-text="formatCurrency(equipmentCost)"></strong></p>
+                            <p>Transport Cost: UGX <strong x-text="formatCurrency(transportCost)"></strong></p>
+                            <p class="text-lg font-bold">Total Cost: UGX <strong
+                                    x-text="formatCurrency(totalCost)"></strong></p>
                         </div>
                         <div>
                             <button class="btn btn--primary btn--lg equipment-details__btn" @click="addToCart()"

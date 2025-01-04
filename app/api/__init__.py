@@ -5,4 +5,4 @@ The authentification blueprint
 from flask import Blueprint
 
 api = Blueprint("api", __name__, url_prefix="/api")
-from app.api import auth, booking, user, equipment, payment
+from app.api import auth, booking, user, equipment, payment, location

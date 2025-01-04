@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import create_engine, select
-from app.models import Equipment, Location
+from app.models import Equipment, Location, User
 import random
 
 # Database connection
@@ -122,8 +122,17 @@ def seed_equipment():
     db.session.commit()
     print("Equipment data seeded successfully!")
 
-# Seed locations first
+
+def seed_admin():
+    user = User(name="Admin", email="admin@example.com", company="Jenga Equipment Rental", role="admin", phone="0771234567")
+    user.set_password("password885")
+    db.session.add(user)
+    db.session.commit()
+    print("Admin added successfully")    
+
+
 seed_locations()
 
-# Seed equipment with random locations
-seed_equipment()
+# seed_equipment()
+
+seed_admin()

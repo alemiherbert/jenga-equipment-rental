@@ -60,7 +60,7 @@ export default () => ({
                 name: item.name,
                 category: item.category,
                 location: item.location || "Kampala",
-                image: "/static/dist/img/hero.jpg",
+                image: item.image ? `/uploads/${item.image}` : 'https://picsum.photos/400/300',
                 dayRate: item.price_per_day,
                 available: item.status === "available",
                 isNew: false

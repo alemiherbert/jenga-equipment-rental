@@ -10,6 +10,7 @@ from sqlalchemy import select
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from config import Config
+from os import makedirs
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -23,6 +24,7 @@ def create_app(test_config=None) -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     
     from app.models import User, TokenBlocklist
 
@@ -56,7 +58,15 @@ def create_app(test_config=None) -> Flask:
     from app.api import api
     from app.main import main
     from app.admin import admin
+    from flask import send_from_directory
+    from os import path
     app.register_blueprint(api)
     app.register_blueprint(main)
     app.register_blueprint(admin)
+    
+    @app.route('/uploads/<filename>')
+    def uploaded_file(filename):
+        upload_dir = path.abspath(app.config['UPLOAD_FOLDER'])
+        return send_from_directory(upload_dir, filename)
+
     return app

@@ -22,12 +22,6 @@ document.addEventListener('alpine:init', () => {
                 }
 
                 const response = await originalFetch(url, options);
-
-                // If unauthorized, redirect to login
-                // if (response.status === 401) {
-                //     window.location.href = '/login';
-                // }
-
                 return response;
             };
         },

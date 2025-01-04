@@ -11,7 +11,7 @@ from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user
 from sqlalchemy import select
 from werkzeug.utils import secure_filename
-from os import path
+import os
 
 # Todo: Delegate this to a CRON job
 def update_all_featured_status():
@@ -69,6 +69,9 @@ def get_equipment(equipment_id):
     return jsonify(equipment.to_dict()), 200
 
 
+import os
+from werkzeug.utils import secure_filename
+
 @api.route("/equipment", methods=["POST"])
 @jwt_required()
 def create_equipment():
@@ -84,34 +87,55 @@ def create_equipment():
 
     # Handle file upload
     if image_file:
-        filename = secure_filename(image_file.filename)
-        image_path = path.join(Config.UPLOAD_FOLDER, filename)
-        image_file.save(image_path)
-        image_url = f"/uploads/{filename}"
+        if image_file.content_length > Config.MAX_CONTENT_LENGTH:
+            return error_response("File size must not exceed 5 MB", 400)
+        
+        # Save the file temporarily
+        temp_filename = secure_filename(image_file.filename)
+        temp_image_path = os.path.join(Config.UPLOAD_FOLDER, temp_filename)
+        image_file.save(temp_image_path)
     else:
-        image_url = None
+        temp_image_path = None
 
-    required_fields = ["name", "price_per_day", "transport_cost_per_km", "location_id"]
+    required_fields = ["name", "category", "location_id"]
     
     if not all(field in data for field in required_fields):
         return error_response(f"Missing required fields: {', '.join(required_fields)}", 400)
     
     try:
+        price_per_day = float(data.get("price_per_day", 0))
+        transport_cost_per_km = float(data.get("transport_cost_per_km", 0))
+
+        # Create the equipment without the image URL initially
         equipment = Equipment(
             name=data["name"],
-            price_per_day=float(data["price_per_day"]),
-            transport_cost_per_km=float(data["transport_cost_per_km"]),
+            category=data["category"],
+            price_per_day=price_per_day,
+            transport_cost_per_km=transport_cost_per_km,
             location_id=int(data["location_id"]),
-            image=image_url
+            image=None
         )
         db.session.add(equipment)
         db.session.commit()
-        
+
+        if temp_image_path:
+            equipment_name = data["name"].replace(" ", "_").lower()
+            file_extension = os.path.splitext(temp_filename)[1]
+            new_filename = f"{equipment_name}{equipment.id}{file_extension}"
+            new_image_path = os.path.join(Config.UPLOAD_FOLDER, new_filename)
+
+            os.rename(temp_image_path, new_image_path)
+
+            equipment.image = new_filename
+            db.session.commit()
+
         return jsonify({
             "msg": "Equipment created successfully",
             "equipment": equipment.to_dict()}), 201
     except Exception as e:
         db.session.rollback()
+        if temp_image_path and os.path.exists(temp_image_path):
+            os.remove(temp_image_path)
         return error_response(f"Error creating equipment: {str(e)}", 500)
 
 @api.route("/equipment/<int:equipment_id>", methods=["PUT"])
