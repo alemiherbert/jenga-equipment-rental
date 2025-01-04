@@ -9,7 +9,8 @@ from app.models import Equipment, Location
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user
 from sqlalchemy import select
-
+from werkzeug.utils import secure_filename
+from os import path
 
 # Todo: Delegate this to a CRON job
 def update_all_featured_status():
@@ -74,12 +75,21 @@ def create_equipment():
     if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
-    if not request.is_json:
-        return error_response("Missing JSON in request", 400)
+    if not request.is_json and not request.files:
+        return error_response("Missing JSON or file in request", 400)
     
-    data = request.json
-    
-    # To do: This must be changed
+    data = request.form
+    image_file = request.files.get('image')
+
+    # Handle file upload
+    if image_file:
+        filename = secure_filename(image_file.filename)
+        image_path = path.join('uploads', filename)
+        image_file.save(image_path)
+        image_url = f"/uploads/{filename}"
+    else:
+        image_url = None
+
     required_fields = ["name", "price_per_day", "transport_cost_per_km"]
     
     if not all(field in data for field in required_fields):
@@ -90,7 +100,8 @@ def create_equipment():
             name=data["name"],
             price_per_day=data["price_per_day"],
             transport_cost_per_km=data["transport_cost_per_km"],
-            location_id=data.get("location_id")
+            location_id=data.get("location_id"),
+            image=image_url
         )
         db.session.add(equipment)
         db.session.commit()
@@ -101,7 +112,6 @@ def create_equipment():
     except Exception as e:
         db.session.rollback()
         return error_response(f"Error creating equipment: {str(e)}", 500)
-
 
 @api.route("/equipment/<int:equipment_id>", methods=["PUT"])
 @jwt_required()
