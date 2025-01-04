@@ -8,7 +8,6 @@ from flask_jwt_extended import jwt_required, current_user
 
 
 @main.route("/")
-@main.route("/home")
 def index():
     """
     Homepage

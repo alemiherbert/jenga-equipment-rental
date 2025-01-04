@@ -70,7 +70,7 @@ document.addEventListener('alpine:init', () => {
 
                 if (data.tokens) {
                     this.storeAuthTokens(data.tokens);
-                    window.location.href = '/home';
+                    window.location.href = '/';
                 } else {
                     throw new Error('Invalid server response: missing tokens');
                 }

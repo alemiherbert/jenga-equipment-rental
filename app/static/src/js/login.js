@@ -69,7 +69,7 @@ document.addEventListener('alpine:init', () => {
                         localStorage.setItem('remember_token', data.access_token);
                     }
                     
-                    window.location.href = '/home';
+                    window.location.href = '/';
                 } else {
                     throw new Error('Invalid server response: missing tokens');
                 }

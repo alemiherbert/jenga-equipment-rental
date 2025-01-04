@@ -5943,7 +5943,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   id: item.id,
                   name: item.name,
                   category: item.category,
-                  image: "/static/dist/img/hero.jpg",
+                  image: item.image ? "/uploads/".concat(item.image) : 'https://picsum.photos/600/400',
                   location: item.location || "Kampala",
                   dayRate: item.price_per_day,
                   available: item.status === "available",
@@ -6243,7 +6243,7 @@ document.addEventListener('alpine:init', function () {
                 if (_this2.form.remember) {
                   localStorage.setItem('remember_token', data.access_token);
                 }
-                window.location.href = '/home';
+                window.location.href = '/';
                 _context.next = 35;
                 break;
               case 34:
@@ -6456,7 +6456,7 @@ document.addEventListener('alpine:init', function () {
                   break;
                 }
                 _this2.storeAuthTokens(data.tokens);
-                window.location.href = '/home';
+                window.location.href = '/';
                 _context.next = 34;
                 break;
               case 33:

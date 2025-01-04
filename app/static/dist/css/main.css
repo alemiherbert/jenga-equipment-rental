@@ -4862,9 +4862,6 @@ legend {
 .equipment-card:hover .equipment-card__title {
   color: var(--root-base-color-primary);
 }
-.equipment-card:hover .equipment-card__image img {
-  filter: none;
-}
 .equipment-card__image {
   position: relative;
   aspect-ratio: 4/3;
@@ -4875,7 +4872,6 @@ legend {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: sepia(50%);
 }
 .equipment-card__badge {
   position: absolute;

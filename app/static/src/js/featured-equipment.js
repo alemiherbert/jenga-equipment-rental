@@ -66,11 +66,12 @@ export default () => ({
                 throw new Error('Failed to fetch featured equipment');
             }
             const data = await response.json();
+
             this.equipment = data.featured_equipment.map(item => ({
                 id: item.id,
                 name: item.name,
                 category: item.category,
-                image: "/static/dist/img/hero.jpg",
+                image: item.image ? `/uploads/${item.image}` : 'https://picsum.photos/600/400',
                 location: item.location || "Kampala",
                 dayRate: item.price_per_day,
                 available: item.status === "available",
