@@ -6,6 +6,7 @@ from app import db
 from app.api import api
 from app.api.utils import error_response
 from app.models import Equipment, Location
+from config import Config
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user
 from sqlalchemy import select
@@ -75,8 +76,8 @@ def create_equipment():
     if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
-    if not request.is_json and not request.files:
-        return error_response("Missing JSON or file in request", 400)
+    if not request.form and not request.files:
+        return error_response("Missing form data or file in request", 400)
     
     data = request.form
     image_file = request.files.get('image')
@@ -84,13 +85,13 @@ def create_equipment():
     # Handle file upload
     if image_file:
         filename = secure_filename(image_file.filename)
-        image_path = path.join('uploads', filename)
+        image_path = path.join(Config.UPLOAD_FOLDER, filename)
         image_file.save(image_path)
         image_url = f"/uploads/{filename}"
     else:
         image_url = None
 
-    required_fields = ["name", "price_per_day", "transport_cost_per_km"]
+    required_fields = ["name", "price_per_day", "transport_cost_per_km", "location_id"]
     
     if not all(field in data for field in required_fields):
         return error_response(f"Missing required fields: {', '.join(required_fields)}", 400)
@@ -98,9 +99,9 @@ def create_equipment():
     try:
         equipment = Equipment(
             name=data["name"],
-            price_per_day=data["price_per_day"],
-            transport_cost_per_km=data["transport_cost_per_km"],
-            location_id=data.get("location_id"),
+            price_per_day=float(data["price_per_day"]),
+            transport_cost_per_km=float(data["transport_cost_per_km"]),
+            location_id=int(data["location_id"]),
             image=image_url
         )
         db.session.add(equipment)
