@@ -251,10 +251,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        viewItem(item) {
-            window.location.href = `/admin/equipment/${item.id}`
-        },
-
         async editItem(item) {
             const newName = prompt('Enter new name:', item.name);
             const newPrice = prompt('Enter new price per day:', item.price_per_day);
@@ -298,7 +294,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         addNewEquipment() {
-            window.location.href = '/admin/equipment/new'
+            window.location.href = '/admin/equipment/add'
         }
     }));
 });

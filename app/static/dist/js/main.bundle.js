@@ -5400,9 +5400,6 @@ document.addEventListener('alpine:init', function () {
           }, _callee4, null, [[1, 11]]);
         }))();
       },
-      viewItem: function viewItem(item) {
-        window.location.href = "/admin/equipment/".concat(item.id);
-      },
       editItem: function editItem(item) {
         var _this7 = this;
         return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
@@ -5465,7 +5462,7 @@ document.addEventListener('alpine:init', function () {
         return this.equipment;
       },
       addNewEquipment: function addNewEquipment() {
-        window.location.href = '/admin/equipment/new';
+        window.location.href = '/admin/equipment/add';
       }
     };
   });
@@ -5673,6 +5670,110 @@ document.addEventListener('alpine:init', function () {
         setTimeout(function () {
           notification.remove();
         }, 3000);
+      }
+    };
+  });
+});
+
+/***/ }),
+
+/***/ "./src/js/edit-equipment.js":
+/*!**********************************!*\
+  !*** ./src/js/edit-equipment.js ***!
+  \**********************************/
+/***/ (() => {
+
+document.addEventListener('alpine:init', function () {
+  Alpine.data('equipmentForm', function () {
+    return {
+      equipment: {
+        id: null,
+        name: '',
+        category: '',
+        location_id: '',
+        price_per_day: '',
+        transport_cost_per_km: '',
+        image: null
+      },
+      locations: [],
+      loading: true,
+      error: null,
+      fetchLocations: function fetchLocations() {
+        var _this = this;
+        fetch('/api/locations').then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          _this.locations = data.items;
+        })["catch"](function (error) {
+          console.error('Error fetching locations:', error);
+        });
+      },
+      fetchEquipment: function fetchEquipment(equipmentId) {
+        var _this2 = this;
+        fetch("/api/equipment/".concat(equipmentId)).then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          _this2.equipment = data;
+          _this2.loading = false;
+        })["catch"](function (error) {
+          console.error('Error fetching equipment:', error);
+          _this2.error = 'Failed to fetch equipment details';
+          _this2.loading = false;
+        });
+      },
+      updateEquipment: function updateEquipment() {
+        if (!this.equipment.name || !this.equipment.category || !this.equipment.location_id) {
+          alert('Please fill in all required fields.');
+          return;
+        }
+        if (!this.equipment.price_per_day || isNaN(parseFloat(this.equipment.price_per_day))) {
+          alert('Please enter a valid price per day.');
+          return;
+        }
+        if (!this.equipment.transport_cost_per_km || isNaN(parseFloat(this.equipment.transport_cost_per_km))) {
+          alert('Please enter a valid transport cost per km.');
+          return;
+        }
+        if (this.equipment.image && this.equipment.image.size > 5 * 1024 * 1024) {
+          alert('The image file size must not exceed 5 MB.');
+          return;
+        }
+        var formData = new FormData();
+        formData.append('name', this.equipment.name);
+        formData.append('category', this.equipment.category);
+        formData.append('location_id', this.equipment.location_id);
+        formData.append('price_per_day', parseFloat(this.equipment.price_per_day));
+        formData.append('transport_cost_per_km', parseFloat(this.equipment.transport_cost_per_km));
+        if (this.equipment.image) {
+          formData.append('image', this.equipment.image);
+        }
+        fetch("/api/equipment/".concat(this.equipment.id), {
+          method: 'PUT',
+          body: formData
+        }).then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          if (data.msg) {
+            alert(data.msg);
+          } else {
+            alert('Error updating equipment');
+          }
+        })["catch"](function (error) {
+          console.error('Error:', error);
+        })["finally"](function () {
+          window.location.href = '/admin/equipment';
+        });
+      },
+      init: function init() {
+        var pathSegments = window.location.pathname.split('/');
+        var equipmentId = pathSegments[pathSegments.length - 1];
+        if (!equipmentId) {
+          this.error = 'Equipment ID not found';
+          this.loading = false;
+          return;
+        }
+        this.fetchEquipment(equipmentId);
+        this.fetchLocations();
       }
     };
   });
@@ -9186,12 +9287,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _dash_equipment__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./dash-equipment */ "./src/js/dash-equipment.js");
 /* harmony import */ var _add_equipment__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./add-equipment */ "./src/js/add-equipment.js");
 /* harmony import */ var _add_equipment__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(_add_equipment__WEBPACK_IMPORTED_MODULE_13__);
-/* harmony import */ var _carousel__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./carousel */ "./src/js/carousel.js");
-/* harmony import */ var _equipment_grid__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./equipment-grid */ "./src/js/equipment-grid.js");
-/* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/module.esm.js");
-/* harmony import */ var _alpinejs_focus__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @alpinejs/focus */ "./node_modules/@alpinejs/focus/dist/module.esm.js");
-/* harmony import */ var feather_icons__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! feather-icons */ "./node_modules/feather-icons/dist/feather.js");
-/* harmony import */ var feather_icons__WEBPACK_IMPORTED_MODULE_18___default = /*#__PURE__*/__webpack_require__.n(feather_icons__WEBPACK_IMPORTED_MODULE_18__);
+/* harmony import */ var _edit_equipment__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./edit-equipment */ "./src/js/edit-equipment.js");
+/* harmony import */ var _edit_equipment__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(_edit_equipment__WEBPACK_IMPORTED_MODULE_14__);
+/* harmony import */ var _carousel__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./carousel */ "./src/js/carousel.js");
+/* harmony import */ var _equipment_grid__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./equipment-grid */ "./src/js/equipment-grid.js");
+/* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/module.esm.js");
+/* harmony import */ var _alpinejs_focus__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @alpinejs/focus */ "./node_modules/@alpinejs/focus/dist/module.esm.js");
+/* harmony import */ var feather_icons__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! feather-icons */ "./node_modules/feather-icons/dist/feather.js");
+/* harmony import */ var feather_icons__WEBPACK_IMPORTED_MODULE_19___default = /*#__PURE__*/__webpack_require__.n(feather_icons__WEBPACK_IMPORTED_MODULE_19__);
+
 
 
 
@@ -9214,14 +9318,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // import searchComponent from './components/search';
-feather_icons__WEBPACK_IMPORTED_MODULE_18___default().replace();
-window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_16__["default"];
+feather_icons__WEBPACK_IMPORTED_MODULE_19___default().replace();
+window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_17__["default"];
 // window.searchComponent = searchComponent;
-alpinejs__WEBPACK_IMPORTED_MODULE_16__["default"].plugin(_alpinejs_focus__WEBPACK_IMPORTED_MODULE_17__["default"]);
-alpinejs__WEBPACK_IMPORTED_MODULE_16__["default"].data('carousel', _carousel__WEBPACK_IMPORTED_MODULE_14__["default"]);
-alpinejs__WEBPACK_IMPORTED_MODULE_16__["default"].data('featuredEquipment', _featured_equipment__WEBPACK_IMPORTED_MODULE_3__["default"]);
-alpinejs__WEBPACK_IMPORTED_MODULE_16__["default"].data('equipmentGrid', _equipment_grid__WEBPACK_IMPORTED_MODULE_15__["default"]);
-alpinejs__WEBPACK_IMPORTED_MODULE_16__["default"].start();
+alpinejs__WEBPACK_IMPORTED_MODULE_17__["default"].plugin(_alpinejs_focus__WEBPACK_IMPORTED_MODULE_18__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_17__["default"].data('carousel', _carousel__WEBPACK_IMPORTED_MODULE_15__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_17__["default"].data('featuredEquipment', _featured_equipment__WEBPACK_IMPORTED_MODULE_3__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_17__["default"].data('equipmentGrid', _equipment_grid__WEBPACK_IMPORTED_MODULE_16__["default"]);
+alpinejs__WEBPACK_IMPORTED_MODULE_17__["default"].start();
 })();
 
 /******/ })()

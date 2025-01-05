@@ -33,7 +33,7 @@ def get_equipment_list():
     )
 
 
-@admin.route("/equipment/new")
+@admin.route("/equipment/add")
 def add_equipment():
     """
     New equipment
@@ -42,13 +42,13 @@ def add_equipment():
         "layouts/dash-new-equipment.html"    
     )
 
-@admin.route("/equipment/<int:equipment_id>")
-def get_equipment(equipment_id):
+@admin.route("/equipment/edit/<int:equipment_id>")
+def edit_equipment(equipment_id):
     """
     Equipment
     """
     return render_template(
-        "layouts/equipment-details.html"    
+        "layouts/dash-edit-equipment.html"    
     )
 
 

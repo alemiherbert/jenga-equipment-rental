@@ -12,6 +12,7 @@ import './cart';
 import './checkout';
 import './dash-equipment';
 import './add-equipment';
+import './edit-equipment';
 import carousel from './carousel';
 import featuredEquipment from './featured-equipment';
 import equipmentGrid from './equipment-grid';

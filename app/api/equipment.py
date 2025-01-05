@@ -69,9 +69,6 @@ def get_equipment(equipment_id):
     return jsonify(equipment.to_dict()), 200
 
 
-import os
-from werkzeug.utils import secure_filename
-
 @api.route("/equipment", methods=["POST"])
 @jwt_required()
 def create_equipment():
@@ -138,6 +135,7 @@ def create_equipment():
             os.remove(temp_image_path)
         return error_response(f"Error creating equipment: {str(e)}", 500)
 
+
 @api.route("/equipment/<int:equipment_id>", methods=["PUT"])
 @jwt_required()
 def update_equipment(equipment_id):
@@ -145,33 +143,58 @@ def update_equipment(equipment_id):
     if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
-    if not request.is_json:
-        return error_response("Missing JSON in request", 400)
-    
     equipment = db.session.get(Equipment, equipment_id)
     if not equipment:
         return error_response("Equipment not found", 404)
     
-    data = request.json
-    allowed_fields = ["name", "price_per_day", "transport_cost_per_km", "status", "location_id"]
+    data = request.form
+    image_file = request.files.get('image')
+
+    # Handle file upload
+    if image_file:
+        if image_file.content_length > Config.MAX_CONTENT_LENGTH:
+            return error_response("File size must not exceed 5 MB", 400)
+        
+        # Save the file temporarily
+        temp_filename = secure_filename(image_file.filename)
+        temp_image_path = os.path.join(Config.UPLOAD_FOLDER, temp_filename)
+        image_file.save(temp_image_path)
+    else:
+        temp_image_path = None
+
+    required_fields = ["name", "category", "location_id"]
     
-    for field in allowed_fields:
-        if field in data:
-            if field == "status":
-                try:
-                    equipment.status = Equipment.Status(data["status"])
-                except ValueError:
-                    return error_response("Invalid status value", 400)
-            else:
-                setattr(equipment, field, data[field])
+    if not all(field in data for field in required_fields):
+        return error_response(f"Missing required fields: {', '.join(required_fields)}", 400)
     
     try:
+        equipment.name = data["name"]
+        equipment.category = data["category"]
+        equipment.location_id = int(data["location_id"])
+        equipment.price_per_day = float(data.get("price_per_day", 0))
+        equipment.transport_cost_per_km = float(data.get("transport_cost_per_km", 0))
+
+        if temp_image_path:
+            equipment_name = data["name"].replace(" ", "_").lower()
+            file_extension = os.path.splitext(temp_filename)[1]
+            new_filename = f"{equipment_name}{equipment.id}{file_extension}"
+            new_image_path = os.path.join(Config.UPLOAD_FOLDER, new_filename)
+
+            os.rename(temp_image_path, new_image_path)
+
+            if equipment.image and os.path.exists(os.path.join(Config.UPLOAD_FOLDER, equipment.image)):
+                os.remove(os.path.join(Config.UPLOAD_FOLDER, equipment.image))
+
+            equipment.image = new_filename
+
         db.session.commit()
         return jsonify({
             "msg": "Equipment updated successfully",
             "equipment": equipment.to_dict()}), 200
     except Exception as e:
         db.session.rollback()
+        if temp_image_path and os.path.exists(temp_image_path):
+            os.remove(temp_image_path)
         return error_response(f"Error updating equipment: {str(e)}", 500)
 
 
