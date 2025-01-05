@@ -15,7 +15,7 @@ from sqlalchemy import select
 @jwt_required()
 def get_users():
     """Get paginated list of users"""
-    if not current_user.role != "admin":
+    if current_user.role != "admin":
         return error_response("Unauthorized access", 403)
     
     page = request.args.get("page", 1, type=int)

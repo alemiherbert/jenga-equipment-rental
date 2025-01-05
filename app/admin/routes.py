@@ -51,6 +51,35 @@ def edit_equipment(equipment_id):
         "layouts/dash-edit-equipment.html"    
     )
 
+@admin.route("/bookings")
+def get_bookings_list():
+    """
+    Bookings
+    """
+    return render_template(
+        "layouts/dash-bookings.html"    
+    )
+
+
+@admin.route("/payments")
+def get_payments_list():
+    """
+    Payments
+    """
+    return render_template(
+        "layouts/dash-payments.html"    
+    )
+
+
+@admin.route("/users")
+def get_Users_list():
+    """
+    Users
+    """
+    return render_template(
+        "layouts/dash-users.html"    
+    )
+
 
 @admin.route("/cart")
 def cart():
