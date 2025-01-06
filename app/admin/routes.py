@@ -3,6 +3,7 @@ admin app routes
 """
 
 from app.admin import admin
+from app.models import User, Equipment, Booking
 from flask import render_template, jsonify
 from flask_jwt_extended import jwt_required, current_user
 
@@ -12,8 +13,13 @@ def dashboard():
     """
     Dashboard
     """
+    num_users = len(User.query.all())
+    num_equipment = len(Equipment.query.all())
+    num_bookings = len(Booking.query.all())
+    
     return render_template(
         "layouts/dashboard.html",
+        data=[num_users, num_equipment, num_bookings],
         notifications = [
             {
                 "status": "unread",
