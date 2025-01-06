@@ -29,7 +29,8 @@ def get_equipment_list():
     Equipment
     """
     return render_template(
-        "layouts/dash-equipment.html"    
+        "layouts/dash-equipment.html",
+        title="Equipment" 
     )
 
 
@@ -39,7 +40,8 @@ def add_equipment():
     New equipment
     """
     return render_template(
-        "layouts/dash-new-equipment.html"    
+        "layouts/dash-new-equipment.html",
+        title="Add Equipment"
     )
 
 @admin.route("/equipment/edit/<int:equipment_id>")
@@ -48,7 +50,8 @@ def edit_equipment(equipment_id):
     Equipment
     """
     return render_template(
-        "layouts/dash-edit-equipment.html"    
+        "layouts/dash-edit-equipment.html",
+        title="Edit Equipment"
     )
 
 @admin.route("/bookings")
@@ -67,7 +70,8 @@ def get_payments_list():
     Payments
     """
     return render_template(
-        "layouts/dash-payments.html"    
+        "layouts/dash-payments.html",
+        title="Bookings"
     )
 
 
@@ -77,25 +81,6 @@ def get_Users_list():
     Users
     """
     return render_template(
-        "layouts/dash-users.html"    
-    )
-
-
-@admin.route("/cart")
-def cart():
-    """
-    Cart
-    """
-    return render_template(
-        "layouts/cart.html"
-    )
-
-
-@admin.route("/checkout")
-def checkout():
-    """
-    Checkout
-    """
-    return render_template(
-        "layouts/checkout.html"
+        "layouts/dash-users.html",
+        title="Users"
     )
