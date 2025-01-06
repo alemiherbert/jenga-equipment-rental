@@ -56,7 +56,7 @@ def get_payment_list():
         query=query,
         page=page,
         per_page=per_page,
-        endpoint="main.get_payment_list"
+        endpoint="api.get_payment_list"
     )), 200
 
 

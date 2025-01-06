@@ -1,13 +1,17 @@
 import feather from 'feather-icons';
 
 document.addEventListener('alpine:init', () => {
-    Alpine.data('userDataTable', (dataSource, filterParams) => ({
+    Alpine.data('paymentDataTable', (dataSource, filterParams) => ({
         curPage: 1,
         filters: [],
         formData: {
-            role: 'All'
+            status: 'All',
+            min_amount: '',
+            max_amount: '',
+            start_date: '',
+            end_date: ''
         },
-        users: [],
+        payments: [],
         loading: false,
         error: null,
         pageSize: 10,
@@ -39,32 +43,52 @@ document.addEventListener('alpine:init', () => {
         async fetchData() {
             this.loading = true;
             this.error = null;
-
+        
             try {
                 const params = new URLSearchParams({
                     page: this.curPage,
                     per_page: this.pageSize,
                 });
-
+        
                 if (this.search) {
                     params.append('search', this.search);
                 }
-
-                if (this.formData.role && this.formData.role !== 'All') {
-                    params.append('role', this.formData.role);
+        
+                if (this.formData.status && this.formData.status !== 'All') {
+                    params.append('status', this.formData.status);
                 }
-
-                const response = await fetch(`/api/users?${params.toString()}`);
+        
+                if (this.formData.min_amount) {
+                    params.append('min_amount', this.formData.min_amount);
+                }
+        
+                if (this.formData.max_amount) {
+                    params.append('max_amount', this.formData.max_amount);
+                }
+        
+                if (this.formData.start_date) {
+                    params.append('start_date', this.formData.start_date);
+                }
+        
+                if (this.formData.end_date) {
+                    params.append('end_date', this.formData.end_date);
+                }
+        
+                const response = await fetch(`/api/payments?${params.toString()}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 }
                 const data = await response.json();
-
-                this.users = data.items.map(item => ({
+        
+                this.payments = data.items.map(item => ({
                     id: item.id,
-                    name: item.name,
-                    email: item.email,
-                    role: item.role,
+                    total_amount: item.total_amount,
+                    currency: item.currency,
+                    status: item.status,
+                    created_at: item.created_at,
+                    user_name: item.user_name,
+                    user_id: item.user_id,
+                    payment_reference: item.payment_reference,
                     selected: false
                 }));
                 this.total = data._meta.total_items;
@@ -110,7 +134,7 @@ document.addEventListener('alpine:init', () => {
         sort(col) {
             if (this.sortCol === col) this.sortAsc = !this.sortAsc;
             this.sortCol = col;
-            this.users.sort((a, b) => {
+            this.payments.sort((a, b) => {
                 if (a[this.sortCol] < b[this.sortCol]) return this.sortAsc ? 1 : -1;
                 if (a[this.sortCol] > b[this.sortCol]) return this.sortAsc ? -1 : 1;
                 return 0;
@@ -118,11 +142,11 @@ document.addEventListener('alpine:init', () => {
         },
 
         updateSelectAllStatus() {
-            this.selectAll = this.selectedItems.length === this.users.length;
+            this.selectAll = this.selectedItems.length === this.payments.length;
         },
 
         toggleAllCheckbox() {
-            const filteredItems = this.filtered(this.users);
+            const filteredItems = this.filtered(this.payments);
 
             if (filteredItems.length === this.selectedItems.length) {
                 filteredItems.forEach((item) => (item.selected = false));
@@ -135,13 +159,13 @@ document.addEventListener('alpine:init', () => {
 
         selectAllCheckbox() {
             this.selectAll = true;
-            const filteredItems = this.filtered(this.users);
+            const filteredItems = this.filtered(this.payments);
             filteredItems.map((item) => (item.selected = true));
         },
 
         deselectAllCheckbox() {
             this.selectAll = false;
-            const filteredItems = this.filtered(this.users);
+            const filteredItems = this.filtered(this.payments);
             filteredItems.map((item) => (item.selected = false));
         },
 
@@ -179,12 +203,12 @@ document.addEventListener('alpine:init', () => {
 
             switch (action) {
                 case 'delete':
-                    if (confirm('Are you sure you want to delete the selected users?')) {
+                    if (confirm('Are you sure you want to delete the selected payments?')) {
                         this.deleteSelectedItems();
                     }
                     break;
                 case 'edit':
-                    console.log('Editing selected users:', this.selectedItems);
+                    console.log('Editing selected payments:', this.selectedItems);
                     break;
                 default:
                     console.log('Unknown action:', action);
@@ -194,7 +218,7 @@ document.addEventListener('alpine:init', () => {
         async deleteSelectedItems() {
             try {
                 for (const item of this.selectedItems) {
-                    const response = await fetch(`/api/users/${item.id}`, {
+                    const response = await fetch(`/api/payments/${item.id}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -203,22 +227,22 @@ document.addEventListener('alpine:init', () => {
                     });
 
                     if (!response.ok) {
-                        throw new Error(`Failed to delete user with ID ${item.id}`);
+                        throw new Error(`Failed to delete payment with ID ${item.id}`);
                     }
                 }
 
                 this.fetchData();
-                alert('Selected users deleted successfully');
+                alert('Selected payments deleted successfully');
             } catch (error) {
-                console.error('Error deleting users:', error);
-                alert('Failed to delete selected users');
+                console.error('Error deleting payments:', error);
+                alert('Failed to delete selected payments');
             }
         },
 
         async deleteItem(item) {
-            if (confirm(`Are you sure you want to delete ${item.name}?`)) {
+            if (confirm(`Are you sure you want to delete payment #${item.id}?`)) {
                 try {
-                    const response = await fetch(`/api/users/${item.id}`, {
+                    const response = await fetch(`/api/payments/${item.id}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -226,58 +250,54 @@ document.addEventListener('alpine:init', () => {
                     });
 
                     if (!response.ok) {
-                        throw new Error(`Failed to delete user with ID ${item.id}`);
+                        throw new Error(`Failed to delete payment with ID ${item.id}`);
                     }
 
                     this.fetchData();
-                    alert('User deleted successfully');
+                    alert('Payment deleted successfully');
                 } catch (error) {
-                    console.error('Error deleting user:', error);
-                    alert('Failed to delete user');
+                    console.error('Error deleting payment:', error);
+                    alert('Failed to delete payment');
                 }
             }
         },
 
         async editItem(item) {
-            const newName = prompt('Enter new name:', item.name);
-            const newEmail = prompt('Enter new email:', item.email);
-            const newRole = prompt('Enter new role:', item.role);
+            const newStatus = prompt('Enter new status (pending/succeeded/failed/refunded):', item.status);
 
-            if (newName === null || newEmail === null || newRole === null) {
+            if (newStatus === null) {
                 return;
             }
 
             try {
-                const response = await fetch(`/api/users/${item.id}`, {
+                const response = await fetch(`/api/payments/${item.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        name: newName,
-                        email: newEmail,
-                        role: newRole
+                        status: newStatus
                     })
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to update user');
+                    throw new Error('Failed to update payment');
                 }
 
                 this.fetchData();
-                alert('User updated successfully');
+                alert('Payment updated successfully');
             } catch (error) {
-                console.error('Error updating user:', error);
-                alert('Failed to update user');
+                console.error('Error updating payment:', error);
+                alert('Failed to update payment');
             }
         },
 
         get selectedItems() {
-            return this.users.filter((item) => item.selected);
+            return this.payments.filter((item) => item.selected);
         },
 
         get pagedItems() {
-            return this.users;
+            return this.payments;
         }
     }));
 });

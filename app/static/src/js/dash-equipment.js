@@ -2,7 +2,7 @@ import { data } from 'alpinejs';
 import feather from 'feather-icons';
 
 document.addEventListener('alpine:init', () => {
-    Alpine.data('dataTable', (dataSource, filterParams) => ({
+    Alpine.data('equipmentDataTable', (dataSource, filterParams) => ({
         curPage: 1,
         filters: [],
         formData: {

@@ -370,7 +370,7 @@ class Booking(PaginatedAPIMixin, db.Model):
         return f"<Booking {self.id} - {equipment_name} by {user_name}>"
 
 
-class Payment(db.Model):
+class Payment(PaginatedAPIMixin, db.Model):
     """
     Payment model for tracking payments
     """
@@ -414,6 +414,8 @@ class Payment(db.Model):
             'currency': self.currency,
             'status': self.status.value,
             'created_at': self.created_at.isoformat(),
+            'user_name': self.user.name,
+            'payment_reference': self.payment_reference,
             'updated_at': self.updated_at.isoformat(),
             'booking_ids': [booking.id for booking in self.bookings],
             '_links': {

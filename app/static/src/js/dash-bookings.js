@@ -1,13 +1,16 @@
 import feather from 'feather-icons';
 
 document.addEventListener('alpine:init', () => {
-    Alpine.data('userDataTable', (dataSource, filterParams) => ({
+    Alpine.data('bookingDataTable', (dataSource, filterParams) => ({
         curPage: 1,
         filters: [],
         formData: {
-            role: 'All'
+            status: 'All',
+            equipment_id: '',
+            start_date: '',
+            end_date: ''
         },
-        users: [],
+        bookings: [],
         loading: false,
         error: null,
         pageSize: 10,
@@ -50,21 +53,37 @@ document.addEventListener('alpine:init', () => {
                     params.append('search', this.search);
                 }
 
-                if (this.formData.role && this.formData.role !== 'All') {
-                    params.append('role', this.formData.role);
+                if (this.formData.status && this.formData.status !== 'All') {
+                    params.append('status', this.formData.status);
                 }
 
-                const response = await fetch(`/api/users?${params.toString()}`);
+                if (this.formData.equipment_id) {
+                    params.append('equipment_id', this.formData.equipment_id);
+                }
+
+                if (this.formData.start_date) {
+                    params.append('start_date', this.formData.start_date);
+                }
+
+                if (this.formData.end_date) {
+                    params.append('end_date', this.formData.end_date);
+                }
+
+                const response = await fetch(`/api/bookings?${params.toString()}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 }
                 const data = await response.json();
 
-                this.users = data.items.map(item => ({
+                this.bookings = data.items.map(item => ({
                     id: item.id,
-                    name: item.name,
-                    email: item.email,
-                    role: item.role,
+                    start_date: item.start_date,
+                    end_date: item.end_date,
+                    rental_amount: item.rental_amount,
+                    status: item.status,
+                    equipment_name: item.equipment_name,
+                    user_name: item.user_name,
+                    payment_id: item.payment_id,
                     selected: false
                 }));
                 this.total = data._meta.total_items;
@@ -110,7 +129,7 @@ document.addEventListener('alpine:init', () => {
         sort(col) {
             if (this.sortCol === col) this.sortAsc = !this.sortAsc;
             this.sortCol = col;
-            this.users.sort((a, b) => {
+            this.bookings.sort((a, b) => {
                 if (a[this.sortCol] < b[this.sortCol]) return this.sortAsc ? 1 : -1;
                 if (a[this.sortCol] > b[this.sortCol]) return this.sortAsc ? -1 : 1;
                 return 0;
@@ -118,11 +137,11 @@ document.addEventListener('alpine:init', () => {
         },
 
         updateSelectAllStatus() {
-            this.selectAll = this.selectedItems.length === this.users.length;
+            this.selectAll = this.selectedItems.length === this.bookings.length;
         },
 
         toggleAllCheckbox() {
-            const filteredItems = this.filtered(this.users);
+            const filteredItems = this.filtered(this.bookings);
 
             if (filteredItems.length === this.selectedItems.length) {
                 filteredItems.forEach((item) => (item.selected = false));
@@ -135,13 +154,13 @@ document.addEventListener('alpine:init', () => {
 
         selectAllCheckbox() {
             this.selectAll = true;
-            const filteredItems = this.filtered(this.users);
+            const filteredItems = this.filtered(this.bookings);
             filteredItems.map((item) => (item.selected = true));
         },
 
         deselectAllCheckbox() {
             this.selectAll = false;
-            const filteredItems = this.filtered(this.users);
+            const filteredItems = this.filtered(this.bookings);
             filteredItems.map((item) => (item.selected = false));
         },
 
@@ -179,12 +198,12 @@ document.addEventListener('alpine:init', () => {
 
             switch (action) {
                 case 'delete':
-                    if (confirm('Are you sure you want to delete the selected users?')) {
+                    if (confirm('Are you sure you want to delete the selected bookings?')) {
                         this.deleteSelectedItems();
                     }
                     break;
                 case 'edit':
-                    console.log('Editing selected users:', this.selectedItems);
+                    console.log('Editing selected bookings:', this.selectedItems);
                     break;
                 default:
                     console.log('Unknown action:', action);
@@ -194,7 +213,7 @@ document.addEventListener('alpine:init', () => {
         async deleteSelectedItems() {
             try {
                 for (const item of this.selectedItems) {
-                    const response = await fetch(`/api/users/${item.id}`, {
+                    const response = await fetch(`/api/bookings/${item.id}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -203,22 +222,22 @@ document.addEventListener('alpine:init', () => {
                     });
 
                     if (!response.ok) {
-                        throw new Error(`Failed to delete user with ID ${item.id}`);
+                        throw new Error(`Failed to delete booking with ID ${item.id}`);
                     }
                 }
 
                 this.fetchData();
-                alert('Selected users deleted successfully');
+                alert('Selected bookings deleted successfully');
             } catch (error) {
-                console.error('Error deleting users:', error);
-                alert('Failed to delete selected users');
+                console.error('Error deleting bookings:', error);
+                alert('Failed to delete selected bookings');
             }
         },
 
         async deleteItem(item) {
-            if (confirm(`Are you sure you want to delete ${item.name}?`)) {
+            if (confirm(`Are you sure you want to delete booking #${item.id}?`)) {
                 try {
-                    const response = await fetch(`/api/users/${item.id}`, {
+                    const response = await fetch(`/api/bookings/${item.id}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -226,58 +245,58 @@ document.addEventListener('alpine:init', () => {
                     });
 
                     if (!response.ok) {
-                        throw new Error(`Failed to delete user with ID ${item.id}`);
+                        throw new Error(`Failed to delete booking with ID ${item.id}`);
                     }
 
                     this.fetchData();
-                    alert('User deleted successfully');
+                    alert('Booking deleted successfully');
                 } catch (error) {
-                    console.error('Error deleting user:', error);
-                    alert('Failed to delete user');
+                    console.error('Error deleting booking:', error);
+                    alert('Failed to delete booking');
                 }
             }
         },
 
         async editItem(item) {
-            const newName = prompt('Enter new name:', item.name);
-            const newEmail = prompt('Enter new email:', item.email);
-            const newRole = prompt('Enter new role:', item.role);
+            const newStatus = prompt('Enter new status (pending/confirmed/cancelled):', item.status);
 
-            if (newName === null || newEmail === null || newRole === null) {
+            if (newStatus === null) {
                 return;
             }
 
             try {
-                const response = await fetch(`/api/users/${item.id}`, {
+                const response = await fetch(`/api/bookings/${item.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        name: newName,
-                        email: newEmail,
-                        role: newRole
+                        status: newStatus
                     })
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to update user');
+                    throw new Error('Failed to update booking');
                 }
 
                 this.fetchData();
-                alert('User updated successfully');
+                alert('Booking updated successfully');
             } catch (error) {
-                console.error('Error updating user:', error);
-                alert('Failed to update user');
+                console.error('Error updating booking:', error);
+                alert('Failed to update booking');
             }
         },
 
         get selectedItems() {
-            return this.users.filter((item) => item.selected);
+            return this.bookings.filter((item) => item.selected);
         },
 
         get pagedItems() {
-            return this.users;
+            return this.bookings;
+        },
+
+        addNewBooking() {
+            window.location.href = '/admin/bookings/add';
         }
     }));
 });

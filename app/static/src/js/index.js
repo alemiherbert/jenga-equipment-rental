@@ -14,6 +14,8 @@ import './dash-equipment';
 import './add-equipment';
 import './edit-equipment';
 import './dash-users';
+import './dash-bookings';
+import './dash-payments';
 import carousel from './carousel';
 import featuredEquipment from './featured-equipment';
 import equipmentGrid from './equipment-grid';

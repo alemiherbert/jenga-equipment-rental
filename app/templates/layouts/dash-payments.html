@@ -9,87 +9,10 @@
         {% include "snippets/header.html" %}
         <div class="container" style="padding-block: 2.5rem;">
             <div class="app-body">
-                <div class="app-card" x-data="dataTable('products', ['name', 'status'])">
-                    <div class="app-card__header">
-                        <button class="btn btn--icon btn--primary" @click="addNewEquipment">
-                            <i data-feather="plus" width="20" height="20"></i>
-                            Add New
-                        </button>
-
-                        <div class="app-card__actions">
-                            <form class="search-form" @submit.prevent="">
-                                <svg aria-hidden="true" focusable="false" height="24" role="img"
-                                    style="fill: currentColor" viewBox="0 0 24 24" width="24"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"
-                                    class="search-form__icon">
-                                    <path
-                                        d="M19.501,9.75c-0,2.152 -0.699,4.14 -1.875,5.752l5.935,5.94c0.585,0.586 0.585,1.537 -0,2.123c-0.586,0.586 -1.538,0.586 -2.124,0l-5.935,-5.939c-1.612,1.181 -3.6,1.875 -5.752,1.875c-5.386,-0 -9.75,-4.364 -9.75,-9.751c0,-5.386 4.364,-9.75 9.75,-9.75c5.387,-0 9.751,4.364 9.751,9.75Zm-9.751,6.751c3.704,-0 6.751,-3.047 6.751,-6.751c-0,-3.703 -3.047,-6.75 -6.751,-6.75c-3.703,0 -6.75,3.047 -6.75,6.75c0,3.704 3.047,6.751 6.75,6.751Z">
-                                    </path>
-                                </svg>
-                                <input x-model="search" class="search-form__control" type="text" placeholder="Search..."
-                                    title="Search">
-                            </form>
-                            <div class="data-table-filter" x-data="{ open: false }" @click.outside="open = false">
-                                <button class="btn btn--light btn--icon btn--counter data-table-filter__toggle"
-                                    :aria-expanded="open" @click="open = ! open" aria-label="Filters"
-                                    aria-expanded="false">
-                                    <svg aria-hidden="true" fill="none" focusable="false" height="24"
-                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        stroke="currentColor" viewBox="0 0 24 24" width="24"
-                                        xmlns="http://www.w3.org/2000/svg" class="btn__icon">
-                                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                                    </svg>
-                                    <span class="btn__counter" x-show="filters.length > 0" x-text="filters.length"
-                                        style="display: none;">0</span>
-                                </button>
-                                <div class="context-menu context-menu--inline-end"
-                                    :data-state="open ? 'open' : 'closed'" data-state="closed">
-                                    <form @submit.prevent="submitForm(formData)"
-                                        class="form-group-stack form-group-stack--bordered form-group-container">
-                                        <div class="form-group">
-                                            <label class="form-label" for="location">Location</label>
-                                            <select class="form-control" id="location" x-model="formData.location">
-                                                <option value="All">All Locations</option>
-                                                <option value="Kololo">Kololo</option>
-                                                <option value="Nakasero">Nakasero</option>
-                                                <option value="Ntinda">Ntinda</option>
-                                                <option value="Kamwokya">Kamwokya</option>
-                                                <option value="Old Kampala">Old Kampala</option>
-                                                <option value="Nakawa">Nakawa</option>
-                                                <option value="Kisugu">Kisugu</option>
-                                                <option value="Lugogo">Lugogo</option>
-                                                <option value="Buziga">Buziga</option>
-                                                <option value="Muyenga">Muyenga</option>
-                                            </select>
-                                            <label class="form-label" for="category">Category</label>
-                                            <select class="form-control" id="category" x-model="formData.category">
-                                                <option value="All">All Categories</option>
-                                                <option value="Earthmoving">Earthmoving</option>
-                                                <option value="Material Handling">Material Handling</option>
-                                                <option value="Construction Vehicles">Construction Vehicles</option>
-                                                <option value="Compaction">Compaction</option>
-                                                <option value="Paving and Concrete">Paving and Concrete</option>
-                                            </select>
-                                            <label class="form-label" for="status">Status</label>
-                                            <select class="form-control" id="status" x-model="formData.status">
-                                                <option value="All">All Statuses</option>
-                                                <option value="available">Available</option>
-                                                <option value="rented">Rented</option>
-                                            </select>
-
-                                        </div>
-                                        <div class="data-table-filter__actions">
-                                            <button class="btn btn--primary btn--sm">Filter</button>
-                                            <button @click="filters = []" type="reset"
-                                                class="btn btn--light btn--sm">Reset</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="app-card" x-data="paymentDataTable('payments', ['total_amount', 'status', 'created_at'])">
                     <div class="app-card__body">
                         <div class="data-table">
+                            <!-- Bulk Actions Alert -->
                             <div class="alert alert--info data-table-alert" x-show="selectedItems.length"
                                 style="display: none;">
                                 <span
@@ -98,7 +21,7 @@
                                 <div class="data-table-alert__actions">
                                     <div class="data-table-alert__column">
                                         <button @click="selectAllCheckbox($event);" class="btn btn--primary btn--sm"
-                                            x-text="`Select all ${equipment.length > total ? total : equipment.length}`">Select
+                                            x-text="`Select all ${payments.length > total ? total : payments.length}`">Select
                                             all 20</button>
                                         <button @click="deselectAllCheckbox($event);"
                                             class="btn btn--primary btn--sm">Deselect all</button>
@@ -106,18 +29,19 @@
                                     <div class="data-table-alert__column">
                                         <select class="form-control form-control--sm" id="actions" aria-label="Actions">
                                             <option value="bulk-edit">Bulk edit</option>
-                                            <option value="send-notification">Send notification</option>
-                                            <option value="publish">Publish</option>
                                             <option value="delete">Delete</option>
                                         </select>
                                         <button class="btn btn--primary btn--sm">Run</button>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Table -->
                             <div class="table-responsive">
                                 <table class="table table--hover">
                                     <thead>
                                         <tr>
+                                            <!-- Select All Checkbox -->
                                             <th style="inline-size: 3.25rem;">
                                                 <span class="sr-only">Select</span>
                                                 <label @click="toggleAllCheckbox($event);" aria-label="Select all item"
@@ -126,62 +50,126 @@
                                                         name="select-all" x-model="selectAll">
                                                 </label>
                                             </th>
-                                            <th>Image</th>
+
+                                            <!-- ID Column -->
                                             <th>
-                                                <button @click="sort('name')" class="sort-btn" type="button">
-                                                    Name
+                                                <button @click="sort('id')" class="sort-btn" type="button">
+                                                    ID
                                                     <i data-feather="chevrons-up"></i>
                                                 </button>
                                             </th>
+
+                                            <!-- Total Amount Column -->
                                             <th>
-                                                <button @click="sort('price')" class="sort-btn" type="button">
-                                                    Location
+                                                <button @click="sort('total_amount')" class="sort-btn" type="button">
+                                                    Total Amount
                                                     <i data-feather="chevrons-up"></i>
                                                 </button>
                                             </th>
-                                            <th>Price (UGX)</th>
-                                            <th>Status</th>
+
+                                            <!-- Currency Column -->
+                                            <th>
+                                                <button @click="sort('currency')" class="sort-btn" type="button">
+                                                    Currency
+                                                    <i data-feather="chevrons-up"></i>
+                                                </button>
+                                            </th>
+
+                                            <!-- Status Column -->
+                                            <th>
+                                                <button @click="sort('status')" class="sort-btn" type="button">
+                                                    Status
+                                                    <i data-feather="chevrons-up"></i>
+                                                </button>
+                                            </th>
+
+                                            <!-- Created At Column -->
+                                            <th>
+                                                <button @click="sort('created_at')" class="sort-btn" type="button">
+                                                    Created At
+                                                    <i data-feather="chevrons-up"></i>
+                                                </button>
+                                            </th>
+
+                                            <!-- User Name Column -->
+                                            <th>User</th>
+
+                                            <!-- Payment Reference Column -->
+                                            <th>Payment Reference</th>
+
+                                            <!-- Actions Column -->
                                             <th>Actions</th>
-                                            <th>&nbsp;</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <!-- No Results -->
                                         <template x-if="pagedItems.length === 0">
                                             <tr>
-                                                <td class="data-table__no-results" colspan="8">No results were found.
+                                                <td class="data-table__no-results" colspan="9">No results were found.
                                                 </td>
                                             </tr>
                                         </template>
+
+                                        <!-- Payment Rows -->
                                         <template x-for="(item, index) in pagedItems" :key="item.id">
                                             <tr>
+                                                <!-- Select Checkbox -->
                                                 <td>
-                                                    <label class="form-check" :aria-label="`Select ${item.name}`">
+                                                    <label class="form-check" :aria-label="`Select ${item.id}`">
                                                         <input :name="item.id" class="form-check__control"
                                                             type="checkbox" value="1" x-model="item.selected"
                                                             :change="updateSelectAllStatus()">
                                                     </label>
                                                 </td>
+
+                                                <!-- ID -->
+                                                <td x-text="item.id"></td>
+
+                                                <!-- Total Amount -->
+                                                <td x-text="`${item.currency} ${item.total_amount.toLocaleString()}`"></td>
+
+                                                <!-- Currency -->
+                                                <td x-text="item.currency"></td>
+
+                                                <!-- Status -->
                                                 <td>
-                                                    <img class="data-table__image" :src="item.image" alt="">
-                                                </td>
-                                                <td x-text="item.name"></td>
-                                                <td x-text="item.location"></td>
-                                                <td x-text="item.price_per_day.toLocaleString()"></td>
-                                                <td>
-                                                    <template x-if="item.status === 'available'">
+                                                    <template x-if="item.status === 'pending'">
+                                                        <span class="status status--warning"
+                                                            x-text="item.status"></span>
+                                                    </template>
+                                                    <template x-if="item.status === 'succeeded'">
                                                         <span class="status status--success"
                                                             x-text="item.status"></span>
                                                     </template>
-                                                    <template x-if="item.status === 'rented'">
+                                                    <template x-if="item.status === 'failed'">
                                                         <span class="status status--danger" x-text="item.status"></span>
                                                     </template>
+                                                    <template x-if="item.status === 'refunded'">
+                                                        <span class="status status--info" x-text="item.status"></span>
+                                                    </template>
                                                 </td>
+
+                                                <!-- Created At -->
+                                                <td x-text="item.created_at"></td>
+
+                                                <!-- User Name -->
+                                                <td>
+                                                    <a :href="`/admin/users/${item.user_id}`" class="link" x-text="item.user_name"></a>
+                                                </td>
+
+                                                <!-- Payment Reference -->
+                                                <td x-text="item.payment_reference || 'N/A'"></td>
+
+                                                <!-- Actions -->
                                                 <td>
                                                     <div class="data-table__actions">
+                                                        <!-- Edit Button -->
                                                         <a href="#" class="btn btn--light btn--sm btn--icon"
                                                             aria-label="Edit" @click.prevent="editItem(item)">
                                                             <i data-feather="edit" width="12" height="12"></i>
                                                         </a>
+
+                                                        <!-- Delete Button -->
                                                         <a href="#" class="btn btn--delete btn--sm btn--icon"
                                                             aria-label="Delete" @click.prevent="deleteItem(item)">
                                                             <i data-feather="trash-2" width="12" height="12"></i>
@@ -193,7 +181,10 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- Table Footer -->
                             <div class="data-table__footer">
+                                <!-- Results Count -->
                                 <div class="data-table__footer-column">
                                     <div class="form-group">
                                         <label class="sr-only" for="number-of-results">Number of results</label>
@@ -209,14 +200,19 @@
                                     <p x-show="pagedItems.length > 0" x-text="resultsCount">Showing 1 to 10 of 20
                                         results</p>
                                 </div>
+
+                                <!-- Pagination -->
                                 <nav x-show="pages().length > 1" class="pagination" aria-label="Posts pagination">
                                     <ul class="pagination__links">
+                                        <!-- Previous Button -->
                                         <li>
                                             <button @click="previousPage" class="btn btn--sm btn--outline-primary"
                                                 :disabled="curPage === 1">
                                                 Previous
                                             </button>
                                         </li>
+
+                                        <!-- Page Numbers -->
                                         <template x-for="(page, index) in pages()" :key="index">
                                             <li>
                                                 <button @click="viewPage(index + 1)"
@@ -227,6 +223,8 @@
                                                 </button>
                                             </li>
                                         </template>
+
+                                        <!-- Next Button -->
                                         <li>
                                             <button @click="nextPage" class="btn btn--sm btn--outline-primary"
                                                 :disabled="curPage === totalPages()">

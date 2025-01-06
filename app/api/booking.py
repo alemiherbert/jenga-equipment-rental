@@ -43,7 +43,7 @@ def get_booking_list():
         query=query,
         page=page,
         per_page=per_page,
-        endpoint="main.get_booking_list"
+        endpoint="api.get_booking_list"
     )), 200
 
 
