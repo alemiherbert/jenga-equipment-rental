@@ -5,7 +5,7 @@ An construction equipment rental service built in python (flask)
 - Alemi Herbert <alemiherbert@gmail.com>
 
 ## Motivation
-To get my hands as dirty as possible with the code. 
+To get my hands as dirty as possible with code -- only utilising unopinionated libraries that will allow me to write as much code as possible.
 
 ## Installation
 ### Clone the app repo
