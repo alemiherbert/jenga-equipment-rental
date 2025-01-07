@@ -14,7 +14,7 @@ git clone https://github.com/alemiherbert/jenga-equipment-rental.git
 
 cd jenga-equipment-rental
 ```
-### Install the dependencies
+### Install the dependencies (in a virtual envirionment of course)
 ```(bash)
 pip3 install -r requirements.txt
 ```
@@ -35,7 +35,18 @@ pip3 install -r requirements.txt
 ```
 python3 app.py
 ```
-You are good to go!
+Lets add some equipment, then you are good to go!
+## Seeding the database.
+Open the flask shell
+```(bash)
+flask shell
+```
+Run seedquip.py inside the python shell
+```(python)
+equip = open('seedequip.py').read()
+exec(equip)
+```
+This also creates a default admin user for your testing, with email as `admin@example.com` and password as `password885`
 ## App routes and API Endpoints
 ```
 Endpoint                    Methods  Rule

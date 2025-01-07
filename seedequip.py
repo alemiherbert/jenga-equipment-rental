@@ -133,6 +133,6 @@ def seed_admin():
 
 seed_locations()
 
-# seed_equipment()
+seed_equipment()
 
 seed_admin()
