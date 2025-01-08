@@ -1,6 +1,8 @@
 <header class="app-header">
-    {{ title }}
     <div class="app-header__inner">
+        <div class="app-header__column">
+            {{ title }}
+        </div>
         <div class="app-header__column">
             <nav class="site-navigation" aria-label="Site">
                 <button class="btn btn--primary btn--icon site-navigation__btn" data-action="navigation-toggle"
@@ -24,7 +26,7 @@
                     src="https://s.gravatar.com/avatar/0e94d9d2f4c98aa745a1c33aa77446d7a3259a267418eddaaff3422affd5a7f2?s=80&amp;r=g"
                     alt="User Placeholder">
                 <div class="user-menu__caption" x-data="userComponent" x-init="fetchUser()">
-                    <span class="user-menu__role">Good Morning</span>
+                    <span class="user-menu__role">Good Afternoon</span>
                     <span class="user-menu__display-name" x-text="userName"></span>
                 </div>
                 <button class="user-menu__toggle" :aria-expanded="open" @click="open = ! open" aria-expanded="false">

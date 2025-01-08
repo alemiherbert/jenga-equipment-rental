@@ -1,5 +1,5 @@
 document.addEventListener('alpine:init', () => {
-    Alpine.data('equipmentForm', () => ({
+    Alpine.data('addEquipmentForm', () => ({
         equipment: {
             name: '',
             category: '',

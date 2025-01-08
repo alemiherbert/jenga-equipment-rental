@@ -252,37 +252,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         async editItem(item) {
-            const newName = prompt('Enter new name:', item.name);
-            const newPrice = prompt('Enter new price per day:', item.price_per_day);
-            const newStatus = prompt('Enter new status (available/rented):', item.status);
-
-            if (newName === null || newPrice === null || newStatus === null) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/equipment/${item.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: newName,
-                        price_per_day: parseFloat(newPrice),
-                        status: newStatus
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to update item');
-                }
-
-                this.fetchData();
-                alert('Item updated successfully');
-            } catch (error) {
-                console.error('Error updating item:', error);
-                alert('Failed to update item');
-            }
+            window.location.href = `/admin/equipment/edit/${item.id}`
         },
 
         get selectedItems() {

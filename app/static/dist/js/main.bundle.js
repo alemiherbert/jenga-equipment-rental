@@ -4466,7 +4466,7 @@ var module_default = src_default;
 /***/ (() => {
 
 document.addEventListener('alpine:init', function () {
-  Alpine.data('equipmentForm', function () {
+  Alpine.data('addEquipmentForm', function () {
     return {
       equipment: {
         name: '',
@@ -5836,56 +5836,16 @@ document.addEventListener('alpine:init', function () {
         }))();
       },
       editItem: function editItem(item) {
-        var _this7 = this;
         return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-          var newName, newPrice, newStatus, response;
           return _regeneratorRuntime().wrap(function _callee5$(_context5) {
             while (1) switch (_context5.prev = _context5.next) {
               case 0:
-                newName = prompt('Enter new name:', item.name);
-                newPrice = prompt('Enter new price per day:', item.price_per_day);
-                newStatus = prompt('Enter new status (available/rented):', item.status);
-                if (!(newName === null || newPrice === null || newStatus === null)) {
-                  _context5.next = 5;
-                  break;
-                }
-                return _context5.abrupt("return");
-              case 5:
-                _context5.prev = 5;
-                _context5.next = 8;
-                return fetch("/api/equipment/".concat(item.id), {
-                  method: 'PUT',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                    name: newName,
-                    price_per_day: parseFloat(newPrice),
-                    status: newStatus
-                  })
-                });
-              case 8:
-                response = _context5.sent;
-                if (response.ok) {
-                  _context5.next = 11;
-                  break;
-                }
-                throw new Error('Failed to update item');
-              case 11:
-                _this7.fetchData();
-                alert('Item updated successfully');
-                _context5.next = 19;
-                break;
-              case 15:
-                _context5.prev = 15;
-                _context5.t0 = _context5["catch"](5);
-                console.error('Error updating item:', _context5.t0);
-                alert('Failed to update item');
-              case 19:
+                window.location.href = "/admin/equipment/edit/".concat(item.id);
+              case 1:
               case "end":
                 return _context5.stop();
             }
-          }, _callee5, null, [[5, 15]]);
+          }, _callee5);
         }))();
       },
       get selectedItems() {
