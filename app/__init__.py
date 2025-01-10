@@ -1,10 +1,9 @@
 """
-Jenga Equipment Rental Service
----
-Jenga is a web application that allows people to rent out heavy machinery
+Jenga Equipment Rental API
 """
 
 from flask import Flask
+from flasgger import Swagger
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import select
 from flask_migrate import Migrate
@@ -15,6 +14,7 @@ from os import makedirs
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
+swagger = Swagger()
 
 
 def create_app(test_config=None) -> Flask:
@@ -24,6 +24,7 @@ def create_app(test_config=None) -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    swagger.init_app(app)
     makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     
     from app.models import User, TokenBlocklist
@@ -56,13 +57,9 @@ def create_app(test_config=None) -> Flask:
         return User.query.filter_by(id=identity).one_or_none()
 
     from app.api import api
-    from app.main import main
-    from app.admin import admin
     from flask import send_from_directory
     from os import path
     app.register_blueprint(api)
-    app.register_blueprint(main)
-    app.register_blueprint(admin)
     
     @app.route('/uploads/<filename>')
     def uploaded_file(filename):

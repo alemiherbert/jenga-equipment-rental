@@ -16,8 +16,38 @@ def login():
     """
     User login route.
 
-    Returns:
-        JSON response with access token or error message.
+    ---
+    tags:
+      - Authentication
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: "user@example.com"
+              password:
+                type: string
+                example: "password123"
+    responses:
+      200:
+        description: Successful login
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                refresh_token:
+                  type: string
+      400:
+        description: Missing JSON in request or missing email/password
+      401:
+        description: Invalid email or password
     """
     if not request.is_json:
         return error_response("Missing JSON in request", 400)
@@ -41,8 +71,55 @@ def register():
     """
     User registration route.
 
-    Returns:
-        JSON response with success message or error details.
+    ---
+    tags:
+      - Authentication
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "John Doe"
+              email:
+                type: string
+                example: "user@example.com"
+              phone:
+                type: string
+                example: "1234567890"
+              company:
+                type: string
+                example: "Example Inc."
+              password:
+                type: string
+                example: "password123"
+    responses:
+      201:
+        description: User registered successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                msg:
+                  type: string
+                  example: "User registered successfully"
+                tokens:
+                  type: object
+                  properties:
+                    access_token:
+                      type: string
+                    refresh_token:
+                      type: string
+      400:
+        description: Missing JSON in request or missing required fields
+      409:
+        description: Email already registered
+      500:
+        description: Error creating user
     """
     if not request.is_json:
         return error_response("Missing JSON in request", 400)
@@ -103,9 +180,23 @@ def register():
 def logout():
     """
     Logout user and revoke access token
-    
-    Returns:
-        JSON response indicating logout status
+
+    ---
+    tags:
+      - Authentication
+    responses:
+      200:
+        description: Successfully logged out
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                msg:
+                  type: string
+                  example: "Successfully logged out"
+      500:
+        description: Error during logout
     """
     try:
         jti = get_jwt()["jti"]
