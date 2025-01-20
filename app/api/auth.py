@@ -10,45 +10,56 @@ from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt
 import validators
 from datetime import datetime, timezone
+from flasgger import swag_from
 
 @api.route("/login", methods=["POST"])
+@swag_from({
+    'tags': ['Authentication'],
+    'description': 'Authenticate a user and return JWT tokens',
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'email': {'type': 'string', 'example': 'user@example.com'},
+                    'password': {'type': 'string', 'example': 'yourpassword'}
+                },
+                'required': ['email', 'password']
+            }
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Successfully authenticated',
+            'examples': {
+                'application/json': {
+                    'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                    'refresh_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                }
+            }
+        },
+        400: {
+            'description': 'Missing JSON or required fields',
+            'examples': {
+                'application/json': {
+                    'msg': 'Missing JSON in request'
+                }
+            }
+        },
+        401: {
+            'description': 'Invalid email or password',
+            'examples': {
+                'application/json': {
+                    'msg': 'Invalid email or password'
+                }
+            }
+        }
+    }
+})
 def login():
-    """
-    User login route.
-
-    ---
-    tags:
-      - Authentication
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              email:
-                type: string
-                example: "user@example.com"
-              password:
-                type: string
-                example: "password123"
-    responses:
-      200:
-        description: Successful login
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                access_token:
-                  type: string
-                refresh_token:
-                  type: string
-      400:
-        description: Missing JSON in request or missing email/password
-      401:
-        description: Invalid email or password
-    """
     if not request.is_json:
         return error_response("Missing JSON in request", 400)
 
@@ -67,60 +78,68 @@ def login():
 
 
 @api.route("/register", methods=["POST"])
+@swag_from({
+    'tags': ['Authentication'],
+    'description': 'Register a new user and return JWT tokens',
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string', 'example': 'John Doe'},
+                    'email': {'type': 'string', 'example': 'user@example.com'},
+                    'phone': {'type': 'string', 'example': '1234567890'},
+                    'company': {'type': 'string', 'example': 'Example Corp'},
+                    'password': {'type': 'string', 'example': 'yourpassword'}
+                },
+                'required': ['name', 'email', 'phone', 'company', 'password']
+            }
+        }
+    ],
+    'responses': {
+        201: {
+            'description': 'User registered successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'User registered successfully',
+                    'tokens': {
+                        'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                        'refresh_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                    }
+                }
+            }
+        },
+        400: {
+            'description': 'Missing JSON or required fields',
+            'examples': {
+                'application/json': {
+                    'msg': 'Missing required fields: name, email'
+                }
+            }
+        },
+        409: {
+            'description': 'Email already registered',
+            'examples': {
+                'application/json': {
+                    'msg': 'Email already registered'
+                }
+            }
+        },
+        500: {
+            'description': 'Error creating user',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error creating user',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def register():
-    """
-    User registration route.
-
-    ---
-    tags:
-      - Authentication
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                example: "John Doe"
-              email:
-                type: string
-                example: "user@example.com"
-              phone:
-                type: string
-                example: "1234567890"
-              company:
-                type: string
-                example: "Example Inc."
-              password:
-                type: string
-                example: "password123"
-    responses:
-      201:
-        description: User registered successfully
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                msg:
-                  type: string
-                  example: "User registered successfully"
-                tokens:
-                  type: object
-                  properties:
-                    access_token:
-                      type: string
-                    refresh_token:
-                      type: string
-      400:
-        description: Missing JSON in request or missing required fields
-      409:
-        description: Email already registered
-      500:
-        description: Error creating user
-    """
     if not request.is_json:
         return error_response("Missing JSON in request", 400)
 
@@ -177,27 +196,31 @@ def register():
 
 @api.route("/logout", methods=["DELETE"])
 @jwt_required()
+@swag_from({
+    'tags': ['Authentication'],
+    'description': 'Logout a user by revoking the JWT token',
+    'security': [{'BearerAuth': []}],
+    'responses': {
+        200: {
+            'description': 'Successfully logged out',
+            'examples': {
+                'application/json': {
+                    'msg': 'Successfully logged out'
+                }
+            }
+        },
+        500: {
+            'description': 'Error during logout',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error during logout',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def logout():
-    """
-    Logout user and revoke access token
-
-    ---
-    tags:
-      - Authentication
-    responses:
-      200:
-        description: Successfully logged out
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                msg:
-                  type: string
-                  example: "Successfully logged out"
-      500:
-        description: Error during logout
-    """
     try:
         jti = get_jwt()["jti"]
         now = datetime.now(timezone.utc)
