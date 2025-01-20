@@ -9,9 +9,99 @@ from flask import request, jsonify
 from flask_jwt_extended import jwt_required, current_user
 from sqlalchemy import select
 from datetime import datetime
+from flasgger import swag_from
+
 
 @api.route("/bookings", methods=["GET"])
 @jwt_required()
+@swag_from({
+    'tags': ['Bookings'],
+    'description': 'Get a paginated list of bookings',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'page',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Page number for pagination',
+            'default': 1
+        },
+        {
+            'name': 'per_page',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Number of items per page (max 100)',
+            'default': 10
+        },
+        {
+            'name': 'status',
+            'in': 'query',
+            'type': 'string',
+            'description': 'Filter bookings by status (e.g., PENDING, CONFIRMED, CANCELLED)'
+        },
+        {
+            'name': 'equipment_id',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Filter bookings by equipment ID'
+        },
+        {
+            'name': 'start_date',
+            'in': 'query',
+            'type': 'string',
+            'format': 'date',
+            'description': 'Filter bookings by start date (ISO format)'
+        },
+        {
+            'name': 'end_date',
+            'in': 'query',
+            'type': 'string',
+            'format': 'date',
+            'description': 'Filter bookings by end date (ISO format)'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Paginated list of bookings',
+            'examples': {
+                'application/json': {
+                    'items': [
+                        {
+                            'id': 1,
+                            'user_id': 1,
+                            'equipment_id': 1,
+                            'start_date': '2023-10-01T00:00:00',
+                            'end_date': '2023-10-05T00:00:00',
+                            'status': 'CONFIRMED'
+                        }
+                    ],
+                    'meta': {
+                        'page': 1,
+                        'per_page': 10,
+                        'total_pages': 5,
+                        'total_items': 50
+                    }
+                }
+            }
+        },
+        400: {
+            'description': 'Invalid status value or other validation errors',
+            'examples': {
+                'application/json': {
+                    'msg': 'Invalid status value'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        }
+    }
+})
 def get_booking_list():
     """Get paginated list of bookings"""
     page = request.args.get("page", 1, type=int)
@@ -49,6 +139,51 @@ def get_booking_list():
 
 @api.route("/bookings/<int:booking_id>", methods=["GET"])
 @jwt_required()
+@swag_from({
+    'tags': ['Bookings'],
+    'description': 'Get details of a specific booking',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'booking_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID of the booking to retrieve'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Booking details',
+            'examples': {
+                'application/json': {
+                    'id': 1,
+                    'user_id': 1,
+                    'equipment_id': 1,
+                    'start_date': '2023-10-01T00:00:00',
+                    'end_date': '2023-10-05T00:00:00',
+                    'status': 'CONFIRMED'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Booking not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Booking not found'
+                }
+            }
+        }
+    }
+})
 def get_booking(booking_id):
     """Get booking details"""
     booking = db.session.get(Booking, booking_id)
@@ -64,6 +199,89 @@ def get_booking(booking_id):
 
 @api.route("/bookings", methods=["POST"])
 @jwt_required()
+@swag_from({
+    'tags': ['Bookings'],
+    'description': 'Create new booking(s)',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'bookings': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'object',
+                            'properties': {
+                                'equipment_id': {'type': 'integer', 'example': 1},
+                                'start_date': {'type': 'string', 'format': 'date-time', 'example': '2023-10-01T00:00:00'},
+                                'end_date': {'type': 'string', 'format': 'date-time', 'example': '2023-10-05T00:00:00'},
+                                'distance_km': {'type': 'number', 'example': 50.0}
+                            },
+                            'required': ['equipment_id', 'start_date', 'end_date']
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    'responses': {
+        201: {
+            'description': 'Bookings created successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'Bookings created successfully',
+                    'bookings': [
+                        {
+                            'id': 1,
+                            'user_id': 1,
+                            'equipment_id': 1,
+                            'start_date': '2023-10-01T00:00:00',
+                            'end_date': '2023-10-05T00:00:00',
+                            'status': 'PENDING'
+                        }
+                    ]
+                }
+            }
+        },
+        400: {
+            'description': 'Missing required fields or invalid data',
+            'examples': {
+                'application/json': {
+                    'msg': 'Missing required fields: equipment_id, start_date, end_date'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Equipment not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Equipment not found'
+                }
+            }
+        },
+        500: {
+            'description': 'Error creating bookings',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error creating bookings',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def create_booking():
     """Create new booking(s)"""
     if not request.is_json:
@@ -131,8 +349,88 @@ def create_booking():
         db.session.rollback()
         return error_response(f"Error creating bookings: {str(e)}", 500)
 
+
 @api.route("/bookings/<int:booking_id>", methods=["PUT"])
 @jwt_required()
+@swag_from({
+    'tags': ['Bookings'],
+    'description': 'Update booking details',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'booking_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID of the booking to update'
+        },
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'start_date': {'type': 'string', 'format': 'date-time', 'example': '2023-10-01T00:00:00'},
+                    'end_date': {'type': 'string', 'format': 'date-time', 'example': '2023-10-05T00:00:00'},
+                    'distance_km': {'type': 'number', 'example': 50.0},
+                    'status': {'type': 'string', 'example': 'CONFIRMED'}
+                }
+            }
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Booking updated successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'Booking updated successfully',
+                    'booking': {
+                        'id': 1,
+                        'user_id': 1,
+                        'equipment_id': 1,
+                        'start_date': '2023-10-01T00:00:00',
+                        'end_date': '2023-10-05T00:00:00',
+                        'status': 'CONFIRMED'
+                    }
+                }
+            }
+        },
+        400: {
+            'description': 'Invalid status transition or other validation errors',
+            'examples': {
+                'application/json': {
+                    'msg': 'Invalid status transition'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Booking not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Booking not found'
+                }
+            }
+        },
+        500: {
+            'description': 'Error updating booking',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error updating booking',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def update_booking(booking_id):
     """Update booking details"""
     if not request.is_json:
@@ -207,6 +505,63 @@ def update_booking(booking_id):
 
 @api.route("/bookings/<int:booking_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from({
+    'tags': ['Bookings'],
+    'description': 'Delete a booking',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'booking_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID of the booking to delete'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Booking deleted successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'Booking deleted successfully'
+                }
+            }
+        },
+        400: {
+            'description': 'Booking cannot be deleted in current status',
+            'examples': {
+                'application/json': {
+                    'msg': 'Booking cannot be deleted in current status'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Booking not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Booking not found'
+                }
+            }
+        },
+        500: {
+            'description': 'Error deleting booking',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error deleting booking',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def delete_booking(booking_id):
     """Delete booking"""
     booking = db.session.get(Booking, booking_id)
@@ -232,4 +587,3 @@ def delete_booking(booking_id):
     except Exception as e:
         db.session.rollback()
         return error_response(f"Error deleting booking: {str(e)}", 500)
-

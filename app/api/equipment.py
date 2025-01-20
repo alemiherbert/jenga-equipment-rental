@@ -12,6 +12,7 @@ from flask_jwt_extended import jwt_required, current_user
 from sqlalchemy import select
 from werkzeug.utils import secure_filename
 import os
+from flasgger import swag_from
 
 # Todo: Delegate this to a CRON job
 def update_all_featured_status():
@@ -23,6 +24,63 @@ def update_all_featured_status():
 
 
 @api.route("/equipment", methods=["GET"])
+@swag_from({
+    'tags': ['Equipment'],
+    'description': 'Get a paginated list of equipment',
+    'parameters': [
+        {
+            'name': 'page',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Page number for pagination',
+            'default': 1
+        },
+        {
+            'name': 'per_page',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Number of items per page (max 100)',
+            'default': 12
+        },
+        {
+            'name': 'search',
+            'in': 'query',
+            'type': 'string',
+            'description': 'Search term to filter equipment by name'
+        },
+        {
+            'name': 'location',
+            'in': 'query',
+            'type': 'string',
+            'description': 'Filter equipment by location name'
+        },
+        {
+            'name': 'category',
+            'in': 'query',
+            'type': 'string',
+            'description': 'Filter equipment by category'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Paginated list of equipment',
+            'examples': {
+                'application/json': {
+                    'items': [
+                        {'id': 1, 'name': 'Excavator', 'category': 'Heavy Machinery', 'price_per_day': 500.0},
+                        {'id': 2, 'name': 'Crane', 'category': 'Heavy Machinery', 'price_per_day': 700.0}
+                    ],
+                    'meta': {
+                        'page': 1,
+                        'per_page': 12,
+                        'total_pages': 5,
+                        'total_items': 60
+                    }
+                }
+            }
+        }
+    }
+})
 def get_equipment_list():
     """Get paginated list of equipment"""
     page = request.args.get("page", 1, type=int)
@@ -49,6 +107,23 @@ def get_equipment_list():
 
 
 @api.route("/equipment/featured", methods=["GET"])
+@swag_from({
+    'tags': ['Equipment'],
+    'description': 'Get a list of featured equipment',
+    'responses': {
+        200: {
+            'description': 'List of featured equipment',
+            'examples': {
+                'application/json': {
+                    'featured_equipment': [
+                        {'id': 1, 'name': 'Excavator', 'category': 'Heavy Machinery', 'price_per_day': 500.0},
+                        {'id': 2, 'name': 'Crane', 'category': 'Heavy Machinery', 'price_per_day': 700.0}
+                    ]
+                }
+            }
+        }
+    }
+})
 def get_featured_equipment():
     """Get a list of featured equipment."""
     query = select(Equipment).where(Equipment.featured == True)
@@ -58,8 +133,44 @@ def get_featured_equipment():
     }), 200
 
 
-
 @api.route("/equipment/<int:equipment_id>", methods=["GET"])
+@swag_from({
+    'tags': ['Equipment'],
+    'description': 'Get details of a specific equipment',
+    'parameters': [
+        {
+            'name': 'equipment_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID of the equipment to retrieve'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Equipment details',
+            'examples': {
+                'application/json': {
+                    'id': 1,
+                    'name': 'Excavator',
+                    'category': 'Heavy Machinery',
+                    'price_per_day': 500.0,
+                    'transport_cost_per_km': 50.0,
+                    'location_id': 1,
+                    'image': 'excavator_1.jpg'
+                }
+            }
+        },
+        404: {
+            'description': 'Equipment not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Equipment not found'
+                }
+            }
+        }
+    }
+})
 def get_equipment(equipment_id):
     """Get equipment details"""
     equipment = db.session.get(Equipment, equipment_id)
@@ -71,6 +182,74 @@ def get_equipment(equipment_id):
 
 @api.route("/equipment", methods=["POST"])
 @jwt_required()
+@swag_from({
+    'tags': ['Equipment'],
+    'description': 'Create new equipment',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string', 'example': 'Excavator'},
+                    'category': {'type': 'string', 'example': 'Heavy Machinery'},
+                    'price_per_day': {'type': 'number', 'example': 500.0},
+                    'transport_cost_per_km': {'type': 'number', 'example': 50.0},
+                    'location_id': {'type': 'integer', 'example': 1},
+                    'image': {'type': 'string', 'format': 'binary', 'description': 'Image file'}
+                },
+                'required': ['name', 'category', 'location_id']
+            }
+        }
+    ],
+    'responses': {
+        201: {
+            'description': 'Equipment created successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'Equipment created successfully',
+                    'equipment': {
+                        'id': 1,
+                        'name': 'Excavator',
+                        'category': 'Heavy Machinery',
+                        'price_per_day': 500.0,
+                        'transport_cost_per_km': 50.0,
+                        'location_id': 1,
+                        'image': 'excavator_1.jpg'
+                    }
+                }
+            }
+        },
+        400: {
+            'description': 'Missing form data or required fields',
+            'examples': {
+                'application/json': {
+                    'msg': 'Missing required fields: name, category, location_id'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        500: {
+            'description': 'Error creating equipment',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error creating equipment',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def create_equipment():
     """Create new equipment"""
     if current_user.role != "admin":
@@ -138,6 +317,89 @@ def create_equipment():
 
 @api.route("/equipment/<int:equipment_id>", methods=["PUT"])
 @jwt_required()
+@swag_from({
+    'tags': ['Equipment'],
+    'description': 'Update equipment details',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'equipment_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID of the equipment to update'
+        },
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string', 'example': 'Excavator'},
+                    'category': {'type': 'string', 'example': 'Heavy Machinery'},
+                    'price_per_day': {'type': 'number', 'example': 500.0},
+                    'transport_cost_per_km': {'type': 'number', 'example': 50.0},
+                    'location_id': {'type': 'integer', 'example': 1},
+                    'image': {'type': 'string', 'format': 'binary', 'description': 'Image file'}
+                },
+                'required': ['name', 'category', 'location_id']
+            }
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Equipment updated successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'Equipment updated successfully',
+                    'equipment': {
+                        'id': 1,
+                        'name': 'Excavator',
+                        'category': 'Heavy Machinery',
+                        'price_per_day': 500.0,
+                        'transport_cost_per_km': 50.0,
+                        'location_id': 1,
+                        'image': 'excavator_1.jpg'
+                    }
+                }
+            }
+        },
+        400: {
+            'description': 'Missing form data or required fields',
+            'examples': {
+                'application/json': {
+                    'msg': 'Missing required fields: name, category, location_id'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Equipment not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Equipment not found'
+                }
+            }
+        },
+        500: {
+            'description': 'Error updating equipment',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error updating equipment',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def update_equipment(equipment_id):
     """Update equipment details"""
     if current_user.role != "admin":
@@ -200,6 +462,55 @@ def update_equipment(equipment_id):
 
 @api.route("/equipment/<int:equipment_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from({
+    'tags': ['Equipment'],
+    'description': 'Delete equipment',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'equipment_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID of the equipment to delete'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Equipment deleted successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'Equipment deleted successfully'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Equipment not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Equipment not found'
+                }
+            }
+        },
+        500: {
+            'description': 'Error deleting equipment',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error deleting equipment',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def delete_equipment(equipment_id):
     """Delete equipment"""
     if current_user.role != "admin":
