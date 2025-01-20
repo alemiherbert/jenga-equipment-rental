@@ -11,14 +11,115 @@ from sqlalchemy import select
 from datetime import datetime
 from werkzeug.exceptions import HTTPException
 import requests
+from flasgger import swag_from
 
 
 # PESA Pay API configuration
 PESA_PAY_API_URL = "http://localhost:8000/v1/payments"
 PESA_PAY_API_KEY = "sk_test_123"
 
+
 @api.route("/payments", methods=["GET"])
 @jwt_required()
+@swag_from({
+    'tags': ['Payments'],
+    'description': 'Get a paginated list of payments',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'page',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Page number for pagination',
+            'default': 1
+        },
+        {
+            'name': 'per_page',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Number of items per page (max 100)',
+            'default': 10
+        },
+        {
+            'name': 'status',
+            'in': 'query',
+            'type': 'string',
+            'description': 'Filter payments by status (e.g., PENDING, SUCCESS, FAILED)'
+        },
+        {
+            'name': 'booking_id',
+            'in': 'query',
+            'type': 'integer',
+            'description': 'Filter payments by booking ID'
+        },
+        {
+            'name': 'min_amount',
+            'in': 'query',
+            'type': 'number',
+            'description': 'Filter payments by minimum amount'
+        },
+        {
+            'name': 'max_amount',
+            'in': 'query',
+            'type': 'number',
+            'description': 'Filter payments by maximum amount'
+        },
+        {
+            'name': 'start_date',
+            'in': 'query',
+            'type': 'string',
+            'format': 'date-time',
+            'description': 'Filter payments by start date (ISO format)'
+        },
+        {
+            'name': 'end_date',
+            'in': 'query',
+            'type': 'string',
+            'format': 'date-time',
+            'description': 'Filter payments by end date (ISO format)'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Paginated list of payments',
+            'examples': {
+                'application/json': {
+                    'items': [
+                        {
+                            'id': 1,
+                            'user_id': 1,
+                            'total_amount': 500.0,
+                            'currency': 'UGX',
+                            'status': 'SUCCESS'
+                        }
+                    ],
+                    'meta': {
+                        'page': 1,
+                        'per_page': 10,
+                        'total_pages': 5,
+                        'total_items': 50
+                    }
+                }
+            }
+        },
+        400: {
+            'description': 'Invalid status value or other validation errors',
+            'examples': {
+                'application/json': {
+                    'msg': 'Invalid status value'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        }
+    }
+})
 def get_payment_list():
     """Get paginated list of payments"""
     page = request.args.get("page", 1, type=int)
@@ -62,6 +163,50 @@ def get_payment_list():
 
 @api.route("/payments/<int:payment_id>", methods=["GET"])
 @jwt_required()
+@swag_from({
+    'tags': ['Payments'],
+    'description': 'Get details of a specific payment',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'payment_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID of the payment to retrieve'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Payment details',
+            'examples': {
+                'application/json': {
+                    'id': 1,
+                    'user_id': 1,
+                    'total_amount': 500.0,
+                    'currency': 'UGX',
+                    'status': 'SUCCESS'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Payment not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Payment not found'
+                }
+            }
+        }
+    }
+})
 def get_payment(payment_id):
     """Get payment details"""
     payment = db.session.get(Payment, payment_id)
@@ -77,6 +222,104 @@ def get_payment(payment_id):
 
 @api.route("/payments", methods=["POST"])
 @jwt_required()
+@swag_from({
+    'tags': ['Payments'],
+    'description': 'Create a new payment',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'booking_ids': {
+                        'type': 'array',
+                        'items': {'type': 'integer'},
+                        'example': [1, 2],
+                        'description': 'List of booking IDs to pay for'
+                    },
+                    'total_amount': {
+                        'type': 'number',
+                        'example': 500.0,
+                        'description': 'Total amount to pay'
+                    },
+                    'billing': {
+                        'type': 'object',
+                        'properties': {
+                            'name': {'type': 'string', 'example': 'John Doe'},
+                            'email': {'type': 'string', 'example': 'john@example.com'},
+                            'phone': {'type': 'string', 'example': '+256700000000'}
+                        },
+                        'required': ['name', 'email', 'phone']
+                    },
+                    'card_details': {
+                        'type': 'object',
+                        'properties': {
+                            'number': {'type': 'string', 'example': '4242424242424242'},
+                            'exp_month': {'type': 'integer', 'example': 12},
+                            'exp_year': {'type': 'integer', 'example': 2025},
+                            'cvc': {'type': 'string', 'example': '123'}
+                        },
+                        'required': ['number', 'exp_month', 'exp_year', 'cvc']
+                    }
+                },
+                'required': ['booking_ids', 'total_amount', 'billing', 'card_details']
+            }
+        }
+    ],
+    'responses': {
+        201: {
+            'description': 'Payment created successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'Payment created successfully',
+                    'payment': {
+                        'id': 1,
+                        'user_id': 1,
+                        'total_amount': 500.0,
+                        'currency': 'UGX',
+                        'status': 'SUCCESS'
+                    }
+                }
+            }
+        },
+        400: {
+            'description': 'Missing required fields or invalid data',
+            'examples': {
+                'application/json': {
+                    'msg': 'Missing required fields: booking_ids, total_amount, billing, card_details'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Booking not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Booking not found'
+                }
+            }
+        },
+        500: {
+            'description': 'Error creating payment',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error creating payment',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def create_payment():
     """Create new payment"""
     if not request.is_json:
@@ -156,6 +399,83 @@ def create_payment():
 
 @api.route("/payments/<int:payment_id>", methods=["PUT"])
 @jwt_required()
+@swag_from({
+    'tags': ['Payments'],
+    'description': 'Update payment details',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'payment_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID of the payment to update'
+        },
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'status': {'type': 'string', 'example': 'SUCCESS'},
+                    'stripe_payment_intent_id': {'type': 'string', 'example': 'pi_123'},
+                    'stripe_payment_method_id': {'type': 'string', 'example': 'pm_123'}
+                }
+            }
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Payment updated successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'Payment updated successfully',
+                    'payment': {
+                        'id': 1,
+                        'user_id': 1,
+                        'total_amount': 500.0,
+                        'currency': 'UGX',
+                        'status': 'SUCCESS'
+                    }
+                }
+            }
+        },
+        400: {
+            'description': 'Invalid status value or other validation errors',
+            'examples': {
+                'application/json': {
+                    'msg': 'Invalid status value'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Payment not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Payment not found'
+                }
+            }
+        },
+        500: {
+            'description': 'Error updating payment',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error updating payment',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def update_payment(payment_id):
     """Update payment details"""
     if not request.is_json:
@@ -196,6 +516,63 @@ def update_payment(payment_id):
 
 @api.route("/payments/<int:payment_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from({
+    'tags': ['Payments'],
+    'description': 'Delete a payment',
+    'security': [{'BearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'payment_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'ID of the payment to delete'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Payment deleted successfully',
+            'examples': {
+                'application/json': {
+                    'msg': 'Payment deleted successfully'
+                }
+            }
+        },
+        400: {
+            'description': 'Payment cannot be deleted in current status',
+            'examples': {
+                'application/json': {
+                    'msg': 'Payment cannot be deleted in current status'
+                }
+            }
+        },
+        403: {
+            'description': 'Unauthorized access',
+            'examples': {
+                'application/json': {
+                    'msg': 'Unauthorized access'
+                }
+            }
+        },
+        404: {
+            'description': 'Payment not found',
+            'examples': {
+                'application/json': {
+                    'msg': 'Payment not found'
+                }
+            }
+        },
+        500: {
+            'description': 'Error deleting payment',
+            'examples': {
+                'application/json': {
+                    'msg': 'Error deleting payment',
+                    'error': 'Some error message'
+                }
+            }
+        }
+    }
+})
 def delete_payment(payment_id):
     """Delete payment"""
     if current_user.role != "admin":
