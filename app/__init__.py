@@ -2,20 +2,19 @@
 Jenga Equipment Rental API
 """
 
-from flask import Flask
+from flask import Flask, jsonify, send_from_directory
 from flasgger import Swagger
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import select
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from config import Config
-from os import makedirs
+from os import makedirs, path
 
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
 swagger = Swagger()
-
 
 def create_app(test_config=None) -> Flask:
     app = Flask(__name__)
@@ -57,13 +56,41 @@ def create_app(test_config=None) -> Flask:
         return User.query.filter_by(id=identity).one_or_none()
 
     from app.api import api
-    from flask import send_from_directory
-    from os import path
     app.register_blueprint(api)
     
     @app.route('/uploads/<filename>')
     def uploaded_file(filename):
         upload_dir = path.abspath(app.config['UPLOAD_FOLDER'])
         return send_from_directory(upload_dir, filename)
+
+    # Error handlers
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({"error": "Bad request", "message": str(error)}), 400
+
+    @app.errorhandler(401)
+    def unauthorized(error):
+        return jsonify({"error": "Unauthorized", "message": "Authentication is required to access this resource."}), 401
+
+    @app.errorhandler(403)
+    def forbidden(error):
+        return jsonify({"error": "Forbidden", "message": "You do not have permission to access this resource."}), 403
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({"error": "Not found", "message": "The requested resource was not found."}), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return jsonify({"error": "Internal server error", "message": "An unexpected error occurred."}), 500
+
+    @app.errorhandler(Exception)
+    def handle_exception(error):
+        # Pass through HTTP errors
+        if hasattr(error, 'code'):
+            return error
+        # Now you're handling non-HTTP exceptions only
+        app.logger.error(f"Unexpected error: {error}")
+        return jsonify({"error": "Internal server error", "message": "An unexpected error occurred."}), 500
 
     return app
