@@ -95,9 +95,8 @@ class TestEquipmentRoutes:
             data=json.dumps(update_data)
         )
         
-        # assert response.status_code == 200
+        assert response.status_code == 200
         data = json.loads(response.data)
-        print(data)
         assert data["equipment"]["name"] == update_data["name"]
         assert data["equipment"]["status"] == update_data["status"]
 

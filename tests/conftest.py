@@ -1,6 +1,6 @@
 import pytest
 from app import create_app, db
-from app.models import User, Equipment, Role
+from app.models import User, Equipment
 
 
 @pytest.fixture(scope='session')
@@ -28,24 +28,14 @@ def session(app):
 
 
 @pytest.fixture(scope="function")
-def admin_role(app):
-    """Create admin role"""
-    role = Role(name="admin")
-    db.session.add(role)
-    db.session.commit()
-    db.session.refresh(role)
-    return role
-
-
-@pytest.fixture(scope="function")
-def admin_user(app, admin_role):
+def admin_user(app):
     """Create admin user"""
     user = User(
         name="Admin User",
         email="admin@example.com",
         phone="0712345678",
         company="Admin Corp",
-        role=admin_role,
+        role="admin",
         status=User.Status.ACTIVE
     )
     user.set_password("adminpass123")

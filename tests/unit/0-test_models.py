@@ -5,7 +5,7 @@ Tests for database models
 import pytest
 from datetime import datetime, timedelta, timezone
 from app import db
-from app.models import User, Role, Equipment, Location, Booking, Payment
+from app.models import User, Equipment, Location, Booking, Payment
 
 
 @pytest.fixture
@@ -19,15 +19,6 @@ def app():
         yield app
         db.session.remove()
         db.drop_all()
-
-
-@pytest.fixture
-def test_role(app):
-    """Create a test role."""
-    role = Role(name="customer")
-    db.session.add(role)
-    db.session.commit()
-    return role
 
 
 @pytest.fixture
@@ -46,14 +37,13 @@ def test_location(app):
 
 
 @pytest.fixture
-def test_user(app, test_role, test_location):
+def test_user(app, test_location):
     """Create a test user."""
     user = User(
         name="Alemi Herbert",
         email="alemiherbert@example.com",
         phone="0772345678",
         company="Alemi Consulting",
-        role=test_role,
         location=test_location,
         status=User.Status.ACTIVE
     )
@@ -138,10 +128,6 @@ class TestUserModel:
         assert test_user.phone == "0772345678"
         assert test_user.status == User.Status.ACTIVE
 
-    def test_user_role_relationship(self, test_user, test_role):
-        """Test user-role relationship."""
-        assert test_user.role == test_role
-        assert test_user in test_role.users
 
     def test_user_location_relationship(self, test_user, test_location):
         """Test user-location relationship."""
