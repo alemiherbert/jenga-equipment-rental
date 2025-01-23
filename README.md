@@ -1,6 +1,8 @@
 # Jenga Equipment Rental
 An construction equipment rental service built in python (flask)
 
+Its live here: https://charis.systems/apidocs
+
 ## Team
 - Alemi Herbert <alemiherbert@gmail.com>
 
@@ -17,6 +19,19 @@ cd jenga-equipment-rental
 ### Install the dependencies (in a virtual envirionment of course)
 ```(bash)
 pip3 install -r requirements.txt
+```
+### Setting Up the database
+If you have MySQL installed, you can just uncomment this line in `.flaskenv` with your credentials.
+```
+# DATABASE_URL=mysql+pymysql://<db-name>:<db-password>@localhost/<table-name>
+```
+Otherwise you will be using sqlite.
+
+Then run the migrations
+```(bash)
+flask db init
+flask db migrate -m "Initial migrations"
+flask db upgrade
 ```
 ### Run the app
 ```
