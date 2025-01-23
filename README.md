@@ -18,7 +18,9 @@ cd jenga-equipment-rental
 ```
 ### Install the dependencies (in a virtual envirionment of course)
 ```(bash)
-pip3 install -r requirements.txt
+virtualenv venv
+source venv/bin/activate
+(venv) pip3 install -r requirements.txt
 ```
 ### Setting Up the database
 If you have MySQL installed, you can just uncomment this line in `.flaskenv` with your credentials.
@@ -29,17 +31,21 @@ Otherwise you will be using sqlite.
 
 Then run the migrations
 ```(bash)
-flask db init
-flask db migrate -m "Initial migrations"
-flask db upgrade
+(venv) flask db init
+(venv) flask db migrate -m "Initial migrations"
+(venv) flask db upgrade
 ```
 
-### Run the app
+### Run the app server
 ```
-flask run
+(venv) gunicorn --bind localhost:8000 -w 4 wsgi:app
 ```
+### Using a Web Server
+You can install NGINX, Apache or whaterver webserver you prefer to serve the application. For https://charis.systems/apidocs where this api lives, I used NGINX
+
+
 ## Mock Payments API
-I created a mock API (PesaPay) for payments (an older project), so you need to install that too to have payments functionality.
+I created a mock API (PesaPay) for payments (an older, separate project), so you need to install that too to have payments functionality.
 ```(bash)
 git clone https://github.com/alemiherbert/pesa-pay.git
 ```
