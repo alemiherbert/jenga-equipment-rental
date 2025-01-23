@@ -109,6 +109,9 @@ uploaded_file               GET      /uploads/<filename>
 
 ## Tech Stack Used
 - Flask (With SQLAlchemy ORM, and flask-jwt-extended for authenntification)
+- Gunicorn as application server
+- MySQL
+- NGINX as a reverse proxy
 
 ## Featured Equipment
 `Equipment` implements a simple scoring algorithm that weighs multiple criteria to decide wether an equipment should be featured on the featured section of the website.
