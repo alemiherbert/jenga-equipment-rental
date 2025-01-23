@@ -33,12 +33,13 @@ flask db init
 flask db migrate -m "Initial migrations"
 flask db upgrade
 ```
+
 ### Run the app
 ```
 flask run
 ```
 ## Mock Payments API
-I created a mock API (PesaPay) for payments, so you need to install that too. Not a part of the project though
+I created a mock API (PesaPay) for payments (an older project), so you need to install that too to have payments functionality. Not a part of the project though.
 ```(bash)
 git clone https://github.com/alemiherbert/pesa-pay.git
 ```
@@ -52,7 +53,7 @@ python3 app.py
 ```
 Lets add some equipment, then you are good to go!
 ## Seeding the database.
-Open the flask shell
+Open the flask shell (another terminal)
 ```(bash)
 flask shell
 ```
@@ -101,22 +102,13 @@ api.update_equipment        PUT      /api/equipment/<int:equipment_id>
 api.update_location         PUT      /api/locations/<int:location_id>
 api.update_payment          PUT      /api/payments/<int:payment_id>
 api.update_user             PUT      /api/users/<int:user_id>
-main.cart                   GET      /cart
-main.checkout               GET      /checkout
-main.get_equipment          GET      /equipment/<int:equipment_id>
-main.get_equipment_list     GET      /equipment/all
-main.get_equipment_list     GET      /equipment
-main.index                  GET      /
-main.reset_password         GET      /password-reset
-main.signin                 GET      /signin
-main.signup                 GET      /signup
+
 static                      GET      /static/<path:filename>
 uploaded_file               GET      /uploads/<filename>
 ```
 
 ## Tech Stack Used
 - Flask (With SQLAlchemy ORM, and flask-jwt-extended for authenntification)
-- SpruceCSS, AlpineJS bundled with webpack for the frontend
 
 ## Featured Equipment
 `Equipment` implements a simple scoring algorithm that weighs multiple criteria to decide wether an equipment should be featured on the featured section of the website.
