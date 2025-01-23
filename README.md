@@ -39,7 +39,7 @@ flask db upgrade
 flask run
 ```
 ## Mock Payments API
-I created a mock API (PesaPay) for payments (an older project), so you need to install that too to have payments functionality. Not a part of the project though.
+I created a mock API (PesaPay) for payments (an older project), so you need to install that too to have payments functionality.
 ```(bash)
 git clone https://github.com/alemiherbert/pesa-pay.git
 ```
