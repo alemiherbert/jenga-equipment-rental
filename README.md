@@ -67,13 +67,6 @@ This also creates a default admin user for your testing, with email as `admin@ex
 ```
 Endpoint                    Methods  Rule
 --------------------------  -------  ----------------------------------------
-admin.add_equipment         GET      /admin/equipment/add
-admin.dashboard             GET      /admin/dashboard
-admin.edit_equipment        GET      /admin/equipment/edit/<int:equipment_id>
-admin.get_Users_list        GET      /admin/users
-admin.get_bookings_list     GET      /admin/bookings
-admin.get_equipment_list    GET      /admin/equipment
-admin.get_payments_list     GET      /admin/payments
 api.create_booking          POST     /api/bookings
 api.create_equipment        POST     /api/equipment
 api.create_location         POST     /api/locations
